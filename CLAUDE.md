@@ -66,8 +66,8 @@ c'est la promesse qu'il faut corriger, pas l'habillage.
 - **Rendu** : statique par défaut (SSG). Ne passer en SSR/hybrid que si une fonctionnalité l'exige explicitement
 - **Styling** : CSS natif / Astro scoped styles
 - **Gestionnaire de paquets** : npm
-- **Domaine** : `serrurier-meaux.fr`, forme canonique sans `www`
-- **Hébergement** : **à confirmer** — voir `DEPLOIEMENT.md`
+- **Domaine** : `serrurier-meaux.fr`, forme canonique sans `www`, acheté chez Internet.bs
+- **Hébergement** : o2switch, **en domaine additionnel sur le compte qui sert déjà Lyon**
 
 ## Commandes courantes
 
@@ -366,10 +366,6 @@ Réglé :
 
 En attente — **ne rien inventer pour combler ces trous** :
 
-- [ ] **Hébergeur** — `site.legal.host` nomme o2switch, repris du site de Lyon. À confirmer : si
-      l'hébergement est ailleurs, les mentions légales sont fausses, et la politique de
-      confidentialité aussi (elle affirme que les journaux ne quittent pas l'UE). Voir
-      `DEPLOIEMENT.md`.
 - [ ] **Jeton Search Console** — la propriété `serrurier-meaux.fr` reste à créer.
 - [ ] **Assurance décennale** — souscription confirmée par Rayane le 05/10/2026 et annoncée sur le
       site (`credentials.decennale`). Manquent **l'assureur, le n° de contrat et la couverture

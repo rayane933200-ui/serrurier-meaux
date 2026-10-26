@@ -182,22 +182,18 @@ export const site = {
     addressCity: 'Les Pavillons-sous-Bois',
     publisher: 'Rayane IDRIS',
 
-    // Hébergeur — REPRIS DU SITE DE LYON, À CONFIRMER AVANT MISE EN LIGNE.
+    // Hébergeur — o2switch, CONFIRMÉ par Rayane le 26 octobre 2026 :
+    // serrurier-meaux.fr est hébergé en domaine additionnel sur le compte qui
+    // sert déjà serrurier-lyon-7j7.fr. Coordonnées relevées sur leurs
+    // conditions générales de vente, pas reconstituées de mémoire.
     //
-    // Les coordonnées ci-dessous sont celles d'o2switch, relevées sur leurs
-    // conditions générales de vente. Elles sont justes pour le site de Lyon.
-    // Pour celui de Meaux, elles ne le seront que si serrurier-meaux.fr est
-    // effectivement servi par o2switch — ce qui est probable (domaine
-    // additionnel sur le compte existant) mais pas établi.
+    // Les mentions légales sont opposables : si l'hébergement devait changer,
+    // ce bloc doit suivre le jour même. Nommer un hébergeur qui n'héberge pas
+    // le site est une information fausse sur une page qui engage.
     //
-    // Les mentions légales sont opposables : nommer un hébergeur qui n'héberge
-    // pas le site est une information fausse publiée sur une page qui engage.
-    // Si l'hébergement est ailleurs, remplacer ce bloc par les coordonnées
-    // relevées sur les CGV du prestataire réel, pas de mémoire.
-    //
-    // La politique de confidentialité dépend aussi de ce choix : elle affirme
-    // que les journaux serveur ne quittent pas l'Union européenne, ce qui est
-    // vrai d'o2switch (Clermont-Ferrand) et faux d'un hébergeur hors UE.
+    // La politique de confidentialité en dépend aussi : elle affirme que les
+    // journaux serveur ne quittent pas l'Union européenne, ce qui est vrai
+    // d'o2switch (Clermont-Ferrand) et serait faux d'un hébergeur hors UE.
     host: {
       name: 'o2switch, SAS au capital de 100 000 €',
       address: 'Chemin des Pardiaux, 63000 Clermont-Ferrand, France',

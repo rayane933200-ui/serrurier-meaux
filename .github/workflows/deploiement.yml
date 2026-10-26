@@ -1,24 +1,25 @@
 # Construit le site de Meaux et l'envoie sur l'hébergement à chaque
 # `git push` sur main.
 #
-# ATTENTION — ce fichier est repris du dépôt de Lyon et n'est PAS prêt :
+# Les deux sites partagent le MÊME compte o2switch (confirmé par Rayane le
+# 26 octobre 2026) : mêmes identifiants FTP, mais deux dossiers distincts.
+# serrurier-meaux.fr y est un domaine additionnel.
 #
-#   · Les secrets ci-dessous doivent être ceux du compte qui sert
-#     serrurier-meaux.fr. Reprendre ceux de Lyon publierait ce site par-dessus
-#     l'autre, sans le moindre avertissement.
-#   · `server-dir:` plus bas vaut `public_html/`, qui est la racine du domaine
-#     PRINCIPAL d'un compte o2switch. Si serrurier-meaux.fr est ajouté comme
-#     domaine additionnel, son dossier est différent — cPanel l'indique au
-#     moment de l'ajout. Voir DEPLOIEMENT.md.
+# C'est ce partage qui rend ce fichier délicat : les bons identifiants donnent
+# accès aux DEUX sites. Le seul rempart est `DOSSIER_SITE` plus bas, et le
+# garde-fou qui le contrôle avant l'envoi.
 #
 # Les identifiants ne sont PAS dans ce fichier. Ils vivent dans les secrets du
 # dépôt (Settings → Secrets and variables → Actions), où ni le code, ni les
 # journaux d'exécution, ni personne d'autre que le propriétaire du dépôt ne
 # peut les lire. GitHub masque automatiquement leur valeur dans les journaux.
 #
-#   FTP_SERVEUR     à renseigner
-#   FTP_UTILISATEUR à renseigner
-#   FTP_MOTDEPASSE  à renseigner
+# Ce dépôt a ses propres secrets, à saisir une fois — ceux de Lyon ne sont pas
+# partagés entre dépôts, même pour un compte identique :
+#
+#   FTP_SERVEUR     pantoufles.o2switch.net
+#   FTP_UTILISATEUR jutu8080
+#   FTP_MOTDEPASSE  le mot de passe cPanel du compte
 
 name: Déploiement serrurier-meaux.fr
 
@@ -34,6 +35,21 @@ on:
 concurrency:
   group: deploiement-meaux
   cancel-in-progress: true
+
+# Dossier du site sur le serveur, déclaré UNE fois pour que le garde-fou plus
+# bas puisse le contrôler.
+#
+# serrurier-meaux.fr est un domaine ADDITIONNEL du compte o2switch : sa racine
+# est un sous-dossier, PAS `public_html/`. `public_html/` est la racine du
+# domaine principal du compte, c'est-à-dire serrurier-lyon-7j7.fr.
+#
+# Ce n'est pas un détail de confort. L'action d'envoi synchronise : elle
+# supprime sur le serveur ce qui n'est pas dans `dist/`. Pointée sur
+# `public_html/`, elle remplacerait le site de Lyon par celui de Meaux et
+# effacerait la différence. Les deux sites ont les mêmes noms de fichiers,
+# donc rien ne protégerait quoi que ce soit.
+env:
+  DOSSIER_SITE: public_html/serrurier-meaux.fr/
 
 jobs:
   publier:
@@ -110,6 +126,27 @@ jobs:
             exit 1
           fi
 
+      # Garde-fou : refuser de partir sur la racine du compte.
+      #
+      # Le compte o2switch sert DEUX sites. `public_html/` appartient à Lyon.
+      # Un envoi synchronisé à cet endroit écraserait un site en production,
+      # et l'action supprime ce qu'elle ne retrouve pas : il ne resterait rien
+      # à restaurer côté serveur.
+      #
+      # Ce contrôle existe parce que la valeur a réellement été `public_html/`
+      # dans ce fichier, reprise telle quelle du dépôt de Lyon.
+      - name: Vérifier le dossier de destination
+        run: |
+          if [ "$DOSSIER_SITE" = "public_html/" ] || [ "$DOSSIER_SITE" = "public_html" ]; then
+            echo "::error::DOSSIER_SITE vaut '$DOSSIER_SITE', la racine du compte — c'est le site de Lyon. Publication annulée."
+            exit 1
+          fi
+          case "$DOSSIER_SITE" in
+            */) ;;
+            *) echo "::error::DOSSIER_SITE doit se terminer par un slash."; exit 1 ;;
+          esac
+          echo "Destination : $DOSSIER_SITE"
+
       - name: Envoyer sur l'hébergement
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
@@ -121,7 +158,7 @@ jobs:
           protocol: ftps
           port: 21
           local-dir: ./dist/
-          server-dir: public_html/
+          server-dir: ${{ env.DOSSIER_SITE }}
           # L'action garde un état sur le serveur et ne renvoie que les fichiers
           # modifiés : un déploiement courant transfère quelques kilo-octets, pas
           # les treize méga-octets du site.

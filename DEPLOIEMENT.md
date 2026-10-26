@@ -4,10 +4,14 @@ Le site est statique : il se construit sur le poste, puis on envoie le résultat
 sur l'hébergement. Il n'y a rien à exécuter côté serveur, ni PHP, ni base de
 données.
 
-C'est le même fonctionnement que le site de Lyon — mais **un autre domaine, et
-un hébergement à régler**. Rien de ce qui suit ne doit être recopié depuis le
-dépôt de Lyon sans vérification : un identifiant FTP ou un sous-domaine erroné
-publierait le site de Meaux par-dessus celui de Lyon.
+`serrurier-meaux.fr` est hébergé en **domaine additionnel** sur le compte
+o2switch qui sert déjà `serrurier-lyon-7j7.fr` (décision de Rayane du
+26 octobre 2026). L'offre o2switch couvre un nombre de sites illimité : ce
+second site ne coûte rien de plus.
+
+**La conséquence tient en une phrase : les mêmes identifiants FTP donnent accès
+aux deux sites.** Ce qui les sépare, c'est le dossier de destination, et rien
+d'autre. Tout ce document tourne autour de ça.
 
 ## En deux commandes
 
@@ -15,86 +19,162 @@ publierait le site de Meaux par-dessus celui de Lyon.
 rm -rf dist && npm run build
 ```
 
-Puis envoyer **le contenu** de `dist/` dans le dossier du site sur
-l'hébergement. C'est tout.
+Puis envoyer **le contenu** de `dist/` dans le dossier du site. C'est tout.
 
 Le `rm -rf dist` n'est pas une précaution de style : le dépôt est dans un
 dossier OneDrive, et la synchronisation entre en concurrence avec l'écriture
 des fichiers. Voir `CLAUDE.md`, section « Le dépôt est dans un dossier
 OneDrive ».
 
-## Les valeurs du compte — À COMPLÉTER
+## Les valeurs du compte
 
-Ces champs ne sont pas renseignés parce qu'ils ne sont pas connus. Les laisser
-vides est volontaire : une valeur devinée ferait publier le site au mauvais
-endroit.
+Identiques à celles de Lyon — c'est le même compte. **Sauf la dernière ligne,
+qui est la seule chose qui distingue les deux sites.**
 
 | | |
 |---|---|
-| Domaine | `serrurier-meaux.fr` |
-| Hébergeur | À COMPLÉTER |
-| Serveur FTP | À COMPLÉTER |
-| Identifiant | À COMPLÉTER |
-| Dossier du site | À COMPLÉTER (`public_html/` chez o2switch) |
+| Domaine | `serrurier-meaux.fr` (acheté chez Internet.bs) |
+| Hébergeur | o2switch |
+| cPanel | `https://pantoufles.o2switch.net:2083` |
+| FTP | `pantoufles.o2switch.net`, port 21, FTPS |
+| Identifiant | `jutu8080` |
+| **Dossier du site** | **`public_html/serrurier-meaux.fr/`** |
+
+Pour mémoire, le dossier de Lyon est `public_html/` — la racine du compte.
+Envoyer Meaux à cet endroit écraserait Lyon.
 
 Le mot de passe n'est pas écrit ici, et ne doit jamais l'être : ce fichier est
-versionné dans Git.
+versionné dans Git. Il est dans le courriel de bienvenue d'o2switch.
 
-**Si le domaine est ajouté au compte o2switch existant** (celui qui sert déjà
-Lyon), ce sera un *domaine additionnel* : même compte FTP, mais **un dossier
-différent** de `public_html/`, que cPanel indique au moment de l'ajout. C'est
-ce dossier-là qu'il faut reporter dans le tableau ci-dessus et dans
-`server-dir:` du workflow.
+## La mise en ligne, dans l'ordre
 
-**Si l'hébergement est ailleurs**, il faut corriger `site.legal.host` dans
-`src/data/site.ts` : les mentions légales nomment aujourd'hui o2switch, repris
-du site de Lyon. Publier le nom d'un hébergeur qui n'héberge pas le site rend
-les mentions légales fausses.
+**L'ordre n'est pas indicatif.** Changer les DNS avant d'avoir ajouté le
+domaine chez o2switch pointe le domaine vers des serveurs qui ne le
+connaissent pas : le site devient injoignable, et il faut attendre la
+propagation pour corriger.
 
-## La première mise en ligne, dans l'ordre
+### 1. Ajouter le domaine dans cPanel
 
-1. **Vider le dossier du site** de l'`index.html` de démonstration installé par
-   l'hébergeur. S'il reste, c'est lui qui s'affiche.
+cPanel → **Domaines** → *Créer un domaine*.
 
-2. **Construire** : `rm -rf dist && npm run build`.
+- **Domaine** : `serrurier-meaux.fr`
+- **Ne PAS cocher « Partager la racine du document »**. Cette case crée un
+  *alias* au lieu d'un domaine additionnel : `serrurier-meaux.fr` afficherait
+  alors le site de Lyon, et les deux adresses serviraient les mêmes pages. Si
+  tu la coches par erreur, supprime l'entrée et recommence — ne tente pas de
+  la rattraper.
+- **Racine du document** : cPanel propose une valeur automatiquement. Corrige-la
+  pour qu'elle soit exactement `public_html/serrurier-meaux.fr`. C'est la
+  valeur inscrite dans le workflow (`DOSSIER_SITE`), les deux doivent
+  correspondre au caractère près.
 
-3. **Envoyer le contenu de `dist/`** — pas le dossier `dist` lui-même, et
-   surtout pas `src/` ni `node_modules/`, qui n'ont rien à faire sur un
-   serveur public.
+À cette étape, les serveurs d'o2switch deviennent autoritatifs pour le
+domaine. C'est ce qui rend l'étape suivante possible.
 
-   Le plus rapide : compresser `dist` en `.zip`, l'envoyer via le gestionnaire
-   de fichiers de l'hébergeur, puis clic droit → *Extraire*. Le site compte
-   plusieurs centaines de fichiers ; un par un en FTP, c'est long et une
-   coupure laisse le site à moitié publié.
+### 2. Pointer le domaine chez Internet.bs
 
-4. **Vérifier que `.htaccess` est bien arrivé.** C'est un fichier caché : les
-   clients FTP et les gestionnaires de fichiers le masquent par défaut.
-   - Gestionnaire de fichiers → *Settings* → cocher *Show hidden files*
-   - FileZilla → *Serveur* → *Forcer l'affichage des fichiers cachés*
+Internet.bs → la fiche de `serrurier-meaux.fr` → **Nameservers**.
 
-   Sans lui, le site perd d'un coup le HTTPS forcé, tous ses en-têtes de
-   sécurité et sa page 404 — sans afficher la moindre erreur.
+Remplacer les serveurs actuels par :
 
-5. **Activer le certificat** : *Let's Encrypt SSL* → émettre pour
-   `serrurier-meaux.fr` et `www.serrurier-meaux.fr`. Attendre le cadenas.
+```
+ns1.o2switch.net
+ns2.o2switch.net
+```
 
-6. **Activer le HSTS** seulement après : décommenter la ligne
-   `Strict-Transport-Security` dans `public/.htaccess`, reconstruire, renvoyer.
-   Activée trop tôt, elle rend le site inaccessible le temps de l'émission du
-   certificat.
+C'est tout : **aucun enregistrement A, CNAME ou MX à saisir à la main.** En
+déléguant les serveurs de noms, c'est o2switch qui gère la zone, et il y crée
+lui-même ce qu'il faut pour `serrurier-meaux.fr` et `www.serrurier-meaux.fr`.
 
-## Ce qui est déjà réglé dans le dépôt
+La propagation prend de quelques minutes à quelques heures. Pour vérifier sans
+attendre le cache de ton navigateur :
 
-- **Domaine** inscrit dans `astro.config.mjs` : les URL canoniques, le sitemap,
-  `robots.txt` et l'image de partage le suivent automatiquement.
-- **`public/.htaccess`** : HTTPS forcé, redirection `www` → sans `www`, page 404
-  du site, en-têtes de sécurité, politique de contenu en observation, cache long
-  sur les fichiers hachés et revalidation du HTML. Il ne nomme aucun domaine, il
-  travaille sur l'hôte réellement servi — rien à y changer.
-- **Clé IndexNow** propre à ce domaine, et son fichier de preuve généré depuis
-  elle. Elle est **différente de celle de Lyon**, et doit le rester.
+```bash
+nslookup serrurier-meaux.fr ns1.o2switch.net
+```
 
-## Après la bascule — À FAIRE, rien n'est fait
+### 3. Laisser le certificat HTTPS se poser
+
+o2switch émet un certificat Let's Encrypt automatiquement (AutoSSL), en
+général dans l'heure qui suit la résolution du domaine. Il couvre les domaines
+additionnels, `www` compris.
+
+Vérifier dans cPanel → **SSL/TLS Status** que `serrurier-meaux.fr` **et**
+`www.serrurier-meaux.fr` ont tous les deux un certificat. S'il manque, la page
+permet de relancer AutoSSL à la main.
+
+Ne pas passer à la suite tant que le cadenas n'apparaît pas sur les deux.
+
+### 4. Envoyer le site
+
+```bash
+rm -rf dist && npm run build
+```
+
+Puis envoyer **le contenu** de `dist/` dans `public_html/serrurier-meaux.fr/`
+— pas le dossier `dist` lui-même, et surtout pas `src/` ni `node_modules/`,
+qui n'ont rien à faire sur un serveur public.
+
+Le plus rapide : compresser `dist` en `.zip`, l'envoyer via le gestionnaire de
+fichiers de cPanel, puis clic droit → *Extraire*. Le site compte plusieurs
+centaines de fichiers ; un par un en FTP, c'est long et une coupure laisse le
+site à moitié publié.
+
+**Vérifier que `.htaccess` est bien arrivé.** C'est un fichier caché : les
+clients FTP et le gestionnaire de fichiers le masquent par défaut.
+
+- Gestionnaire de fichiers → *Settings* → cocher *Show hidden files*
+- FileZilla → *Serveur* → *Forcer l'affichage des fichiers cachés*
+
+Sans lui, le site perd d'un coup le HTTPS forcé, la redirection `www`, tous
+ses en-têtes de sécurité et sa page 404 — sans afficher la moindre erreur.
+
+### 5. Vérifier les redirections
+
+Dans cet ordre, chacune doit aboutir sur `https://serrurier-meaux.fr/` :
+
+- `http://serrurier-meaux.fr` → HTTPS
+- `http://www.serrurier-meaux.fr` → HTTPS puis sans `www`
+- `https://www.serrurier-meaux.fr` → sans `www`
+
+**La forme canonique est sans `www`.** C'est elle qui est déclarée dans
+`astro.config.mjs`, donc dans le sitemap et dans toutes les balises
+canoniques. Ne pas l'inverser sans changer les trois.
+
+Et pendant qu'on y est : vérifier que `https://serrurier-lyon-7j7.fr/` affiche
+toujours le site de Lyon. C'est le contrôle qui attrape une erreur de dossier.
+
+### 6. Activer le HSTS, seulement maintenant
+
+Décommenter la ligne `Strict-Transport-Security` dans `public/.htaccess`,
+reconstruire, renvoyer.
+
+Activée avant que le certificat fonctionne, elle engage le domaine pour un an
+**sans marche arrière côté serveur** : c'est le navigateur du visiteur qui se
+souvient. D'où l'ordre.
+
+## Automatiser le déploiement
+
+`.github/workflows/deploiement.yml` construit et envoie en FTP à chaque
+`git push` sur `main`, puis signale les pages modifiées à IndexNow.
+
+Il lui faut les secrets du dépôt : **Settings → Secrets and variables →
+Actions**. Les secrets ne sont pas partagés entre dépôts, même pour un compte
+identique — ceux de Lyon ne sont pas visibles ici.
+
+| Secret | Valeur |
+|---|---|
+| `FTP_SERVEUR` | `pantoufles.o2switch.net` |
+| `FTP_UTILISATEUR` | `jutu8080` |
+| `FTP_MOTDEPASSE` | le mot de passe cPanel |
+
+Le dossier de destination, lui, n'est **pas** un secret : il est écrit en clair
+dans le workflow (`DOSSIER_SITE`), précisément pour qu'il soit relisible et
+contrôlable. Une étape refuse de publier si cette valeur vaut `public_html/`,
+parce que l'envoi est synchronisé — il supprime sur le serveur ce qui n'est pas
+dans `dist/`, et effacerait donc le site de Lyon sans rien laisser à restaurer.
+
+## Après la mise en ligne
 
 - **Search Console** : créer la propriété `serrurier-meaux.fr` (c'en est une
   nouvelle, celle de Lyon ne la couvre pas), choisir la validation par *balise
@@ -108,13 +188,3 @@ les mentions légales fausses.
 - **Fiche Google Business Profile** : elle n'existe pour aucune des deux villes.
   Pour une activité de dépannage, c'est le levier qui manque le plus — davantage
   que le site lui-même.
-
-## Automatiser le déploiement
-
-`.github/workflows/deploiement.yml` construit et envoie en FTP à chaque
-`git push` sur `main`. Il est repris du dépôt de Lyon et **ne fonctionnera pas
-tel quel** : il lui faut les secrets du dépôt de Meaux (`FTP_SERVEUR`,
-`FTP_UTILISATEUR`, `FTP_MOTDEPASSE`) et le bon `server-dir:`.
-
-Tant que ces secrets ne sont pas renseignés, le déploiement se fait à la main
-comme décrit plus haut.
