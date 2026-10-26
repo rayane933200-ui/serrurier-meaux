@@ -335,6 +335,28 @@ n'avait pas repris : 9 sur `/marques-de-serrures/`, 8 sur `/assurance-habitation
 `/assureurs-habitation/`, 4 sur `/apres-un-cambriolage/`. Corrigés ici.
 **Elles sont toujours en ligne sur le site de Lyon.**
 
+## Ce dépôt doit rester privé
+
+Les fichiers actuels ne contiennent aucun identifiant. **L'historique git, si.**
+
+Les commits antérieurs au passage sur Cloudflare (`63df0ad` à `6f55bb8`)
+contiennent l'identifiant du compte o2switch qui héberge le site de Lyon
+(`jutu8080`), le nom de son serveur et son adresse d'accès cPanel. Ils y
+figuraient légitimement tant que l'hébergement était o2switch ; ils ont disparu
+des fichiers avec le commit `4e3acd5`, mais pas de l'historique.
+
+Ce n'est pas un mot de passe. C'est la moitié d'une paire d'identifiants, et
+elle suffit à cibler une attaque par force brute sur un cPanel qui sert un site
+en production.
+
+Donc : **dépôt privé**. Cloudflare Pages fonctionne parfaitement avec un dépôt
+privé, il n'y a rien à gagner à le rendre public.
+
+Si le dépôt devait un jour devenir public, **nettoyer l'historique d'abord** —
+`git filter-repo`, ou un écrasement de tous les commits en un seul. Le faire
+après publication ne sert à rien : GitHub conserve les objets, et un fork ou un
+clone en garde une copie.
+
 ## Conventions de code
 
 - Composants et fichiers `.astro` en **PascalCase** (ex: `Header.astro`, `ContactForm.astro`)

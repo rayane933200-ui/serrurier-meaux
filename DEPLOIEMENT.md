@@ -177,6 +177,75 @@ Activé avant que le certificat fonctionne, il engage le domaine pour un an
 **sans marche arrière côté serveur** : c'est le navigateur du visiteur qui se
 souvient. D'où l'ordre.
 
+## Mettre le dépôt sur GitHub
+
+Le dépôt est local. Le pousser sert à deux choses : garder une copie hors du
+poste, et permettre à Cloudflare Pages de reconstruire tout seul à chaque
+modification.
+
+**Le dépôt doit être créé en PRIVÉ.** L'historique contient l'identifiant du
+compte o2switch qui héberge le site de Lyon — voir la section correspondante de
+`CLAUDE.md`. Cloudflare Pages fonctionne sans difficulté avec un dépôt privé.
+
+Deux façons de créer le dépôt :
+
+- **Dans le navigateur** : github.com → *New repository* → nom
+  `serrurier-meaux` → **Private** → ne rien cocher d'autre (pas de README, pas
+  de .gitignore : le dépôt en a déjà).
+- **En ligne de commande**, si GitHub CLI est installé :
+  ```bash
+  gh repo create serrurier-meaux --private --source=. --remote=origin --push
+  ```
+  (`gh` n'est pas installé sur ce poste au 26 octobre 2026.)
+
+Puis, si le dépôt a été créé dans le navigateur :
+
+```bash
+git remote add origin https://github.com/<ton-compte>/serrurier-meaux.git
+git push -u origin main
+```
+
+Git demandera un identifiant : utiliser un **jeton d'accès personnel**
+(Settings → Developer settings → Personal access tokens), pas le mot de passe
+du compte, que GitHub n'accepte plus depuis 2021.
+
+**Vérifier** : les 6 commits apparaissent sur GitHub, et le dépôt porte bien la
+mention *Private*.
+
+### Brancher Cloudflare Pages sur le dépôt
+
+Une fois le dépôt poussé, c'est la voie la plus confortable — elle remplace le
+téléversement manuel de l'étape 1.
+
+Projet Pages → *Settings* → **Builds & deployments** → *Connect to Git*, ou
+créer le projet directement par cette voie. Réglages :
+
+| Champ | Valeur |
+|---|---|
+| Framework preset | Astro |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Production branch | `main` |
+
+Cloudflare reconstruira à chaque `git push` sur `main`.
+
+**Attention au doublon.** Si le dépôt est connecté à Pages ET que le workflow
+GitHub Actions tourne, **chaque push déclenche deux déploiements** : celui de
+Cloudflare et celui de `wrangler`. Ils ne se gênent pas, mais ils se marchent
+dessus dans l'historique des déploiements et doublent les soumissions IndexNow.
+Choisir l'un des deux :
+
+- **Connexion Git Cloudflare** : plus simple, aucun secret à gérer. Mais on perd
+  les contrôles d'avant-publication du workflow (sitemap sur localhost,
+  `_headers` manquant, clé IndexNow) et la soumission IndexNow. Il faut alors
+  supprimer `.github/workflows/deploiement.yml`.
+- **Workflow GitHub Actions** : garde les contrôles et IndexNow. Il faut alors
+  **ne pas** connecter le dépôt dans Pages, et laisser le projet en *Direct
+  Upload*.
+
+Le workflow est recommandé ici, précisément pour ces contrôles : chacun existe
+parce qu'il correspond à une panne qui ne se voit pas.
+
 ## Automatiser le déploiement
 
 `.github/workflows/deploiement.yml` construit, contrôle, publie sur Cloudflare
