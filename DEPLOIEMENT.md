@@ -35,9 +35,10 @@ qui est la seule chose qui distingue les deux sites.**
 |---|---|
 | Domaine | `serrurier-meaux.fr` (acheté chez Internet.bs) |
 | Hébergeur | o2switch |
-| cPanel | `https://pantoufles.o2switch.net:2083` |
+| cPanel | `https://serrurier-lyon-7j7.fr/cpanel` (voir ci-dessous) |
 | FTP | `pantoufles.o2switch.net`, port 21, FTPS |
 | Identifiant | `jutu8080` |
+| Serveur | `pantoufles.o2switch.net` → 109.234.167.223 |
 | **Dossier du site** | **`public_html/serrurier-meaux.fr/`** |
 
 Pour mémoire, le dossier de Lyon est `public_html/` — la racine du compte.
@@ -45,6 +46,32 @@ Envoyer Meaux à cet endroit écraserait Lyon.
 
 Le mot de passe n'est pas écrit ici, et ne doit jamais l'être : ce fichier est
 versionné dans Git. Il est dans le courriel de bienvenue d'o2switch.
+
+### Entrer dans cPanel
+
+`pantoufles.o2switch.net` est le nom du serveur, **pas un site web** : tapé seul
+dans un navigateur, il ne donne rien. C'est ce qui a fait croire, le 26 octobre
+2026, que l'hébergement ne fonctionnait plus — alors que le site de Lyon
+tournait normalement.
+
+Trois portes d'entrée, à essayer dans cet ordre :
+
+1. **`https://serrurier-lyon-7j7.fr/cpanel`** — la plus sûre. o2switch y sert une
+   page « cPanel Redirect » qui propose elle-même le bon lien selon le réseau.
+2. **`https://serrurier-lyon-7j7.fr:2083`** — l'accès direct, si le port 2083
+   n'est pas bloqué.
+3. **`https://cpanel.jutu8080.odns.fr`** — la voie de secours quand un pare-feu
+   bloque le port 2083 (réseau d'entreprise, certains fournisseurs d'accès,
+   partage de connexion mobile).
+
+Sur la troisième, le navigateur affiche un **avertissement de certificat**.
+C'est normal et sans danger ici : `jutu8080.odns.fr` est l'adresse technique de
+ce compte o2switch, et elle résout vers la même machine que
+`pantoufles.o2switch.net` (109.234.167.223, vérifié le 26 octobre 2026). Le
+certificat couvre les domaines du compte, pas ce nom technique.
+
+Ne jamais saisir ces identifiants sur une adresse qui ne figure pas dans cette
+liste.
 
 ## La mise en ligne, dans l'ordre
 
