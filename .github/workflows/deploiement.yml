@@ -154,8 +154,21 @@ jobs:
             exit 1
           fi
 
+      # enablement: true — l'action active GitHub Pages sur le dépôt elle-même,
+      # par l'API, au lieu de supposer que c'est déjà fait dans Settings.
+      #
+      # Sans cette option, l'étape échoue en une seconde avec « Get Pages site
+      # failed » dès que Pages n'est pas déjà activé. C'est arrivé trois fois de
+      # suite le 26 octobre 2026, y compris APRÈS le réglage manuel de la source
+      # sur « GitHub Actions » — l'erreur est la même et ne dit pas laquelle des
+      # deux conditions manque, ce qui rend le diagnostic pénible.
+      #
+      # Avec l'option, le workflow ne dépend plus d'un réglage d'interface : il
+      # est autonome, et reconstruisible à l'identique sur un dépôt neuf.
       - name: Préparer GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       # include-hidden-files : sans cette option, .nojekyll n'est PAS embarqué
       # dans l'archive, et on retombe exactement sur la panne qu'il évite.
