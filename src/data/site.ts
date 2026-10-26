@@ -182,24 +182,45 @@ export const site = {
     addressCity: 'Les Pavillons-sous-Bois',
     publisher: 'Rayane IDRIS',
 
-    // Hébergeur — o2switch, CONFIRMÉ par Rayane le 26 octobre 2026 :
-    // serrurier-meaux.fr est hébergé en domaine additionnel sur le compte qui
-    // sert déjà serrurier-lyon-7j7.fr. Coordonnées relevées sur leurs
-    // conditions générales de vente, pas reconstituées de mémoire.
+    // Hébergeur — Cloudflare Pages, sur décision de Rayane le 26 octobre 2026.
     //
-    // Les mentions légales sont opposables : si l'hébergement devait changer,
-    // ce bloc doit suivre le jour même. Nommer un hébergeur qui n'héberge pas
-    // le site est une information fausse sur une page qui engage.
+    // Le site de Lyon reste chez o2switch ; celui-ci part sur Cloudflare. Les
+    // deux sites n'ont donc plus le même hébergeur, et ce bloc ne doit PAS être
+    // recopié d'un dépôt à l'autre.
     //
-    // La politique de confidentialité en dépend aussi : elle affirme que les
-    // journaux serveur ne quittent pas l'Union européenne, ce qui est vrai
-    // d'o2switch (Clermont-Ferrand) et serait faux d'un hébergeur hors UE.
+    // Les mentions légales sont opposables : nommer un hébergeur qui n'héberge
+    // pas le site est une information fausse sur une page qui engage. Si
+    // l'hébergement rebouge, ce bloc suit le jour même — et la politique de
+    // confidentialité avec, puisqu'elle décrit où vont les journaux serveur.
+    //
+    // Conséquence directe du changement : l'hébergement quitte la France pour
+    // une société américaine. La section « Transferts hors de l'Union
+    // européenne » de la politique de confidentialité a été réécrite en
+    // conséquence. Ne pas la remettre dans son état « hébergé en France ».
     host: {
-      name: 'o2switch, SAS au capital de 100 000 €',
-      address: 'Chemin des Pardiaux, 63000 Clermont-Ferrand, France',
-      url: 'https://www.o2switch.fr',
-      siret: '510 909 807 00032',
-      phone: '04 44 44 60 40',
+      // Dénomination et adresse du siège, relevées sur le formulaire 10-K
+      // déposé par Cloudflare auprès de la SEC — document public et officiel,
+      // pas un annuaire tiers.
+      name: 'Cloudflare, Inc.',
+      address: '101 Townsend Street, San Francisco, CA 94107, États-Unis',
+      url: 'https://www.cloudflare.com',
+      siret: '', // sans objet : société de droit américain, pas d'immatriculation française
+      /**
+       * Téléphone — À COMPLÉTER.
+       *
+       * La LCEN impose de porter le téléphone de l'hébergeur dans les mentions
+       * légales. Il n'est pas renseigné ici parce qu'il n'a pas pu être vérifié :
+       * deux annuaires d'entreprises donnent deux numéros différents, et la page
+       * de contact de Cloudflare refuse l'accès automatisé (HTTP 403).
+       *
+       * Publier un numéro faux sur une page opposable est pire que de ne pas en
+       * publier. À relever à la main sur cloudflare.com, puis à reporter ici.
+       *
+       * Le champ n'est aujourd'hui affiché par aucune page : la page mentions
+       * légales ne rend que `name`, `address` et `url`. Le renseigner n'aura
+       * donc d'effet que si cette page est complétée pour l'afficher.
+       */
+      phone: '',
     },
 
     // Champs encore inconnus : laissés vides volontairement. La page mentions

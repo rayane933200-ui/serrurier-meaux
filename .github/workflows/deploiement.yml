@@ -1,27 +1,32 @@
-# Construit le site de Meaux et l'envoie sur l'hébergement à chaque
+# Construit le site de Meaux et le publie sur Cloudflare Pages à chaque
 # `git push` sur main.
 #
-# Les deux sites partagent le MÊME compte o2switch (confirmé par Rayane le
-# 26 octobre 2026) : mêmes identifiants FTP, mais deux dossiers distincts.
-# serrurier-meaux.fr y est un domaine additionnel.
+# L'hébergement est passé d'o2switch à Cloudflare Pages le 26 octobre 2026, sur
+# décision de Rayane. Le site de Lyon, lui, reste chez o2switch : les deux
+# dépôts n'ont plus la même chaîne de publication, et ce fichier ne doit PAS
+# être recopié de l'un à l'autre.
 #
-# C'est ce partage qui rend ce fichier délicat : les bons identifiants donnent
-# accès aux DEUX sites. Le seul rempart est `DOSSIER_SITE` plus bas, et le
-# garde-fou qui le contrôle avant l'envoi.
+# Ce que le changement a supprimé :
+#   · l'envoi FTP, et avec lui le risque d'écraser le site de Lyon — les deux
+#     sites ne partagent plus aucun compte ;
+#   · le contrôle de présence de dist/.htaccess, puisque Apache n'est plus dans
+#     la boucle (voir public/_headers).
+#
+# ATTENTION — ce workflow ne s'exécutera que si le dépôt est poussé sur GitHub.
+# Au 26 octobre 2026 il est purement local, sans dépôt distant : la publication
+# se fait donc à la main, par téléversement du dossier dist/ dans le tableau de
+# bord Cloudflare, ou par `npx wrangler pages deploy dist`. Voir DEPLOIEMENT.md.
 #
 # Les identifiants ne sont PAS dans ce fichier. Ils vivent dans les secrets du
 # dépôt (Settings → Secrets and variables → Actions), où ni le code, ni les
 # journaux d'exécution, ni personne d'autre que le propriétaire du dépôt ne
-# peut les lire. GitHub masque automatiquement leur valeur dans les journaux.
+# peut les lire.
 #
-# Ce dépôt a ses propres secrets, à saisir une fois — ceux de Lyon ne sont pas
-# partagés entre dépôts, même pour un compte identique :
-#
-#   FTP_SERVEUR     pantoufles.o2switch.net
-#   FTP_UTILISATEUR jutu8080
-#   FTP_MOTDEPASSE  le mot de passe cPanel du compte
+#   CLOUDFLARE_API_TOKEN   jeton avec la permission « Cloudflare Pages : Edit »
+#   CLOUDFLARE_ACCOUNT_ID  identifiant de compte, lisible dans l'URL du tableau
+#                          de bord Cloudflare
 
-name: Déploiement serrurier-meaux.fr
+name: Déploiement Cloudflare Pages
 
 on:
   push:
@@ -35,34 +40,6 @@ on:
 concurrency:
   group: deploiement-meaux
   cancel-in-progress: true
-
-# Dossier du site sur le serveur, déclaré UNE fois pour que le garde-fou plus
-# bas puisse le contrôler.
-#
-# serrurier-meaux.fr est un domaine ADDITIONNEL du compte o2switch : sa racine
-# est un dossier à lui, PAS `public_html/`. `public_html/` est la racine du
-# domaine principal du compte, c'est-à-dire serrurier-lyon-7j7.fr.
-#
-# Ce n'est pas un détail de confort. L'action d'envoi synchronise : elle
-# supprime sur le serveur ce qui n'est pas dans `dist/`. Pointée sur
-# `public_html/`, elle remplacerait le site de Lyon par celui de Meaux et
-# effacerait la différence. Les deux sites ont les mêmes noms de fichiers,
-# donc rien ne protégerait quoi que ce soit.
-#
-# La valeur ci-dessous est exprimée RELATIVEMENT au dossier d'accueil FTP
-# (`/home/jutu8080/`) et doit correspondre à la racine du document réellement
-# enregistrée dans cPanel :
-#
-#   racine /home/jutu8080/serrurier-meaux.fr              → serrurier-meaux.fr/
-#   racine /home/jutu8080/public_html/serrurier-meaux.fr  → public_html/serrurier-meaux.fr/
-#
-# La première est préférable : sous `public_html/`, le site serait aussi servi
-# à serrurier-lyon-7j7.fr/serrurier-meaux.fr/, soit une seconde adresse pour
-# chaque page. Voir DEPLOIEMENT.md, étape 1.
-#
-# À CONFIRMER après la création du domaine dans cPanel.
-env:
-  DOSSIER_SITE: serrurier-meaux.fr/
 
 jobs:
   publier:
@@ -92,8 +69,12 @@ jobs:
             echo "::error::Le sitemap contient des URL localhost, publication annulée."
             exit 1
           fi
-          if [ ! -f dist/.htaccess ]; then
-            echo "::error::dist/.htaccess absent : le site perdrait HTTPS, en-têtes et page 404."
+          # Sur Cloudflare Pages, les en-têtes viennent de _headers. Sans ce
+          # fichier le site s'affiche parfaitement — il perd juste en silence
+          # tous ses en-têtes de sécurité et sa politique de contenu. C'est
+          # exactement le genre de panne qu'on ne voit pas, d'où ce contrôle.
+          if [ ! -f dist/_headers ]; then
+            echo "::error::dist/_headers absent : le site perdrait ses en-têtes de sécurité."
             exit 1
           fi
           # Fichier de preuve IndexNow. Sans lui, les soumissions repartent en
@@ -133,53 +114,18 @@ jobs:
           # grep -o puis wc -l : le sitemap tient sur une seule ligne, compter
           # les lignes renverrait toujours 1.
           pages=$(grep -o '<loc>' dist/sitemap-0.xml | wc -l)
-          echo "$pages pages, .htaccess et clé IndexNow présents."
+          echo "$pages pages, _headers et clé IndexNow présents."
           if [ "$pages" -lt 40 ]; then
             echo "::error::Seulement $pages pages dans le sitemap, construction incomplète."
             exit 1
           fi
 
-      # Garde-fou : refuser de partir sur la racine du compte.
-      #
-      # Le compte o2switch sert DEUX sites. `public_html/` appartient à Lyon.
-      # Un envoi synchronisé à cet endroit écraserait un site en production,
-      # et l'action supprime ce qu'elle ne retrouve pas : il ne resterait rien
-      # à restaurer côté serveur.
-      #
-      # Ce contrôle existe parce que la valeur a réellement été `public_html/`
-      # dans ce fichier, reprise telle quelle du dépôt de Lyon.
-      - name: Vérifier le dossier de destination
-        run: |
-          if [ "$DOSSIER_SITE" = "public_html/" ] || [ "$DOSSIER_SITE" = "public_html" ]; then
-            echo "::error::DOSSIER_SITE vaut '$DOSSIER_SITE', la racine du compte — c'est le site de Lyon. Publication annulée."
-            exit 1
-          fi
-          case "$DOSSIER_SITE" in
-            */) ;;
-            *) echo "::error::DOSSIER_SITE doit se terminer par un slash."; exit 1 ;;
-          esac
-          echo "Destination : $DOSSIER_SITE"
-
-      - name: Envoyer sur l'hébergement
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+      - name: Publier sur Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
         with:
-          server: ${{ secrets.FTP_SERVEUR }}
-          username: ${{ secrets.FTP_UTILISATEUR }}
-          password: ${{ secrets.FTP_MOTDEPASSE }}
-          # FTPS explicite : le FTP simple ferait circuler le mot de passe en
-          # clair sur le réseau à chaque déploiement.
-          protocol: ftps
-          port: 21
-          local-dir: ./dist/
-          server-dir: ${{ env.DOSSIER_SITE }}
-          # L'action garde un état sur le serveur et ne renvoie que les fichiers
-          # modifiés : un déploiement courant transfère quelques kilo-octets, pas
-          # les treize méga-octets du site.
-          state-name: .deploiement-etat.json
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=serrurier-meaux --branch=main
 
       # IndexNow prévient Bing, Yandex, Seznam et Naver qu'une page a changé, au
       # lieu d'attendre leur prochain passage. Google n'en fait pas partie :

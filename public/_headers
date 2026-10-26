@@ -1,0 +1,75 @@
+# En-têtes HTTP pour Cloudflare Pages.
+#
+# Remplace la section « en-têtes de sécurité » et « cache » de public/.htaccess,
+# qui a été supprimé : un fichier .htaccess n'est lu que par Apache. Sur
+# Cloudflare Pages il ne serait pas seulement inutile, il serait SERVI — lisible
+# par n'importe qui à /.htaccess, avec sa politique de contenu et ses
+# commentaires. C'est pour ça qu'il est parti, pas seulement parce qu'il ne
+# servait plus.
+#
+# Astro copie le contenu de public/ dans dist/ : ce fichier se retrouve à la
+# racine du site publié, là où Pages le lit. Il n'est pas servi aux visiteurs,
+# Pages le consomme et le retire.
+#
+# Ce que Cloudflare fait déjà tout seul, et qui n'a donc pas été repris ici :
+#   · HTTPS forcé          → réglage « Always Use HTTPS » du tableau de bord
+#   · compression          → automatique (gzip/brotli)
+#   · types MIME           → corrects pour webp, avif, woff2
+#   · listing de dossier   → jamais, Pages ne sert que des fichiers connus
+#   · page 404             → /404.html est servie automatiquement
+#   · revalidation du HTML → comportement par défaut de Pages
+#
+# Ce que Cloudflare ne fait PAS depuis ce fichier : la redirection de
+# www.serrurier-meaux.fr vers serrurier-meaux.fr. Les fichiers `_headers` et
+# `_redirects` de Pages travaillent sur des CHEMINS, pas sur des noms d'hôte.
+# Cette redirection se configure dans le tableau de bord, et son absence ne
+# casse rien d'apparent : les deux adresses répondraient simplement en
+# parallèle, ce qui donne deux URL par page aux yeux d'un moteur. Voir
+# DEPLOIEMENT.md.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Le site n'utilise aucune de ces interfaces : on les refuse explicitement.
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=()
+  # Politique de contenu, en observation seule : elle ne bloque rien et sert à
+  # repérer ce que la page charge vraiment. Les domaines Google sont ceux de la
+  # balise Ads, relevés sur le site en production et non dans la documentation.
+  # Refaire ce relevé dans la console du navigateur avant de renommer cet
+  # en-tête en Content-Security-Policy : une conversion bloquée par la CSP
+  # échoue en silence.
+  Content-Security-Policy-Report-Only: default-src 'self'; img-src 'self' data: https://www.google.com https://www.google.fr https://www.googleadservices.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://www.googleadservices.com https://googleads.g.doubleclick.net; font-src 'self'; connect-src 'self' https://www.google.com https://www.google.fr https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://ad.doubleclick.net; frame-src https://td.doubleclick.net https://www.googletagmanager.com; frame-ancestors 'self'; base-uri 'self'; object-src 'none'
+
+# HSTS — HTTPS imposé pour un an. Volontairement SANS le jeton preload, qui
+# engage le domaine de façon quasi irréversible.
+#
+# DÉSACTIVÉ pour l'instant, et c'est le bon état pour un domaine neuf :
+# serrurier-meaux.fr n'est pas encore publié. Un an d'engagement pris avant que
+# le HTTPS fonctionne se paie cher — il n'y a pas de marche arrière côté
+# serveur, c'est le navigateur du visiteur qui se souvient.
+#
+# À activer APRÈS : domaine rattaché au projet Pages → certificat délivré →
+# cadenas vérifié sur les deux noms → redirection www vérifiée. Soit en
+# décommentant la ligne ci-dessous, soit par le réglage HSTS du tableau de bord
+# (SSL/TLS → Edge Certificates). Un seul des deux, pas les deux.
+#
+#  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+# Les fichiers de /_astro/ portent un hachage dans leur nom : leur contenu ne
+# change jamais, on peut les garder un an.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Le sitemap et robots.txt doivent rester frais.
+/robots.txt
+  Cache-Control: public, max-age=3600
+
+/sitemap-index.xml
+  Cache-Control: public, max-age=3600
+
+/sitemap-0.xml
+  Cache-Control: public, max-age=3600

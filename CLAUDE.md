@@ -28,8 +28,13 @@ chemins de fichiers sont volontairement identiques entre les deux dépôts, pour
 corrigé ici se recopie tel quel là-bas — et réciproquement.
 
 Les fichiers réellement communs : `src/components/`, `src/layouts/`, `src/styles/`,
-`src/pages/robots.txt.ts`, `src/pages/[cleIndexNow].txt.ts`, `public/.htaccess`,
-`public/fonts/`, `.github/scripts/indexnow.mjs`.
+`src/pages/robots.txt.ts`, `src/pages/[cleIndexNow].txt.ts`, `public/fonts/`,
+`.github/scripts/indexnow.mjs`.
+
+**Ne sont plus communs depuis le 26 octobre 2026** : tout ce qui touche à
+l'hébergement. Lyon est chez o2switch avec un `public/.htaccess` et un envoi
+FTP ; Meaux est sur Cloudflare Pages avec un `public/_headers` et un
+déploiement Pages. Ne jamais recopier l'un sur l'autre.
 
 **Ce qui ne doit JAMAIS être recopié d'un dépôt à l'autre** : le domaine d'`astro.config.mjs`, la
 clé IndexNow, le jeton Search Console, les secrets FTP, et tout `src/data/` (zones, services,
@@ -67,7 +72,10 @@ c'est la promesse qu'il faut corriger, pas l'habillage.
 - **Styling** : CSS natif / Astro scoped styles
 - **Gestionnaire de paquets** : npm
 - **Domaine** : `serrurier-meaux.fr`, forme canonique sans `www`, acheté chez Internet.bs
-- **Hébergement** : o2switch, **en domaine additionnel sur le compte qui sert déjà Lyon**
+- **Hébergement** : **Cloudflare Pages** (décision de Rayane le 26/10/2026 ; Lyon reste chez
+  o2switch). Les en-têtes et le cache vivent dans `public/_headers` — il n'y a **pas** de
+  `.htaccess` dans ce dépôt, et il ne faut pas en remettre : Cloudflare ne le lirait pas et le
+  servirait en clair à `/.htaccess`.
 
 ## Commandes courantes
 
@@ -132,7 +140,7 @@ balise n'est pas émise — le site fonctionne, il ne remonte simplement aucune 
 
 ```
 /
-├── public/              # fichiers statiques servis tels quels (favicon, .htaccess, polices)
+├── public/              # fichiers statiques servis tels quels (favicon, _headers, polices)
 ├── src/
 │   ├── assets/           # logo fourni par l'utilisateur (logo-full.png, logo-icon.png)
 │   ├── components/        # composants Astro/UI réutilisables
@@ -367,6 +375,10 @@ Réglé :
 En attente — **ne rien inventer pour combler ces trous** :
 
 - [ ] **Jeton Search Console** — la propriété `serrurier-meaux.fr` reste à créer.
+- [ ] **Téléphone de l'hébergeur** — `site.legal.host.phone` est vide. La LCEN impose de le
+      porter dans les mentions légales. Il n'a pas pu être vérifié : deux annuaires donnent deux
+      numéros différents pour Cloudflare, et leur page de contact refuse l'accès automatisé. À
+      relever à la main sur cloudflare.com plutôt qu'à recopier d'un annuaire.
 - [ ] **Assurance décennale** — souscription confirmée par Rayane le 05/10/2026 et annoncée sur le
       site (`credentials.decennale`). Manquent **l'assureur, le n° de contrat et la couverture
       géographique** : la loi impose déjà de les porter sur chaque devis et chaque facture, il
