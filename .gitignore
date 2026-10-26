@@ -25,3 +25,6 @@ desktop.ini
 
 # empreintes IndexNow : etat local du script, conserve par le cache GitHub Actions
 empreintes-indexnow.json
+# scripts temporaires de maintenance
+.tmp-*
+.audit-tmp/
