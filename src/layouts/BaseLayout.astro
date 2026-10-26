@@ -140,12 +140,24 @@ const schemas = [localBusiness, ...(estAccueil ? [webSite] : []), ...extraSchema
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
     {noindex && <meta name="robots" content="noindex, follow" />}
-    <meta name="google-site-verification" content={site.analytics.googleSiteVerification} />
+    {site.analytics.googleSiteVerification && (
+      <meta name="google-site-verification" content={site.analytics.googleSiteVerification} />
+    )}
     {site.analytics.bingSiteVerification && (
       <meta name="msvalidate.01" content={site.analytics.bingSiteVerification} />
     )}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="#0a0a0b" />
+
+    {/* Politique de référent.
+        Normalement envoyée en en-tête HTTP (Referrer-Policy). GitHub Pages ne
+        sait pas servir d'en-tête personnalisé, d'où cette balise : c'est le seul
+        des en-têtes de sécurité du site qui ait un équivalent en meta que les
+        navigateurs respectent réellement.
+        X-Content-Type-Options, X-Frame-Options et Permissions-Policy n'en ont
+        pas — un <meta http-equiv> pour ceux-là est ignoré. Ils sont perdus tant
+        que le site est sur GitHub Pages. Voir DEPLOIEMENT.md. */}
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     {/* Polices auto-hébergées : aucun appel à un tiers, donc aucune transmission
         d'adresse IP hors UE. Préchargées car elles sont dans le chemin de rendu. */}

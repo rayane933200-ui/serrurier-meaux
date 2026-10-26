@@ -1,286 +1,157 @@
-# Mettre le site de Meaux en ligne sur Cloudflare Pages
+# Mettre le site de Meaux en ligne sur GitHub Pages
 
-Le site est statique : il se construit sur le poste, puis on envoie le résultat.
-Il n'y a rien à exécuter côté serveur, ni PHP, ni base de données.
+Le site est statique. L'hébergement est **GitHub Pages**, sur décision de Rayane
+le 26 octobre 2026 — troisième hébergement envisagé le même jour, après
+o2switch puis Cloudflare Pages.
 
-**L'hébergement est Cloudflare Pages**, sur décision de Rayane le 26 octobre
-2026. Le site de Lyon reste chez o2switch : les deux dépôts n'ont plus la même
-chaîne de publication, et aucun fichier de configuration d'hébergement ne doit
-être recopié de l'un à l'autre.
+Le site de Lyon reste chez o2switch. Les deux dépôts n'ont plus la même chaîne
+de publication, et aucun fichier de configuration d'hébergement ne doit être
+recopié de l'un à l'autre.
 
-Conséquence à garder en tête : les deux sites ne partagent plus aucun compte.
-Le risque d'écraser Lyon en publiant Meaux a disparu avec le FTP.
+- **Dépôt** : `https://github.com/rayane933200-ui/serrurier-meaux` — **public**
+- **Domaine** : `serrurier-meaux.fr`, acheté chez Internet.bs, forme canonique
+  sans `www`
 
-## En deux commandes
+## Ce que GitHub Pages ne sait pas faire
 
-```bash
-rm -rf dist && npm run build
-```
+C'est le point à connaître avant tout le reste, parce que rien ne le signale.
 
-Puis publier le contenu de `dist/`. C'est tout.
+**GitHub Pages ne sert aucun en-tête HTTP personnalisé.** Il n'y a pas
+d'équivalent de `.htaccess` ni de `_headers`. Sont donc perdus, et c'est
+irrécupérable sur cette plateforme :
 
-Le `rm -rf dist` n'est pas une précaution de style : le dépôt est dans un
-dossier OneDrive, et la synchronisation entre en concurrence avec l'écriture
-des fichiers. Voir `CLAUDE.md`, section « Le dépôt est dans un dossier
-OneDrive ».
-
-## Ce que Cloudflare fait à la place d'Apache
-
-Le `public/.htaccess` a été **supprimé**. Ce n'est pas seulement qu'il ne sert
-plus — un fichier `.htaccess` n'est lu que par Apache — c'est qu'il serait
-**servi** : lisible par n'importe qui à `/.htaccess`, avec sa politique de
-contenu et ses commentaires.
-
-Il est remplacé par `public/_headers`, que Cloudflare Pages consomme et retire.
-
-| Ce que faisait `.htaccess` | Qui s'en charge maintenant |
+| En-tête | État |
 |---|---|
-| En-têtes de sécurité, CSP | `public/_headers` |
-| Cache long sur `/_astro/` et les polices | `public/_headers` |
-| HSTS | `public/_headers`, commenté — à activer après coup |
-| HTTPS forcé | Réglage *Always Use HTTPS* du tableau de bord |
-| Redirection `www` → sans `www` | **Bulk Redirect** du tableau de bord (étape 4) |
-| Page 404 | Pages sert `/404.html` automatiquement |
-| Compression gzip/brotli | Automatique |
-| Types MIME, pas de listing de dossier | Automatique |
+| `Referrer-Policy` | **récupéré** par `<meta name="referrer">` dans `BaseLayout.astro` |
+| `X-Content-Type-Options` | perdu — aucun équivalent en balise meta |
+| `X-Frame-Options` | perdu — un `<meta http-equiv>` est ignoré par les navigateurs |
+| `Permissions-Policy` | perdu — aucun équivalent |
+| `Content-Security-Policy` | perdu en pratique. Une CSP en balise meta existe, mais seulement en mode bloquant : le mode `Report-Only` n'est pas supporté en meta. L'activer en bloquant risquerait de casser en silence le suivi de conversion Google Ads, ce que le projet refuse explicitement. |
+| `Cache-Control` | perdu — GitHub Pages impose le sien |
 
-**Le piège** : `_headers` et `_redirects` travaillent sur des **chemins**, pas
-sur des noms d'hôte. La redirection `www` ne peut donc pas s'écrire dans un
-fichier du dépôt, et son absence ne casse rien d'apparent — les deux adresses
-répondraient simplement en parallèle, ce qui donne deux URL pour chacune des
-60 pages aux yeux d'un moteur de recherche. D'où l'étape 4, qui n'est pas
-facultative.
+Le site fonctionne parfaitement sans. Il est simplement moins protégé contre
+le détournement en iframe et la confusion de type MIME. C'est le prix de ce
+choix d'hébergement, assumé.
+
+**En revanche**, GitHub Pages gère bien : le HTTPS par Let's Encrypt renouvelé
+tout seul, la page 404 (il sert `/404.html`), et la redirection `www` → apex,
+automatiquement.
+
+## Le piège qui casse tout
+
+**Sans le fichier `public/.nojekyll`, GitHub Pages fait passer le site par
+Jekyll, qui supprime tout dossier dont le nom commence par un souligné.** Il
+effacerait donc `/_astro/` — la totalité du CSS et du JavaScript. Le site
+s'afficherait en texte brut, sans style, et la cause n'est indiquée nulle part.
+
+Le fichier existe dans `public/`, donc Astro le copie dans `dist/`. Le workflow
+refuse de publier s'il manque, et vérifie aussi que `/_astro/` n'est pas vide.
+
+Même logique pour `public/CNAME`, qui porte le domaine personnalisé : sans lui,
+GitHub Pages retombe sur l'adresse en `github.io`. Le workflow contrôle en plus
+que son contenu correspond au domaine annoncé par le sitemap.
 
 ## La mise en ligne, dans l'ordre
 
-### 1. Créer le projet Pages
+### 1. Activer Pages sur le dépôt
 
-Tableau de bord Cloudflare → **Workers & Pages** → *Create* → **Pages**.
+Dépôt → **Settings** → **Pages**.
 
-Le dépôt est **purement local** au 26 octobre 2026, sans dépôt distant : la voie
-« Connect to Git » n'est pas disponible en l'état. Deux options :
+Dans **Build and deployment**, régler **Source** sur **GitHub Actions** — pas
+« Deploy from a branch ». C'est ce réglage qui laisse le workflow publier.
 
-- **Direct Upload** — choisir *Upload assets*, nommer le projet
-  `serrurier-meaux`, et déposer le **contenu** de `dist/` (pas le dossier
-  `dist` lui-même). C'est le plus simple pour démarrer.
-- **En ligne de commande** :
-  ```bash
-  npx wrangler pages deploy dist --project-name=serrurier-meaux
-  ```
-  La première exécution ouvre une fenêtre de connexion Cloudflare.
+### 2. Lancer une première publication
 
-Le nom du projet doit être `serrurier-meaux` : c'est celui qu'attend
-`.github/workflows/deploiement.yml`.
+Le workflow part tout seul au prochain `git push` sur `main`. Pour le
+déclencher sans rien modifier : onglet **Actions** → *Déploiement GitHub
+Pages* → **Run workflow**.
 
-**Vérifier** : le projet répond sur `https://serrurier-meaux.pages.dev`. À ce
-stade le site est en ligne, mais sur l'adresse technique de Cloudflare.
+**Vérifier** : le workflow passe au vert, et l'onglet Actions affiche l'URL
+publiée — en `rayane933200-ui.github.io/serrurier-meaux` tant que le domaine
+n'est pas configuré.
 
-### 2. Rattacher le domaine à Cloudflare
+Aucun secret n'est à renseigner. La publication utilise le jeton que GitHub
+fournit lui-même à l'exécution. C'est le seul avantage net de cette plateforme
+sur les deux précédentes.
 
-Pour qu'un domaine **apex** (sans `www`) pointe vers Pages, il doit être géré
-par le DNS de Cloudflare. Ce n'est pas un choix : c'est ce qui permet à
-Cloudflare de résoudre la racine du domaine, qu'un CNAME classique ne sait pas
-faire.
+### 3. Les enregistrements DNS chez Internet.bs
 
-Tableau de bord → **Add a site** → `serrurier-meaux.fr` → offre **Free**.
+Contrairement à o2switch et à Cloudflare, **les adresses de GitHub Pages sont
+publiques et fixes** : elles peuvent être écrites ici une fois pour toutes.
 
-Cloudflare affiche alors **deux serveurs de noms** qui lui sont propres, du
-type `prénom.ns.cloudflare.com`. **Ils sont attribués par compte et ne sont pas
-devinables** — il faut les lire sur cette page.
+Internet.bs → fiche de `serrurier-meaux.fr` → zone DNS. À créer :
 
-### 3. Pointer le domaine chez Internet.bs
+| Type | Nom | Valeur |
+|---|---|---|
+| `A` | `@` | `185.199.108.153` |
+| `A` | `@` | `185.199.109.153` |
+| `A` | `@` | `185.199.110.153` |
+| `A` | `@` | `185.199.111.153` |
+| `CNAME` | `www` | `rayane933200-ui.github.io` |
 
-Internet.bs → la fiche de `serrurier-meaux.fr` → **Nameservers**.
+Les quatre `A` ne sont pas un choix : ce sont quatre serveurs différents, et les
+quatre sont attendus. `@` désigne le domaine nu, sans sous-domaine ; certaines
+interfaces veulent un champ vide à la place.
 
-Remplacer les serveurs actuels par les deux noms relevés à l'étape 2.
+Le `CNAME` pour `www` sert la redirection : **GitHub crée automatiquement la
+redirection `www` → apex** dès lors que les deux noms sont configurés et que le
+domaine personnalisé du dépôt est l'apex. C'est le bon sens pour nous, puisque
+la forme canonique est sans `www`.
 
-Pour mémoire, l'état de départ : le domaine a été créé le 26 octobre 2026 à
-14 h 10 UTC et son statut au registre AFNIC était `inactive`, c'est-à-dire
-**aucun serveur de noms** — d'où une réponse `NXDOMAIN`. C'est normal pour un
-domaine acheté et pas encore pointé.
+Les enregistrements `AAAA` (IPv6) existent aussi — `2606:50c0:8000::153` à
+`:8003::153` — mais ils sont facultatifs, les `A` suffisent.
 
-**Vérifier** que la délégation est prise en compte :
-
-```bash
-nslookup -type=ns serrurier-meaux.fr
-```
-
-Cloudflare envoie aussi un courriel quand la zone devient active.
-
-### 4. Rattacher les deux noms au projet Pages
-
-Projet Pages → onglet **Custom domains** → *Set up a custom domain*.
-
-Ajouter **`serrurier-meaux.fr`**. Cloudflare crée l'enregistrement et émet le
-certificat tout seul, en général en quelques minutes.
-
-Puis la redirection de `www`, qui est la partie que personne ne pense à faire.
-La méthode officielle de Cloudflare tient en deux gestes :
-
-**a. Une liste de redirections** — tableau de bord → **Bulk Redirects** :
-
-| Champ | Valeur |
-|---|---|
-| Source | `www.serrurier-meaux.fr` |
-| Cible | `https://serrurier-meaux.fr` |
-| Statut | `301` |
-| Options | conserver la chaîne de requête, correspondance de sous-chemin, conserver le suffixe de chemin, inclure les sous-domaines |
-
-Puis créer une règle de redirection en masse à partir de cette liste.
-
-**b. Un enregistrement DNS pour `www`** — tableau de bord → **DNS** :
-
-| Type | Nom | Valeur | Proxy |
-|---|---|---|---|
-| `A` | `www` | `192.0.2.1` | **Proxied** (nuage orange) |
-
-Cette IP est volontairement une adresse de documentation qui ne mène nulle
-part : seul compte le fait que l'enregistrement soit *proxifié*, ce qui fait
-passer la requête par Cloudflare, où la règle de redirection s'applique avant
-d'atteindre quoi que ce soit.
-
-**Vérifier**, et ne pas s'en tenir au navigateur, qui cache les redirections :
+**Vérifier**, sans se fier au cache du navigateur :
 
 ```bash
-curl -I https://www.serrurier-meaux.fr/
+nslookup serrurier-meaux.fr
 ```
 
-La réponse doit porter `HTTP/2 301` et `location: https://serrurier-meaux.fr/`.
+Les quatre adresses en `185.199.x.153` doivent apparaître.
+
+### 4. Déclarer le domaine sur le dépôt
+
+Settings → **Pages** → **Custom domain** → saisir `serrurier-meaux.fr` → *Save*.
+
+GitHub vérifie le DNS, puis coche **Enforce HTTPS** une fois le certificat
+émis — compter de quelques minutes à une heure. Ne pas forcer, ne pas
+désactiver.
+
+Le fichier `public/CNAME` du dépôt porte déjà cette valeur, donc elle survivra
+aux republications. Sans lui, chaque déploiement effacerait le réglage.
 
 ### 5. Vérifier le site réel
 
 Dans cet ordre :
 
-- `https://serrurier-meaux.fr/` affiche le site, cadenas présent
+- `https://serrurier-meaux.fr/` affiche le site **avec ses styles**. S'il est en
+  texte brut, c'est `.nojekyll` qui manque.
 - `http://serrurier-meaux.fr` bascule en HTTPS
-- `https://www.serrurier-meaux.fr/` redirige en 301 vers sans `www`
-- `https://serrurier-meaux.fr/une-page-qui-nexiste-pas/` affiche **notre** page
-  404, pas celle de Cloudflare
-- les en-têtes de sécurité sont bien là :
+- `https://www.serrurier-meaux.fr/` redirige vers sans `www` :
   ```bash
-  curl -I https://serrurier-meaux.fr/ | grep -i "x-content-type\|referrer-policy\|permissions-policy"
+  curl -I https://www.serrurier-meaux.fr/
   ```
-
-Ce dernier contrôle est le plus important : si `_headers` n'a pas été pris en
-compte, **le site s'affiche parfaitement** et perd juste tous ses en-têtes. Rien
-ne le signale.
-
-### 6. Activer le HSTS, seulement maintenant
-
-Deux voies, **une seule à choisir** :
-
-- décommenter la ligne `Strict-Transport-Security` dans `public/_headers`,
-  reconstruire, republier ;
-- ou le réglage *SSL/TLS → Edge Certificates → HSTS* du tableau de bord.
-
-Activé avant que le certificat fonctionne, il engage le domaine pour un an
-**sans marche arrière côté serveur** : c'est le navigateur du visiteur qui se
-souvient. D'où l'ordre.
-
-## Mettre le dépôt sur GitHub
-
-Le dépôt est local. Le pousser sert à deux choses : garder une copie hors du
-poste, et permettre à Cloudflare Pages de reconstruire tout seul à chaque
-modification.
-
-**Le dépôt doit être créé en PRIVÉ.** L'historique contient l'identifiant du
-compte o2switch qui héberge le site de Lyon — voir la section correspondante de
-`CLAUDE.md`. Cloudflare Pages fonctionne sans difficulté avec un dépôt privé.
-
-Deux façons de créer le dépôt :
-
-- **Dans le navigateur** : github.com → *New repository* → nom
-  `serrurier-meaux` → **Private** → ne rien cocher d'autre (pas de README, pas
-  de .gitignore : le dépôt en a déjà).
-- **En ligne de commande**, si GitHub CLI est installé :
-  ```bash
-  gh repo create serrurier-meaux --private --source=. --remote=origin --push
-  ```
-  (`gh` n'est pas installé sur ce poste au 26 octobre 2026.)
-
-Puis, si le dépôt a été créé dans le navigateur :
-
-```bash
-git remote add origin https://github.com/<ton-compte>/serrurier-meaux.git
-git push -u origin main
-```
-
-Git demandera un identifiant : utiliser un **jeton d'accès personnel**
-(Settings → Developer settings → Personal access tokens), pas le mot de passe
-du compte, que GitHub n'accepte plus depuis 2021.
-
-**Vérifier** : les 6 commits apparaissent sur GitHub, et le dépôt porte bien la
-mention *Private*.
-
-### Brancher Cloudflare Pages sur le dépôt
-
-Une fois le dépôt poussé, c'est la voie la plus confortable — elle remplace le
-téléversement manuel de l'étape 1.
-
-Projet Pages → *Settings* → **Builds & deployments** → *Connect to Git*, ou
-créer le projet directement par cette voie. Réglages :
-
-| Champ | Valeur |
-|---|---|
-| Framework preset | Astro |
-| Build command | `npm run build` |
-| Build output directory | `dist` |
-| Production branch | `main` |
-
-Cloudflare reconstruira à chaque `git push` sur `main`.
-
-**Attention au doublon.** Si le dépôt est connecté à Pages ET que le workflow
-GitHub Actions tourne, **chaque push déclenche deux déploiements** : celui de
-Cloudflare et celui de `wrangler`. Ils ne se gênent pas, mais ils se marchent
-dessus dans l'historique des déploiements et doublent les soumissions IndexNow.
-Choisir l'un des deux :
-
-- **Connexion Git Cloudflare** : plus simple, aucun secret à gérer. Mais on perd
-  les contrôles d'avant-publication du workflow (sitemap sur localhost,
-  `_headers` manquant, clé IndexNow) et la soumission IndexNow. Il faut alors
-  supprimer `.github/workflows/deploiement.yml`.
-- **Workflow GitHub Actions** : garde les contrôles et IndexNow. Il faut alors
-  **ne pas** connecter le dépôt dans Pages, et laisser le projet en *Direct
-  Upload*.
-
-Le workflow est recommandé ici, précisément pour ces contrôles : chacun existe
-parce qu'il correspond à une panne qui ne se voit pas.
-
-## Automatiser le déploiement
-
-`.github/workflows/deploiement.yml` construit, contrôle, publie sur Cloudflare
-Pages puis signale les pages modifiées à IndexNow.
-
-**Il ne s'exécutera que si le dépôt est poussé sur GitHub** — il est purement
-local aujourd'hui. Tant que c'est le cas, la publication se fait à la main
-(étape 1).
-
-Le jour où le dépôt est poussé, il lui faut deux secrets — **Settings → Secrets
-and variables → Actions** :
-
-| Secret | Où le trouver |
-|---|---|
-| `CLOUDFLARE_API_TOKEN` | My Profile → API Tokens → *Create Token*, permission **Cloudflare Pages : Edit** |
-| `CLOUDFLARE_ACCOUNT_ID` | lisible dans l'URL du tableau de bord, ou dans le panneau latéral du projet |
-
-Le jeton doit porter la permission la plus étroite possible : *Cloudflare Pages
-— Edit*, rien d'autre. Un jeton « tous droits » dans les secrets d'un dépôt
-donne accès à l'ensemble du compte Cloudflare, DNS compris.
+  attendu : `301` et `location: https://serrurier-meaux.fr/`
+- `https://serrurier-meaux.fr/une-page-qui-nexiste-pas/` affiche **notre** 404
+- une page intérieure au hasard, par exemple
+  `https://serrurier-meaux.fr/zones/serrurier-meaux-beauval/`
 
 ## Après la mise en ligne
 
-- **Search Console** : créer la propriété `serrurier-meaux.fr`, choisir la
-  validation par *balise HTML*, coller le jeton dans
-  `site.analytics.googleSiteVerification`, reconstruire, republier, puis
-  valider. Soumettre ensuite `https://serrurier-meaux.fr/sitemap-index.xml`.
+- **Search Console** : créer la propriété `serrurier-meaux.fr`, validation par
+  *balise HTML*, coller le jeton dans `site.analytics.googleSiteVerification`,
+  pousser. Tant que ce champ est vide, la balise n'est pas émise du tout.
+  Soumettre ensuite `https://serrurier-meaux.fr/sitemap-index.xml`.
+- **Mot de passe o2switch** : à changer. L'identifiant du compte figure dans
+  l'historique public de ce dépôt (commits `63df0ad` à `6f55bb8`). Penser à
+  reporter le nouveau mot de passe dans les secrets du dépôt de Lyon, sinon son
+  déploiement automatique cassera.
 - **Téléphone de l'hébergeur** : la LCEN impose de le porter dans les mentions
-  légales. `site.legal.host.phone` est **vide** parce qu'il n'a pas pu être
-  vérifié — deux annuaires donnent deux numéros, et la page de contact de
-  Cloudflare refuse l'accès automatisé. À relever à la main sur cloudflare.com.
-- **Google Ads** : le compte est le même que pour Lyon, le suivi de conversion
-  fonctionne sans rien changer. Mais les deux sites alimenteront les mêmes
-  colonnes : pour les distinguer, **une campagne par ville**, avec son ciblage
-  géographique et ses URL finales.
-- **Fiche Google Business Profile** : elle n'existe pour aucune des deux villes.
-  Pour une activité de dépannage, c'est le levier qui manque le plus — davantage
-  que le site lui-même.
+  légales. `site.legal.host.phone` est vide, faute de source officielle
+  vérifiable. À relever à la main.
+- **Google Ads** : même compte que Lyon, le suivi fonctionne sans rien changer.
+  Mais les deux sites alimenteront les mêmes colonnes de conversions : les
+  séparer demande **une campagne par ville**, avec son ciblage et ses URL.
+- **Fiche Google Business Profile** : toujours inexistante pour les deux villes.
+  Pour du dépannage local, c'est le levier qui manque le plus — davantage que
+  le site.

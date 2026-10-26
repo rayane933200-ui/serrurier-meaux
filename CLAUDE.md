@@ -33,8 +33,8 @@ Les fichiers réellement communs : `src/components/`, `src/layouts/`, `src/style
 
 **Ne sont plus communs depuis le 26 octobre 2026** : tout ce qui touche à
 l'hébergement. Lyon est chez o2switch avec un `public/.htaccess` et un envoi
-FTP ; Meaux est sur Cloudflare Pages avec un `public/_headers` et un
-déploiement Pages. Ne jamais recopier l'un sur l'autre.
+FTP ; Meaux est sur GitHub Pages avec un `public/.nojekyll`, un `public/CNAME`
+et une publication par GitHub Actions. Ne jamais recopier l'un sur l'autre.
 
 **Ce qui ne doit JAMAIS être recopié d'un dépôt à l'autre** : le domaine d'`astro.config.mjs`, la
 clé IndexNow, le jeton Search Console, les secrets FTP, et tout `src/data/` (zones, services,
@@ -72,10 +72,20 @@ c'est la promesse qu'il faut corriger, pas l'habillage.
 - **Styling** : CSS natif / Astro scoped styles
 - **Gestionnaire de paquets** : npm
 - **Domaine** : `serrurier-meaux.fr`, forme canonique sans `www`, acheté chez Internet.bs
-- **Hébergement** : **Cloudflare Pages** (décision de Rayane le 26/10/2026 ; Lyon reste chez
-  o2switch). Les en-têtes et le cache vivent dans `public/_headers` — il n'y a **pas** de
-  `.htaccess` dans ce dépôt, et il ne faut pas en remettre : Cloudflare ne le lirait pas et le
-  servirait en clair à `/.htaccess`.
+- **Hébergement** : **GitHub Pages** (décision de Rayane le 26/10/2026 ; Lyon reste chez
+  o2switch). Dépôt `rayane933200-ui/serrurier-meaux`, **public**.
+
+  Deux fichiers sans lesquels le site casse, et qui ne doivent jamais être supprimés :
+  `public/.nojekyll` — sans lui, Jekyll efface `/_astro/`, c'est-à-dire tout le CSS et tout le
+  JavaScript, et le site s'affiche en texte brut — et `public/CNAME`, qui porte le domaine
+  personnalisé et que chaque déploiement réécrirait sinon.
+
+  **GitHub Pages ne sert aucun en-tête HTTP personnalisé.** Ni `.htaccess`, ni `_headers` : les
+  deux seraient ignorés, et servis en clair. `X-Content-Type-Options`, `X-Frame-Options`,
+  `Permissions-Policy` et la CSP sont perdus, sans équivalent en balise meta. Seule la politique
+  de référent a été récupérée, par un `<meta name="referrer">` dans `BaseLayout.astro`. C'est le
+  prix du choix d'hébergement, pas un oubli — ne pas « réparer » en remettant un fichier
+  d'en-têtes.
 
 ## Commandes courantes
 
@@ -140,7 +150,7 @@ balise n'est pas émise — le site fonctionne, il ne remonte simplement aucune 
 
 ```
 /
-├── public/              # fichiers statiques servis tels quels (favicon, _headers, polices)
+├── public/              # fichiers statiques (favicon, .nojekyll, CNAME, polices)
 ├── src/
 │   ├── assets/           # logo fourni par l'utilisateur (logo-full.png, logo-icon.png)
 │   ├── components/        # composants Astro/UI réutilisables
@@ -335,27 +345,35 @@ n'avait pas repris : 9 sur `/marques-de-serrures/`, 8 sur `/assurance-habitation
 `/assureurs-habitation/`, 4 sur `/apres-un-cambriolage/`. Corrigés ici.
 **Elles sont toujours en ligne sur le site de Lyon.**
 
-## Ce dépôt doit rester privé
+## Le dépôt est public, et son historique contient un identifiant
 
-Les fichiers actuels ne contiennent aucun identifiant. **L'historique git, si.**
+**État réel, à ne pas confondre avec une intention.** Le dépôt
+`rayane933200-ui/serrurier-meaux` est **public**. Il devait être créé en privé ;
+la case n'a pas été prise en compte, et le push a eu lieu avant vérification.
+Rayane a ensuite choisi de le laisser public, le 26 octobre 2026.
 
-Les commits antérieurs au passage sur Cloudflare (`63df0ad` à `6f55bb8`)
-contiennent l'identifiant du compte o2switch qui héberge le site de Lyon
-(`jutu8080`), le nom de son serveur et son adresse d'accès cPanel. Ils y
-figuraient légitimement tant que l'hébergement était o2switch ; ils ont disparu
-des fichiers avec le commit `4e3acd5`, mais pas de l'historique.
+Les fichiers actuels ne contiennent aucun identifiant. **L'historique, si.** Les
+commits `63df0ad` à `6f55bb8` portent l'identifiant du compte o2switch qui
+héberge le site de Lyon (`jutu8080`), le nom de son serveur et son adresse
+d'accès cPanel. Ils y figuraient légitimement tant que l'hébergement était
+o2switch ; ils ont disparu des fichiers avec `4e3acd5`, mais pas de l'historique,
+et l'historique est lisible par tout le monde.
 
-Ce n'est pas un mot de passe. C'est la moitié d'une paire d'identifiants, et
-elle suffit à cibler une attaque par force brute sur un cPanel qui sert un site
-en production.
+Ce n'est pas un mot de passe — c'est la moitié d'une paire d'identifiants, celle
+qui permet de cibler. **La mitigation est le changement du mot de passe cPanel
+d'o2switch**, pas la visibilité du dépôt : une fois le mot de passe tourné,
+l'identifiant ne vaut plus rien. C'est porté dans les champs à compléter.
 
-Donc : **dépôt privé**. Cloudflare Pages fonctionne parfaitement avec un dépôt
-privé, il n'y a rien à gagner à le rendre public.
+Deux choses à savoir pour la suite :
 
-Si le dépôt devait un jour devenir public, **nettoyer l'historique d'abord** —
-`git filter-repo`, ou un écrasement de tous les commits en un seul. Le faire
-après publication ne sert à rien : GitHub conserve les objets, et un fork ou un
-clone en garde une copie.
+- Repasser le dépôt en privé **ne supprime pas** les objets déjà publiés. GitHub
+  les conserve, accessibles par leur empreinte. Seule une suppression du dépôt,
+  suivie d'une recréation à partir d'un historique nettoyé (`git filter-repo`,
+  ou un écrasement en un seul commit), efface réellement la trace.
+- La visibilité du dépôt n'a **aucun** rapport avec la mise en ligne du site.
+  GitHub Pages publie aussi bien depuis un dépôt privé que public. Si la
+  question se repose, ce n'est pas un argument valable dans un sens ou dans
+  l'autre.
 
 ## Conventions de code
 
@@ -398,9 +416,12 @@ En attente — **ne rien inventer pour combler ces trous** :
 
 - [ ] **Jeton Search Console** — la propriété `serrurier-meaux.fr` reste à créer.
 - [ ] **Téléphone de l'hébergeur** — `site.legal.host.phone` est vide. La LCEN impose de le
-      porter dans les mentions légales. Il n'a pas pu être vérifié : deux annuaires donnent deux
-      numéros différents pour Cloudflare, et leur page de contact refuse l'accès automatisé. À
-      relever à la main sur cloudflare.com plutôt qu'à recopier d'un annuaire.
+      porter dans les mentions légales. Il n'a pas pu être vérifié à une source officielle pour
+      GitHub, Inc. À relever à la main plutôt qu'à recopier d'un annuaire : publier un numéro
+      faux sur une page opposable est pire que de ne pas en publier.
+- [ ] **Mot de passe o2switch à changer** — l'identifiant du compte figure dans l'historique
+      public de ce dépôt. Penser à reporter le nouveau mot de passe dans les secrets du dépôt de
+      Lyon, sinon son déploiement automatique cassera au prochain push.
 - [ ] **Assurance décennale** — souscription confirmée par Rayane le 05/10/2026 et annoncée sur le
       site (`credentials.decennale`). Manquent **l'assureur, le n° de contrat et la couverture
       géographique** : la loi impose déjà de les porter sur chaque devis et chaque facture, il

@@ -182,39 +182,39 @@ export const site = {
     addressCity: 'Les Pavillons-sous-Bois',
     publisher: 'Rayane IDRIS',
 
-    // Hébergeur — Cloudflare Pages, sur décision de Rayane le 26 octobre 2026.
+    // Hébergeur — GitHub Pages, sur décision de Rayane le 26 octobre 2026.
     //
-    // Le site de Lyon reste chez o2switch ; celui-ci part sur Cloudflare. Les
-    // deux sites n'ont donc plus le même hébergeur, et ce bloc ne doit PAS être
-    // recopié d'un dépôt à l'autre.
+    // Troisième hébergeur envisagé le même jour : o2switch, puis Cloudflare
+    // Pages, puis GitHub Pages. C'est celui-ci qui est en place.
+    //
+    // Le site de Lyon reste chez o2switch. Les deux sites n'ont donc plus le
+    // même hébergeur, et ce bloc ne doit PAS être recopié d'un dépôt à l'autre.
     //
     // Les mentions légales sont opposables : nommer un hébergeur qui n'héberge
     // pas le site est une information fausse sur une page qui engage. Si
     // l'hébergement rebouge, ce bloc suit le jour même — et la politique de
     // confidentialité avec, puisqu'elle décrit où vont les journaux serveur.
     //
-    // Conséquence directe du changement : l'hébergement quitte la France pour
-    // une société américaine. La section « Transferts hors de l'Union
-    // européenne » de la politique de confidentialité a été réécrite en
-    // conséquence. Ne pas la remettre dans son état « hébergé en France ».
+    // L'hébergement est hors de France. La section « Transferts hors de l'Union
+    // européenne » de la politique de confidentialité le dit explicitement. Ne
+    // pas la remettre dans son état « hébergé en France ».
     host: {
-      // Dénomination et adresse du siège, relevées sur le formulaire 10-K
-      // déposé par Cloudflare auprès de la SEC — document public et officiel,
-      // pas un annuaire tiers.
-      name: 'Cloudflare, Inc.',
-      address: '101 Townsend Street, San Francisco, CA 94107, États-Unis',
-      url: 'https://www.cloudflare.com',
+      // Dénomination et adresse du siège. Même adresse dans trois sources
+      // concordantes : les conditions générales d'entreprise de GitHub, le
+      // registre ARIN de son réseau, et ses notifications légales. Les sources
+      // écrivent la rue tantôt « Colin P. Kelly Street », tantôt « Colin P.
+      // Kelly Jr. Street » ; la seconde forme est celle du registre ARIN.
+      name: 'GitHub, Inc.',
+      address: '88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis',
+      url: 'https://github.com',
       siret: '', // sans objet : société de droit américain, pas d'immatriculation française
       /**
        * Téléphone — À COMPLÉTER.
        *
        * La LCEN impose de porter le téléphone de l'hébergeur dans les mentions
-       * légales. Il n'est pas renseigné ici parce qu'il n'a pas pu être vérifié :
-       * deux annuaires d'entreprises donnent deux numéros différents, et la page
-       * de contact de Cloudflare refuse l'accès automatisé (HTTP 403).
-       *
-       * Publier un numéro faux sur une page opposable est pire que de ne pas en
-       * publier. À relever à la main sur cloudflare.com, puis à reporter ici.
+       * légales. Il n'est pas renseigné parce qu'il n'a pas pu être vérifié à une
+       * source officielle, et publier un numéro faux sur une page opposable est
+       * pire que de ne pas en publier.
        *
        * Le champ n'est aujourd'hui affiché par aucune page : la page mentions
        * légales ne rend que `name`, `address` et `url`. Le renseigner n'aura

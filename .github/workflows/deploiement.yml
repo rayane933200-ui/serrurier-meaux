@@ -1,32 +1,35 @@
-# Construit le site de Meaux et le publie sur Cloudflare Pages à chaque
+# Construit le site de Meaux et le publie sur GitHub Pages à chaque
 # `git push` sur main.
 #
-# L'hébergement est passé d'o2switch à Cloudflare Pages le 26 octobre 2026, sur
-# décision de Rayane. Le site de Lyon, lui, reste chez o2switch : les deux
-# dépôts n'ont plus la même chaîne de publication, et ce fichier ne doit PAS
-# être recopié de l'un à l'autre.
+# Troisième hébergement envisagé le 26 octobre 2026 : o2switch, puis Cloudflare
+# Pages, puis GitHub Pages. C'est celui-ci qui est en place. Le site de Lyon
+# reste chez o2switch : les deux dépôts n'ont plus la même chaîne de
+# publication, et ce fichier ne doit PAS être recopié de l'un à l'autre.
 #
-# Ce que le changement a supprimé :
-#   · l'envoi FTP, et avec lui le risque d'écraser le site de Lyon — les deux
-#     sites ne partagent plus aucun compte ;
-#   · le contrôle de présence de dist/.htaccess, puisque Apache n'est plus dans
-#     la boucle (voir public/_headers).
+# Aucun secret à renseigner. La publication passe par le jeton que GitHub
+# fournit lui-même à l'exécution (`id-token`), pas par une clé d'API à stocker.
+# C'est le seul avantage net de GitHub Pages sur les deux autres hébergements.
 #
-# ATTENTION — ce workflow ne s'exécutera que si le dépôt est poussé sur GitHub.
-# Au 26 octobre 2026 il est purement local, sans dépôt distant : la publication
-# se fait donc à la main, par téléversement du dossier dist/ dans le tableau de
-# bord Cloudflare, ou par `npx wrangler pages deploy dist`. Voir DEPLOIEMENT.md.
+# Ce que GitHub Pages ne sait PAS faire, et qui est donc perdu :
+#   · les en-têtes HTTP personnalisés. X-Content-Type-Options, X-Frame-Options
+#     et Permissions-Policy n'ont pas d'équivalent en balise meta et ne sont
+#     plus envoyés. Seule la politique de référent a été récupérée, par un
+#     <meta name="referrer"> dans BaseLayout.
+#   · la politique de contenu (CSP), pour la même raison.
+#   · le contrôle du cache. GitHub Pages impose le sien.
 #
-# Les identifiants ne sont PAS dans ce fichier. Ils vivent dans les secrets du
-# dépôt (Settings → Secrets and variables → Actions), où ni le code, ni les
-# journaux d'exécution, ni personne d'autre que le propriétaire du dépôt ne
-# peut les lire.
+# Ce qu'il sait faire :
+#   · la redirection www → apex, automatiquement, dès lors que les deux noms
+#     sont configurés en DNS et que le domaine personnalisé du dépôt est l'apex.
+#   · le HTTPS, par certificat Let's Encrypt renouvelé tout seul.
+#   · la page 404, en servant /404.html.
 #
-#   CLOUDFLARE_API_TOKEN   jeton avec la permission « Cloudflare Pages : Edit »
-#   CLOUDFLARE_ACCOUNT_ID  identifiant de compte, lisible dans l'URL du tableau
-#                          de bord Cloudflare
+# PIÈGE : sans le fichier public/.nojekyll, GitHub Pages fait passer le site par
+# Jekyll, qui supprime tout dossier commençant par un souligné. Il effacerait
+# donc /_astro/, c'est-à-dire la TOTALITÉ du CSS et du JavaScript. Le site
+# s'afficherait en texte brut. Le contrôle plus bas refuse de publier sans lui.
 
-name: Déploiement Cloudflare Pages
+name: Déploiement GitHub Pages
 
 on:
   push:
@@ -35,15 +38,29 @@ on:
   # utile pour republier sans avoir à modifier quoi que ce soit.
   workflow_dispatch:
 
-# Deux pushes rapprochés ne doivent pas téléverser en même temps : le second
-# annule le premier plutôt que d'entrelacer deux envois sur le même dossier.
+# Droits requis par la publication GitHub Pages. Volontairement limités à ça :
+# `contents: read` suffit pour lire le dépôt, le workflow n'écrit rien dedans.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Deux pushes rapprochés ne doivent pas publier en même temps. On n'annule PAS
+# le déploiement en cours : contrairement à un envoi FTP, une publication Pages
+# interrompue laisse le site dans son état précédent, et il vaut mieux attendre
+# la fin de la première que de la couper au milieu.
 concurrency:
-  group: deploiement-meaux
-  cancel-in-progress: true
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   publier:
     runs-on: ubuntu-latest
+    # Exigé par actions/deploy-pages : c'est cet environnement qui porte l'URL
+    # publiée, visible dans l'onglet Actions une fois le déploiement terminé.
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
     steps:
       - name: Récupérer le dépôt
         uses: actions/checkout@v7
@@ -69,12 +86,29 @@ jobs:
             echo "::error::Le sitemap contient des URL localhost, publication annulée."
             exit 1
           fi
-          # Sur Cloudflare Pages, les en-têtes viennent de _headers. Sans ce
-          # fichier le site s'affiche parfaitement — il perd juste en silence
-          # tous ses en-têtes de sécurité et sa politique de contenu. C'est
-          # exactement le genre de panne qu'on ne voit pas, d'où ce contrôle.
-          if [ ! -f dist/_headers ]; then
-            echo "::error::dist/_headers absent : le site perdrait ses en-têtes de sécurité."
+          # Sans .nojekyll, GitHub Pages passe le site par Jekyll, qui supprime
+          # tout dossier commençant par un souligné — donc /_astro/, c'est-à-dire
+          # tout le CSS et tout le JavaScript. Le site s'afficherait en texte
+          # brut. C'est la panne la plus spectaculaire de cette plateforme, et
+          # elle tient à un fichier vide.
+          if [ ! -f dist/.nojekyll ]; then
+            echo "::error::dist/.nojekyll absent : Jekyll supprimerait /_astro/, le site perdrait tout son CSS."
+            exit 1
+          fi
+          # Le CNAME porte le domaine personnalisé. Sans lui, GitHub Pages
+          # retombe sur l'adresse en github.io et le domaine ne répond plus.
+          if [ ! -f dist/CNAME ]; then
+            echo "::error::dist/CNAME absent : le domaine personnalisé serait perdu."
+            exit 1
+          fi
+          attendu=$(grep -o '<loc>https://[^/]*' dist/sitemap-0.xml | head -1 | sed 's|<loc>https://||')
+          if [ "$(cat dist/CNAME)" != "$attendu" ]; then
+            echo "::error::dist/CNAME vaut '$(cat dist/CNAME)' alors que le sitemap annonce '$attendu'."
+            exit 1
+          fi
+          # Contrôle de fond : /_astro/ doit contenir quelque chose.
+          if [ -z "$(ls -A dist/_astro 2>/dev/null)" ]; then
+            echo "::error::dist/_astro vide : le site n'aurait ni CSS ni JavaScript."
             exit 1
           fi
           # Fichier de preuve IndexNow. Sans lui, les soumissions repartent en
@@ -114,18 +148,26 @@ jobs:
           # grep -o puis wc -l : le sitemap tient sur une seule ligne, compter
           # les lignes renverrait toujours 1.
           pages=$(grep -o '<loc>' dist/sitemap-0.xml | wc -l)
-          echo "$pages pages, _headers et clé IndexNow présents."
+          echo "$pages pages, .nojekyll, CNAME et clé IndexNow présents."
           if [ "$pages" -lt 40 ]; then
             echo "::error::Seulement $pages pages dans le sitemap, construction incomplète."
             exit 1
           fi
 
-      - name: Publier sur Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+      - name: Préparer GitHub Pages
+        uses: actions/configure-pages@v5
+
+      # include-hidden-files : sans cette option, .nojekyll n'est PAS embarqué
+      # dans l'archive, et on retombe exactement sur la panne qu'il évite.
+      - name: Empaqueter le site
+        uses: actions/upload-pages-artifact@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=serrurier-meaux --branch=main
+          path: dist
+          include-hidden-files: true
+
+      - name: Publier sur GitHub Pages
+        id: pages
+        uses: actions/deploy-pages@v4
 
       # IndexNow prévient Bing, Yandex, Seznam et Naver qu'une page a changé, au
       # lieu d'attendre leur prochain passage. Google n'en fait pas partie :
