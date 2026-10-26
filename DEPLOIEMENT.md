@@ -63,10 +63,33 @@ cPanel → **Domaines** → *Créer un domaine*.
   alors le site de Lyon, et les deux adresses serviraient les mêmes pages. Si
   tu la coches par erreur, supprime l'entrée et recommence — ne tente pas de
   la rattraper.
-- **Racine du document** : cPanel propose une valeur automatiquement. Corrige-la
-  pour qu'elle soit exactement `public_html/serrurier-meaux.fr`. C'est la
-  valeur inscrite dans le workflow (`DOSSIER_SITE`), les deux doivent
-  correspondre au caractère près.
+- **Racine du document** : cPanel propose une valeur automatiquement, souvent
+  `public_html/serrurier-meaux.fr`. **Préférer `serrurier-meaux.fr` tout court**,
+  c'est-à-dire `/home/jutu8080/serrurier-meaux.fr`, en dehors de `public_html`.
+
+  La raison : `public_html/` est la racine du domaine principal. Tout ce qui s'y
+  trouve est aussi servi par lui. Une racine en `public_html/serrurier-meaux.fr`
+  rendrait donc le site de Meaux accessible à
+  `serrurier-lyon-7j7.fr/serrurier-meaux.fr/` — une seconde adresse pour chacune
+  des 60 pages. Les balises canoniques du site étant absolues, Google saurait
+  quoi retenir, mais autant ne pas créer le doublon.
+
+  Certains hébergeurs verrouillent ce champ sur `public_html` (réglage WHM hors
+  de portée du client). Si cPanel refuse ou remet le préfixe tout seul, ce n'est
+  pas grave : accepter, et ajuster `DOSSIER_SITE` en conséquence.
+
+> **Relever la valeur finale.** Le champ `DOSSIER_SITE` du workflow doit
+> correspondre à la racine réellement acceptée, exprimée **relativement au
+> dossier d'accueil FTP** (`/home/jutu8080/`), et se terminer par un slash :
+>
+> | Racine du document dans cPanel | `DOSSIER_SITE` |
+> |---|---|
+> | `/home/jutu8080/serrurier-meaux.fr` | `serrurier-meaux.fr/` |
+> | `/home/jutu8080/public_html/serrurier-meaux.fr` | `public_html/serrurier-meaux.fr/` |
+>
+> Une erreur ici n'envoie pas le site au mauvais endroit par hasard : elle crée
+> simplement un dossier inutile, et le domaine continue d'afficher la page
+> d'attente. C'est le symptôme à reconnaître.
 
 À cette étape, les serveurs d'o2switch deviennent autoritatifs pour le
 domaine. C'est ce qui rend l'étape suivante possible.
