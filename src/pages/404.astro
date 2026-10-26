@@ -1,0 +1,198 @@
+---
+// Page d'erreur 404. Astro la compile en `dist/404.html` et Netlify la sert
+// automatiquement sur toute URL inconnue : aucune configuration n'est requise.
+//
+// Le visiteur qui arrive ici est souvent dehors, sur téléphone, devant une porte
+// fermée. La page va donc droit à l'action utile : le bouton d'appel d'abord,
+// puis les routes les plus probables (prestation ou commune mal saisie).
+//
+// Indexation : cette page gagnerait une balise `<meta name="robots" content="noindex">`,
+// que seul BaseLayout peut placer dans le `<head>`. L'ajout d'une prop au layout
+// sort du périmètre de ce fichier — voir la note de livraison.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Icon from '../components/Icon.astro';
+import { services } from '../data/services';
+import { site } from '../data/site';
+
+const crumbs = [{ label: 'Accueil', href: '/' }, { label: 'Page introuvable' }];
+
+const mainLinks = [
+  { href: '/', label: 'Accueil' },
+  { href: '/services/', label: 'Nos prestations' },
+  { href: '/zones-intervention/', label: 'Zones d’intervention' },
+  { href: '/contact/', label: 'Contact et devis' },
+];
+---
+
+<BaseLayout
+  title="Page introuvable"
+  description="Cette adresse ne correspond à aucune page du site. Appelez-nous pour un dépannage de serrurerie à Meaux, ou retrouvez nos prestations et nos zones."
+  noindex
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>Cette page est introuvable</h1>
+      <p>
+        L'adresse demandée ne correspond à aucune page du site. Si vous êtes devant une porte
+        fermée, le plus rapide reste de nous appeler : nous répondons {site.hours}.
+      </p>
+
+      <a class="btn btn-primary call-btn" href={site.phoneHref}>
+        <Icon name="phone" size={22} />
+        <span>Appeler le {site.phoneDisplay}</span>
+      </a>
+
+      <p class="call-note">
+        Le diagnostic par téléphone est gratuit et le tarif vous est annoncé avant tout
+        déplacement.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Reprendre la navigation</h2>
+      <ul class="quick-links">
+        {mainLinks.map((link) => (
+          <li>
+            <a href={link.href}>{link.label}</a>
+          </li>
+        ))}
+      </ul>
+
+      <h2 class="spaced">Nos prestations</h2>
+      <p class="section-intro">
+        Vous cherchiez peut-être l'une de ces {services.length} pages : chacune détaille la prestation, les
+        situations concernées et ce qui détermine le prix.
+      </p>
+      <ul class="service-links">
+        {services.map((service) => (
+          <li>
+            <a href={`/services/${service.slug}/`}>
+              <span class="service-link-icon">
+                <Icon name={service.icon} size={24} />
+              </span>
+              <span class="service-link-text">
+                <strong>{service.title}</strong>
+                <span>{service.teaser}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <h2 class="spaced">Votre commune</h2>
+      <p class="section-intro">
+        Nous couvrons {site.area}. Chaque quartier de Meaux et chaque commune couverte a
+        sa page, avec les secteurs desservis et les délais annoncés.
+      </p>
+      <p>
+        <a class="btn btn-outline" href="/zones-intervention/">
+          <Icon name="map-pin" size={18} />
+          <span>Voir toutes les zones d'intervention</span>
+        </a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero p {
+    max-width: 60ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .call-btn {
+    font-size: 1.15rem;
+    padding: 1rem 1.9rem;
+  }
+
+  .call-note {
+    margin-top: var(--space-sm);
+    margin-bottom: 0;
+    font-size: 0.93rem;
+  }
+
+  .section-intro {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+  }
+
+  .spaced {
+    margin-top: var(--space-lg);
+  }
+
+  .quick-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+  }
+
+  .quick-links a {
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+
+  .service-links {
+    list-style: none;
+    margin: var(--space-md) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-sm);
+  }
+
+  .service-links a {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: flex-start;
+    height: 100%;
+    padding: var(--space-sm);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    color: var(--color-text);
+    transition: border-color 0.15s ease;
+  }
+
+  .service-links a:hover,
+  .service-links a:focus-visible {
+    border-color: var(--color-gold-text);
+    text-decoration: none;
+  }
+
+  .service-link-icon {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    line-height: 0;
+    margin-top: 0.15rem;
+  }
+
+  .service-link-text strong {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+  }
+
+  .service-link-text span {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  .service-links a:hover .service-link-text strong,
+  .service-links a:focus-visible .service-link-text strong {
+    color: var(--color-gold-text);
+  }
+</style>

@@ -1,0 +1,186 @@
+---
+// Formulaire de demande de devis, réutilisable (accueil, contact, pages
+// prestations et zones). Ouvre la messagerie du visiteur avec un email
+// pré-rempli : pas de backend, le site reste statique.
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  /** Contexte ajouté à l'objet de l'email (ex : « Ouverture de porte », « Beauval ») */
+  context?: string;
+  class?: string;
+}
+
+const {
+  title = 'Demander un devis gratuit',
+  context = '',
+  class: className = '',
+} = Astro.props;
+
+const CONTACT_EMAIL = site.email;
+---
+
+<form id="quote-form" method="post" class={`quote-form ${className}`} aria-describedby="quote-form-note">
+  <h2>{title}</h2>
+  <p id="quote-form-note" class="quote-form-note">
+    Ce formulaire ouvre votre messagerie avec un email pré-rempli à envoyer à {CONTACT_EMAIL}.
+    Pour une urgence, appelez directement le {site.phoneDisplay}.
+  </p>
+
+  <div class="quote-form-row">
+    <div class="quote-form-field">
+      <label for="quote-name">Nom</label>
+      <input type="text" id="quote-name" name="name" autocomplete="name" required />
+    </div>
+    <div class="quote-form-field">
+      <label for="quote-phone">Téléphone</label>
+      <input type="tel" id="quote-phone" name="phone" autocomplete="tel" required />
+    </div>
+  </div>
+
+  <div class="quote-form-field">
+    <label for="quote-city">Ville ou quartier</label>
+    <input type="text" id="quote-city" name="city" placeholder="Ex : Meaux Centre, Villenoy..." />
+  </div>
+
+  <div class="quote-form-field">
+    <label for="quote-message">Votre besoin</label>
+    <textarea
+      id="quote-message"
+      name="message"
+      rows="4"
+      required
+      placeholder="Ex : porte claquée, besoin de changer une serrure, demande de devis blindage..."></textarea>
+  </div>
+
+  <button type="submit" class="btn btn-primary">
+    <Icon name="mail" size={18} />
+    <span>Envoyer ma demande</span>
+  </button>
+
+  {/* Sans JavaScript, le bouton ci-dessus ne peut pas composer l'email : on donne
+      au visiteur les deux moyens directs plutôt que de le laisser sur un bouton mort. */}
+  <noscript>
+    <p class="quote-form-noscript">
+      L'envoi automatique demande JavaScript. Appelez-nous au{' '}
+      <a href={site.phoneHref}>{site.phoneDisplay}</a>, ou écrivez directement à{' '}
+      <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+    </p>
+  </noscript>
+</form>
+
+<script define:vars={{ CONTACT_EMAIL, context }}>
+  const form = document.getElementById('quote-form');
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const value = (id) => form.querySelector(`#${id}`)?.value.trim() ?? '';
+    const name = value('quote-name');
+    const phone = value('quote-phone');
+    const city = value('quote-city');
+    const message = value('quote-message');
+
+    const subject = context
+      ? `Demande de devis — ${context} — ${name}`
+      : `Demande de devis — ${name}`;
+    const body = [
+      `Nom : ${name}`,
+      `Téléphone : ${phone}`,
+      city ? `Ville : ${city}` : null,
+      context ? `Prestation / zone : ${context}` : null,
+      '',
+      'Message :',
+      message,
+    ]
+      .filter((line) => line !== null)
+      .join('\n');
+
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+</script>
+
+<style>
+  .quote-form {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .quote-form h2 {
+    margin-bottom: 0;
+  }
+
+  .quote-form-note {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 0;
+  }
+
+  .quote-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+  }
+
+  .quote-form-field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quote-form label {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .quote-form input,
+  .quote-form textarea {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--color-border-ui);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    color: var(--color-text);
+    resize: vertical;
+  }
+
+  .quote-form input::placeholder,
+  .quote-form textarea::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .quote-form input:focus,
+  .quote-form textarea:focus {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 1px;
+  }
+
+  .quote-form button {
+    align-self: flex-start;
+    margin-top: 0.25rem;
+  }
+
+  .quote-form-noscript {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--color-border-ui);
+    border-radius: var(--radius);
+    color: var(--color-text);
+    font-size: 0.92rem;
+  }
+
+  @media (max-width: 560px) {
+    .quote-form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

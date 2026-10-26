@@ -1,0 +1,201 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import StickyCallBar from '../components/StickyCallBar.astro';
+import GoogleTag from '../components/GoogleTag.astro';
+import CookieBanner from '../components/CookieBanner.astro';
+import { getImage } from 'astro:assets';
+import { site } from '../data/site';
+import logoFull from '../assets/logo-full.png';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Données structurées supplémentaires (FAQPage, Service, Article...) */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /**
+   * Ajoute « | <nom> à <ville> » au titre. À passer à false quand `title` est
+   * déjà autoportant : le suffixe coûte 19 caractères et répétait « Serrurier »
+   * deux fois sur les pages de prestation et de zone.
+   */
+  suffix?: boolean;
+  /**
+   * Type Open Graph. « article » sur les billets du blog : les réseaux sociaux
+   * affichent alors la date de publication au lieu d'une simple carte de site.
+   */
+  ogType?: 'website' | 'article';
+  /** Date de publication ISO, pour og:article. Sans effet hors ogType="article". */
+  publishedTime?: string;
+  /**
+   * Sort la page de l'index. Réservé aux pages qui n'ont rien à y faire — la
+   * page 404, servie telle quelle par .htaccess, serait sinon indexable comme
+   * une page ordinaire, avec son propre titre et sa propre description.
+   */
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  jsonLd,
+  suffix = true,
+  ogType = 'website',
+  publishedTime,
+  noindex = false,
+} = Astro.props;
+const pageTitle = suffix ? `${title} | ${site.name} à ${site.city}` : title;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Fiche établissement : pas d'adresse postale publiée, l'activité est une
+// activité de déplacement (service area business) — l'adresse du siège figure
+// dans les mentions légales, comme la loi l'exige.
+// Logo déclaré à Google pour le panneau de connaissances.
+//
+// Le fichier source pèse 1 Mo. Référencer `logoFull.src` tel quel faisait recopier
+// ce mégaoctet dans dist/ et l'annonçait à Google, qui le télécharge pour construire
+// la fiche — alors que l'image n'est affichée nulle part sur le site.
+//
+// On le passe donc par le pipeline d'images. 600 pixels de large dépassent largement
+// le minimum de 112 attendu, et le WebP figure parmi les formats que Google accepte
+// pour une image en données structurées.
+const logoPourGoogle = await getImage({ src: logoFull, width: 600, format: 'webp' });
+
+const localBusiness = {
+  '@context': 'https://schema.org',
+  '@type': 'Locksmith',
+  '@id': new URL('/#business', Astro.site).href,
+  name: site.name,
+  description: `Serrurier à ${site.city} et dans ${site.area}, disponible ${site.hours}.`,
+  url: Astro.site?.href,
+  telephone: site.phoneE164,
+  email: site.email,
+  // Google affiche le logo dans le panneau de connaissances et les résultats
+  // enrichis ; sans `image`, la fiche reste muette. Les deux visuels existent
+  // déjà et ne sont pas inventés pour l'occasion.
+  logo: new URL(logoPourGoogle.src, Astro.site).href,
+  image: new URL('/og-image.png', Astro.site).href,
+  // Reprend le plancher publié sur /tarifs/, jamais une fourchette estimée :
+  // ces montants sont opposables (voir CLAUDE.md).
+  priceRange: `À partir de ${site.startingPrice}`,
+  areaServed: [
+    { '@type': 'City', name: 'Meaux' },
+    { '@type': 'AdministrativeArea', name: 'Communauté d’agglomération du Pays de Meaux' },
+    { '@type': 'AdministrativeArea', name: 'Seine-et-Marne' },
+  ],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+      ],
+      opens: '00:00',
+      closes: '23:59',
+    },
+  ],
+};
+
+// Les réseaux sociaux exigent une URL absolue pour l'image de prévisualisation.
+const ogImageURL = new URL('/og-image.png', Astro.site).href;
+const ogImageAlt = `Logo ${site.name} — bouclier, cadenas et clé ; sécurité, rapidité, confiance`;
+
+// Nom du site affiché au-dessus du titre dans les résultats de recherche.
+//
+// Google demande d'y faire figurer le nom du site. Le faire par le <title>
+// obligerait à écrire « Ouverture de porte à Meaux | Serrurier à Meaux » : « à
+// Meaux » deux fois, ce que le même guide range dans l'accumulation de mots-clés.
+// Le balisage WebSite est la voie documentée pour déclarer ce nom une bonne
+// fois, sans toucher aux titres.
+//
+// Google ne le lit que sur la page d'accueil : l'émettre partout serait ignoré,
+// et ajouterait un bloc inutile sur quarante-six pages.
+const estAccueil = Astro.url.pathname === '/';
+const webSite = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': new URL('/#website', Astro.site).href,
+  name: site.name,
+  alternateName: `${site.name} à ${site.city}`,
+  url: Astro.site?.href,
+  inLanguage: 'fr-FR',
+  publisher: { '@id': new URL('/#business', Astro.site).href },
+};
+
+const extraSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const schemas = [localBusiness, ...(estAccueil ? [webSite] : []), ...extraSchemas];
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <meta name="google-site-verification" content={site.analytics.googleSiteVerification} />
+    {site.analytics.bingSiteVerification && (
+      <meta name="msvalidate.01" content={site.analytics.bingSiteVerification} />
+    )}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#0a0a0b" />
+
+    {/* Polices auto-hébergées : aucun appel à un tiers, donc aucune transmission
+        d'adresse IP hors UE. Préchargées car elles sont dans le chemin de rendu. */}
+    <link rel="preload" href="/fonts/montserrat-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/roboto-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content={ogType} />
+    {ogType === 'article' && publishedTime && (
+      <meta property="article:published_time" content={publishedTime} />
+    )}
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    {schemas.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
+
+    {/* En dernier dans le head : le mode consentement doit être posé avant que
+        la bibliothèque Google ne s'exécute, et rien de ce qui précède n'en
+        dépend. Aucun cookie n'est écrit tant que le visiteur n'a pas accepté. */}
+    <GoogleTag />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Aller au contenu principal</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <StickyCallBar />
+    <CookieBanner />
+  </body>
+</html>
+
+<style is:global>
+  /* Réserve la hauteur de la barre d'appel fixe sur mobile */
+  @media (max-width: 1100px) {
+    body {
+      padding-bottom: 4.75rem;
+    }
+  }
+</style>

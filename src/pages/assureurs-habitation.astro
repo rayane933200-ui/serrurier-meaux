@@ -1,0 +1,488 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import RelatedArticles from '../components/RelatedArticles.astro';
+import Icon from '../components/Icon.astro';
+import { assureurs, mentionsFacture, limites, sources, repereMarche } from '../data/assurances';
+import { site } from '../data/site';
+
+const { legal } = site;
+const crumbs = [{ label: 'Accueil', href: '/' }, { label: 'Assureurs et facture' }];
+
+const description =
+  'Entreprise immatriculée, SIRET vérifiable, facture détaillée conforme à la réglementation du dépannage à domicile : le dossier que votre assureur habitation attend.';
+---
+
+<BaseLayout
+  title="Assureurs habitation : une facture conforme à Meaux"
+  description={description}
+  suffix={false}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>Une facture que votre assureur peut traiter</h1>
+      <p>
+        Après une effraction, le remboursement se joue souvent sur un détail administratif. Une
+        facture sans numéro SIRET, sans devis préalable ou sans décomposition des lignes se
+        retourne contre l’assuré — et c’est lui, pas l’artisan, qui perd de l’argent.
+      </p>
+      <div class="identite">
+        <p class="identite-ligne">
+          <Icon name="shield" size={18} />
+          <span>
+            {/* Enseigne et non nom du gérant : voir le commentaire de
+                src/pages/a-propos.astro. Le SIRET affiché juste en dessous
+                suffit à lever toute ambiguïté sur l'identité de l'entreprise. */}
+            <strong>{legal.tradeName}</strong>, {legal.legalForm.toLowerCase()} immatriculé
+            depuis le {legal.createdOn}.
+          </span>
+        </p>
+        <p class="identite-ligne">
+          <Icon name="key" size={18} />
+          <span>
+            SIRET <strong>{legal.siret}</strong> —
+            {' '}<a href="https://annuaire-entreprises.data.gouv.fr/" rel="noopener noreferrer nofollow" target="_blank">
+              vérifiable en une minute sur l’annuaire des entreprises
+            </a>.
+          </span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container content-column">
+      <h2>Les cinq mentions qu’un assureur cherche</h2>
+      <p>
+        Ce ne sont pas des arguments commerciaux : chacune correspond à une obligation
+        réglementaire. C’est précisément ce qui les rend opposables — et ce qui distingue une
+        facture d’entreprise immatriculée de celle d’un intervenant qu’on ne retrouvera pas.
+      </p>
+
+      <ol class="mentions">
+        {mentionsFacture.map((m) => (
+          <li>
+            <h3>{m.intitule}</h3>
+            <p>{m.detail}</p>
+            <p class="fondement">{m.fondement}</p>
+          </li>
+        ))}
+      </ol>
+
+      <p class="note-box">
+        <Icon name="key" size={18} />
+        <span>
+          Nous vous laissons également <strong>l’ancienne serrure déposée</strong>. Un expert peut
+          demander à voir la pièce forcée, et c’est la preuve matérielle la plus difficile à
+          reconstituer après coup.
+        </span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2>Les dix groupes qui assurent la plupart des logements français</h2>
+      <p class="section-lead">
+        Quel que soit le vôtre, les pièces demandées sont les mêmes : elles découlent du Code de
+        commerce et de la réglementation du dépannage à domicile, pas de la politique de chaque
+        compagnie.
+      </p>
+
+      <div class="table-wrap">
+        <table class="rank-table">
+          <thead>
+            <tr>
+              <th scope="col" class="col-rank">#</th>
+              <th scope="col">Groupe</th>
+              <th scope="col">Marques sur votre contrat</th>
+              <th scope="col">Habitation</th>
+            </tr>
+          </thead>
+          <tbody>
+            {assureurs.map((a) => (
+              <tr>
+                <td class="col-rank">{a.rang}</td>
+                <th scope="row">{a.groupe}</th>
+                <td>
+                  <span class="marques">
+                    {a.marques.map((m) => <span class="marque">{m}</span>)}
+                  </span>
+                </td>
+                <td>
+                  {a.chiffreAffaires && <span class="ca">{a.chiffreAffaires}</span>}
+                  {a.contrats && <span class="contrats">{a.contrats} de contrats</span>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="avertissement">
+        <Icon name="shield" size={18} />
+        {/* L'affirmation porte sur la RECEVABILITÉ du document, pas sur le
+            remboursement : une facture d'entreprise immatriculée portant les
+            mentions légales est admise comme justificatif par n'importe quel
+            assureur, c'est ce qui la rend opposable. Ne jamais glisser vers
+            « acceptées », qui laisserait entendre une prise en charge garantie
+            — la section suivante énumère précisément ce qui peut la limiter.
+            La mention d'absence d'accord commercial reste indispensable, mais
+            elle vient après : ouvrir un bloc de réassurance par une négation
+            dessert le propos. */}
+        <span>
+          <strong>
+            Dans le cadre de notre activité réglementée, nos factures sont admises par ces
+            compagnies
+          </strong>{' '}
+          : elles portent les mentions imposées par la loi, et c’est ce qui conditionne leur
+          recevabilité comme justificatif. Nous n’avons en revanche d’accord commercial avec
+          aucune d’entre elles, et nous ne le prétendons pas — elles figurent ici parce que ce
+          sont celles chez qui vous êtes statistiquement assuré. Chiffres d’affaires habitation
+          2025 ; Covéa et AXA pèsent respectivement {repereMarche.partCovea} et
+          {' '}{repereMarche.partAxa} du marché des assurances de biens et de responsabilité.
+        </span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container content-column">
+      <h2>Ce qu’une facture conforme ne garantit pas</h2>
+      <p>
+        Une facture en règle lève un obstacle, elle n’en lève pas quatre. Autant les connaître
+        avant d’appeler que de les découvrir au moment du remboursement.
+      </p>
+
+      {limites.map((l) => (
+        <article class="limite">
+          <h3>{l.titre}</h3>
+          <p>{l.texte}</p>
+        </article>
+      ))}
+
+      <p>
+        Le détail des garanties, des délais et des pièces à conserver est sur la page
+        {' '}<a href="/assurance-habitation/">assurance habitation et serrurerie</a>. Si votre
+        porte vient d’être forcée, commencez plutôt par
+        {' '}<a href="/apres-un-cambriolage/">que faire après un cambriolage</a>.
+      </p>
+
+      <h2>Quelques repères sur le marché</h2>
+      <div class="reperes">
+        <div class="repere">
+          <p class="repere-valeur">{repereMarche.contratsMRH}</p>
+          <p class="repere-label">Contrats habitation en France, {repereMarche.contratsAnnee}</p>
+        </div>
+        <div class="repere">
+          <p class="repere-valeur">{repereMarche.tauxResidencesPrincipales}</p>
+          <p class="repere-label">Des résidences principales assurées</p>
+        </div>
+        <div class="repere">
+          <p class="repere-valeur">{repereMarche.coutMoyenVol}</p>
+          <p class="repere-label">Coût moyen d’un sinistre vol</p>
+        </div>
+      </div>
+      <p>
+        Le coût moyen d’un vol dépasse largement celui d’une intervention de serrurerie : c’est le
+        contenu emporté qui pèse, pas la porte. Raison de plus pour déclarer, même quand
+        l’effraction a échoué et que rien n’a disparu.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container content-column">
+      <h2>Sources</h2>
+      <ul class="source-list">
+        {sources.map((s) => (
+          <li>
+            <a href={s.url} rel="noopener noreferrer nofollow" target="_blank">{s.libelle}</a>
+          </li>
+        ))}
+      </ul>
+      <p class="disclaimer">
+        Cette page décrit nos propres documents et rappelle des règles générales. Elle ne préjuge
+        pas de la décision de votre assureur : seul votre contrat détermine vos garanties, votre
+        franchise et vos plafonds.
+      </p>
+    </div>
+  </section>
+
+  <RelatedArticles slugs={['apres-un-cambriolage-demarches', 'reconnaitre-serrurier-serieux']} />
+
+  <CtaBanner
+    title="Une porte forcée à sécuriser à Meaux ?"
+    description={`Devis signé avant intervention, facture détaillée, ancienne serrure remise. Disponible ${site.hours}.`}
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero > .container > p {
+    max-width: 72ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .identite {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: var(--space-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-gold);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    max-width: 62ch;
+  }
+
+  .identite-ligne {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.97rem !important;
+  }
+
+  .identite-ligne :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  .identite strong {
+    color: var(--color-text);
+  }
+
+  .content-column {
+    max-width: 78ch;
+  }
+
+  .content-column p,
+  .content-column li {
+    color: var(--color-text-muted);
+  }
+
+  .section-lead {
+    max-width: 74ch;
+    color: var(--color-text-muted);
+  }
+
+  .mentions {
+    list-style: none;
+    counter-reset: mention;
+    margin: 0 0 var(--space-md);
+    padding: 0;
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .mentions li {
+    counter-increment: mention;
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md) var(--space-md) var(--space-md) 3.8rem;
+  }
+
+  .mentions li::before {
+    content: counter(mention);
+    position: absolute;
+    left: var(--space-md);
+    top: var(--space-md);
+    width: 1.9rem;
+    height: 1.9rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-gold);
+    color: var(--color-black);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .mentions h3 {
+    font-size: 1.03rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .mentions p {
+    margin-bottom: 0;
+  }
+
+  .fondement {
+    margin-top: 0.5rem !important;
+    font-size: 0.8rem;
+    color: var(--color-text-muted) !important;
+    font-style: italic;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    margin-bottom: var(--space-md);
+  }
+
+  .rank-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 44rem;
+  }
+
+  .rank-table th,
+  .rank-table td {
+    text-align: left;
+    padding: 0.8rem 0.9rem;
+    border-bottom: 1px solid var(--color-border-soft);
+    vertical-align: top;
+  }
+
+  .rank-table thead th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+  }
+
+  .rank-table tbody th {
+    font-family: var(--font-heading);
+    color: var(--color-text);
+    font-size: 0.97rem;
+  }
+
+  .col-rank {
+    width: 2.5rem;
+    color: var(--color-text-muted);
+    font-family: var(--font-heading);
+  }
+
+  .marques {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .marque {
+    font-size: 0.8rem;
+    color: var(--color-gold-text);
+    border: 1px solid var(--color-border-ui);
+    border-radius: 999px;
+    padding: 0.12rem 0.6rem;
+    white-space: nowrap;
+  }
+
+  .ca {
+    display: block;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+  }
+
+  .contrats {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+
+  .avertissement,
+  .note-box {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-gold);
+    border-radius: var(--radius);
+    padding: var(--space-sm) var(--space-md);
+    color: var(--color-text-muted);
+    max-width: 90ch;
+  }
+
+  .avertissement :global(svg),
+  .note-box :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .avertissement strong,
+  .note-box strong {
+    color: var(--color-text);
+  }
+
+  .limite {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    margin-bottom: var(--space-sm);
+  }
+
+  .limite h3 {
+    font-size: 1.02rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .limite p {
+    margin-bottom: 0;
+  }
+
+  .reperes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .repere {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    text-align: center;
+  }
+
+  .repere-valeur {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
+    color: var(--color-gold-text);
+    margin-bottom: 0.2rem;
+  }
+
+  .repere-label {
+    margin-bottom: 0;
+    font-size: 0.86rem;
+    color: var(--color-text-muted) !important;
+  }
+
+  .source-list {
+    list-style: none;
+    margin: 0 0 var(--space-md);
+    padding: 0;
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .source-list li {
+    font-size: 0.92rem;
+  }
+
+  .disclaimer {
+    font-size: 0.88rem;
+    border-left: 3px solid var(--color-border-ui);
+    padding-left: 1rem;
+    margin-bottom: 0;
+  }
+</style>

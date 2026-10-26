@@ -1,0 +1,90 @@
+/* Charte graphique SERRURIER — source unique des couleurs et typographies
+ *
+ * THÈME CLAIR, demandé par Rayane le 19 octobre 2026.
+ *
+ * Le site était en thème sombre. Le passage au clair s'est heurté à deux
+ * contraintes matérielles, qui expliquent la structure ci-dessous :
+ *
+ * 1. LE LOGO EST OPAQUE, FOND NOIR INCRUSTÉ. `logo-icon.png` et
+ *    `logo-full.png` n'ont pas de canal alpha : leurs quatre coins valent
+ *    #010206 à 100 % d'opacité. Posés sur une page blanche, ils apparaîtraient
+ *    comme un rectangle noir. Plutôt que de retoucher le logo fourni — ce que
+ *    CLAUDE.md interdit — l'en-tête et le pied de page restent des bandeaux
+ *    sombres. Le logo y est chez lui, et l'or y garde sa pleine saturation.
+ *
+ * 2. L'OR N'EST PAS LISIBLE EN TEXTE SUR FOND CLAIR. #d4a937 sur #faf9f7 ne
+ *    donne que 2,09:1, là où WCAG AA exige 4,5:1 pour du texte. L'or reste donc
+ *    une couleur de REMPLISSAGE (fonds de boutons, pastilles, filets) et jamais
+ *    une couleur de texte sur clair. Pour le texte, --color-gold-text descend
+ *    la même teinte jusqu'à 5,28:1.
+ *
+ * Tous les rapports ci-dessous sont calculés, pas estimés.
+ */
+:root {
+  /* ------------------------------------------------------------------
+   * Palette de marque, dérivée du logo. Valeurs brutes, inchangées.
+   * ------------------------------------------------------------------ */
+  --color-black: #0a0a0b;
+  --color-white: #ffffff;
+  --color-gold: #d4a937;
+  --color-gold-dark: #a9821f;
+  --color-silver: #c7cbd1;
+
+  /* Or assombri jusqu'à être lisible en texte sur fond clair : 5,28:1 sur
+     --color-bg et 5,56:1 sur blanc. C'est la couleur des liens et de tout
+     texte doré du corps de page. Ne pas lui substituer --color-gold, qui
+     tombe à 2,09:1 et devient illisible. */
+  --color-gold-text: #846315;
+
+  /* ------------------------------------------------------------------
+   * Corps de page — thème clair.
+   * ------------------------------------------------------------------ */
+  --color-bg: #faf9f7;        /* blanc cassé chaud, écho discret à l'or */
+  --color-bg-alt: #f2efe9;    /* sections alternées */
+  --color-surface: #ffffff;   /* cartes et panneaux posés sur le fond */
+  --color-surface-alt: #f6f4f0;
+
+  --color-text: #17181c;      /* 16,86:1 sur --color-bg */
+  --color-text-muted: #56595f; /* 6,68:1 sur --color-bg */
+
+  --color-border: #e4e0d8;      /* séparateurs décoratifs, sans exigence */
+  --color-border-soft: #ece9e2;
+  /* Bordure des composants d'interface (champs, boutons secondaires).
+     WCAG 1.4.11 exige 3:1 pour délimiter un contrôle : ce palier donne
+     3,51:1 sur --color-bg. Ne pas l'éclaircir. */
+  --color-border-ui: #82858c;
+
+  /* ------------------------------------------------------------------
+   * Bandeaux sombres — en-tête, hero, pied de page, barre d'appel.
+   * Y vivent le logo et l'or à pleine saturation. Ne jamais employer ces
+   * variables dans le corps de page : le texte y deviendrait invisible.
+   * ------------------------------------------------------------------ */
+  --band-bg: #0a0a0b;
+  --band-bg-top: #000000;        /* barre d'annonce, au-dessus de l'en-tête */
+  --band-surface: #17181c;
+  --band-surface-alt: #232429;
+  --band-border: #2b2d33;
+  --band-text: #e7e7ea;          /* 16,04:1 sur --band-bg */
+  --band-text-muted: #9a9ea6;
+  --band-border-ui: #646872;     /* 3,18:1 sur --band-surface */
+
+  /* Typographies de la charte */
+  --font-heading: 'Montserrat', sans-serif;
+  --font-body: 'Roboto', sans-serif;
+
+  /* Échelle d'espacement */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+
+  /* Rayons / ombres.
+     L'ombre du thème sombre (noir à 55 %) salit une page claire : sur blanc,
+     une ombre se construit en deux couches très diluées, l'une serrée pour
+     détacher le bord, l'autre large pour poser la carte. */
+  --radius: 10px;
+  --shadow-card: 0 1px 2px rgba(23, 24, 28, 0.05), 0 8px 24px rgba(23, 24, 28, 0.07);
+  --shadow-card-hover: 0 2px 4px rgba(23, 24, 28, 0.07), 0 16px 36px rgba(23, 24, 28, 0.11);
+  --shadow-band: 0 12px 32px rgba(0, 0, 0, 0.55);
+}

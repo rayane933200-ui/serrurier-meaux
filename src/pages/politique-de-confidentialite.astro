@@ -1,0 +1,486 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import { site } from '../data/site';
+
+const { legal } = site;
+const crumbs = [
+  { label: 'Accueil', href: '/' },
+  { label: 'Politique de confidentialité' },
+];
+
+// Date de la dernière révision de ce texte. À mettre à jour à chaque
+// modification de fond de la page.
+const lastUpdated = '28 septembre 2026';
+
+// Comme sur la page mentions légales : une ligne dont la valeur est vide est
+// retirée de l'affichage. Mieux vaut une mention absente qu'une mention
+// inventée — ces informations sont opposables.
+type Row = { term: string; value: string; href?: string };
+
+const controllerRows: Row[] = [
+  // Le RGPD demande que le responsable soit identifiable (art. 13), pas
+  // nécessairement nommé sur cette page : l'enseigne et le SIRET, unique et
+  // public, l'identifient sans ambiguïté, et un renvoi vers les mentions
+  // légales donne l'identification complète exigée par la LCEN.
+  { term: 'Responsable du traitement', value: legal.tradeName },
+  { term: 'SIRET', value: legal.siret },
+  { term: 'Forme juridique', value: legal.legalForm },
+  { term: 'Email', value: site.email, href: `mailto:${site.email}` },
+  { term: 'Téléphone', value: site.phoneDisplay, href: site.phoneHref },
+].filter((row) => row.value.trim() !== '');
+
+// Un bloc par traitement : finalité, données concernées, base légale (RGPD
+// art. 6.1) et durée de conservation appliquée.
+type Processing = {
+  name: string;
+  purpose: string;
+  data: string;
+  basis: string;
+  retention: string;
+};
+
+const processings: Processing[] = [
+  {
+    name: 'Réponse à vos demandes de devis et d’intervention',
+    purpose:
+      'Vous rappeler, évaluer votre besoin, établir un devis et organiser l’intervention.',
+    data:
+      'Nom, numéro de téléphone, adresse email, ville ou quartier, et les éléments que vous décrivez vous-même dans votre message ou lors de l’appel.',
+    basis:
+      'Article 6.1.b du RGPD — exécution de mesures précontractuelles prises à votre demande, puis exécution du contrat si l’intervention est confirmée.',
+    retention:
+      'Trois ans à compter du dernier échange lorsque la demande reste sans suite.',
+  },
+  {
+    name: 'Établissement des devis, factures et pièces comptables',
+    purpose:
+      'Facturer la prestation réalisée et conserver les justificatifs exigés par la réglementation comptable et fiscale.',
+    data:
+      'Nom, coordonnées, adresse d’intervention, nature et montant de la prestation.',
+    basis:
+      'Article 6.1.c du RGPD — respect d’une obligation légale à laquelle le responsable de traitement est soumis.',
+    retention:
+      'Dix ans à compter de la clôture de l’exercice comptable concerné, conformément à l’article L. 123-22 du Code de commerce.',
+  },
+  {
+    name: 'Mesure des conversions publicitaires',
+    purpose:
+      'Savoir si une visite provient d’une annonce Google Ads et laquelle a donné lieu à un appel ou à une demande de devis, afin de régler les campagnes.',
+    data:
+      'Identifiant de clic publicitaire déposé dans un cookie, page consultée, adresse IP et informations techniques du navigateur transmises à Google. Si vous appelez depuis une visite issue d’une annonce : date, heure et durée de l’appel, ainsi que les premiers chiffres de votre numéro, relevés par le service de transfert de Google.',
+    basis:
+      'Article 6.1.a du RGPD et article 82 de la loi Informatique et Libertés — votre consentement, recueilli par le bandeau affiché à votre première visite. Les données partent une fois que vous avez accepté, et votre choix reste modifiable à tout moment.',
+    retention:
+      'Quatre-vingt-dix jours pour le cookie déposé sur votre appareil. Les statistiques agrégées sont conservées par Google selon ses propres durées.',
+  },
+  {
+    name: 'Journaux techniques du serveur d’hébergement',
+    purpose:
+      'Assurer la disponibilité du site, diagnostiquer les incidents et préserver la sécurité de l’infrastructure.',
+    data:
+      'Adresse IP et informations techniques de connexion (horodatage de la requête, page demandée).',
+    basis:
+      'Article 6.1.f du RGPD — intérêt légitime à maintenir un site accessible et sécurisé.',
+    retention:
+      'Durée limitée, définie par l’hébergeur dans ses propres règles d’exploitation.',
+  },
+];
+
+// Liste complète des droits ouverts par les articles 15 à 21 du RGPD, complétée
+// par les directives post mortem de l’article 85 de la loi Informatique et Libertés.
+const rights: { name: string; text: string }[] = [
+  {
+    name: 'Droit d’accès',
+    text: 'Obtenir la confirmation que des données vous concernant sont traitées, et en recevoir une copie.',
+  },
+  {
+    name: 'Droit de rectification',
+    text: 'Faire corriger une donnée inexacte ou compléter une donnée incomplète.',
+  },
+  {
+    name: 'Droit à l’effacement',
+    text: 'Demander la suppression de vos données, dans la limite des documents que la loi impose de conserver.',
+  },
+  {
+    name: 'Droit à la limitation',
+    text: 'Demander le gel temporaire de l’utilisation de vos données, par exemple le temps de vérifier une contestation.',
+  },
+  {
+    name: 'Droit à la portabilité',
+    text: 'Recevoir dans un format lisible par machine les données que vous avez fournies, pour les transmettre à un autre professionnel.',
+  },
+  {
+    name: 'Droit d’opposition',
+    text: 'Vous opposer, pour des raisons tenant à votre situation particulière, à un traitement fondé sur l’intérêt légitime.',
+  },
+  {
+    name: 'Directives post mortem',
+    text: 'Définir des directives relatives au sort de vos données après votre décès, en application de l’article 85 de la loi Informatique et Libertés.',
+  },
+];
+---
+
+<BaseLayout
+  title="Politique de confidentialité"
+  description="Politique de confidentialité du site : responsable de traitement, finalités, bases légales, destinataires, durées de conservation et vos droits RGPD."
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>Politique de confidentialité</h1>
+      <p>
+        Cette page explique quelles données personnelles sont traitées à l’occasion de votre
+        visite ou de votre demande, pourquoi elles le sont et quels droits vous pouvez exercer,
+        conformément à l’article 13 du Règlement général sur la protection des données (RGPD) et
+        à la loi Informatique et Libertés.
+      </p>
+      <p class="page-hero-date">Dernière mise à jour : {lastUpdated}.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container legal-content">
+      <h2>Responsable du traitement</h2>
+      <p>
+        Les traitements décrits ci-dessous sont mis en œuvre par le professionnel qui édite ce
+        site. Les demandes relatives aux données personnelles lui parviennent directement, aux
+        coordonnées suivantes.
+      </p>
+      <dl>
+        {controllerRows.map((row) => (
+          <div>
+            <dt>{row.term}</dt>
+            <dd>{row.href ? <a href={row.href}>{row.value}</a> : row.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p>
+        L’identification complète de l’entreprise, y compris l’adresse du siège, figure sur la
+        page <a href="/mentions-legales/">mentions légales</a>.
+      </p>
+
+      <h2>Fonctionnement du site</h2>
+      <p>
+        Ce site est un site statique : les pages sont des fichiers préparés à l’avance, servis
+        tels quels, sans application serveur ni base de données. Les informations que vous
+        saisissez restent donc dans votre navigateur : le site lui-même les laisse chez vous.
+      </p>
+      <p>
+        Le formulaire de demande de devis fonctionne selon ce même principe. Au moment de
+        l’envoi, il ouvre votre propre logiciel de messagerie avec un message pré-rempli à
+        destination de <a href={`mailto:${site.email}`}>{site.email}</a>. Vous gardez la main sur
+        ce message : vous le relisez, le modifiez et décidez de l’envoyer. Vos informations
+        voyagent donc de votre messagerie vers la boîte de réception professionnelle, sans
+        transiter par ce site.
+      </p>
+      <p>
+        Les polices de caractères sont hébergées sur le même serveur que les pages : leur
+        affichage n’appelle aucun service tiers. Un seul élément extérieur peut se charger, la
+        balise de mesure publicitaire décrite plus bas, et uniquement après votre accord.
+      </p>
+
+      <h2>Traitements mis en œuvre</h2>
+      <p>
+        Chaque traitement ci-dessous est décrit avec sa finalité, les données concernées, la base
+        légale qui l’autorise et la durée pendant laquelle les informations sont conservées.
+      </p>
+      <div class="processing-list">
+        {processings.map((processing) => (
+          <article class="processing-card">
+            <h3>{processing.name}</h3>
+            <dl>
+              <div>
+                <dt>Finalité</dt>
+                <dd>{processing.purpose}</dd>
+              </div>
+              <div>
+                <dt>Données concernées</dt>
+                <dd>{processing.data}</dd>
+              </div>
+              <div>
+                <dt>Base légale</dt>
+                <dd>{processing.basis}</dd>
+              </div>
+              <div>
+                <dt>Durée de conservation</dt>
+                <dd>{processing.retention}</dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+      <p>
+        Les informations demandées dans le formulaire servent à préparer une réponse utile : un
+        moyen de vous rappeler et une description de votre besoin suffisent à établir un devis.
+        Vous restez libre du niveau de détail que vous communiquez. Chaque demande est lue et
+        traitée par une personne : aucune décision automatisée ni profilage n’intervient.
+      </p>
+
+      <h2>Destinataires des données</h2>
+      <p>
+        Vos données sont destinées au responsable du traitement, qui les utilise pour répondre à
+        votre demande et réaliser l’intervention. Elles servent à ce seul usage et restent à
+        l’écart de toute cession, location ou revente à des tiers.
+      </p>
+      <p>
+        Deux prestataires techniques interviennent nécessairement dans la chaîne :
+      </p>
+      <ul>
+        <li>
+          <strong>Google LLC</strong>, à deux titres distincts. D’une part comme fournisseur de
+          la messagerie utilisée pour l’adresse de contact : les messages que vous envoyez à
+          cette adresse sont hébergés sur ce service. D’autre part comme régie publicitaire, si
+          et seulement si vous avez accepté la mesure des conversions : Google reçoit alors
+          l’information qu’une visite issue d’une annonce a eu lieu.
+        </li>
+        <li>
+          <strong>{legal.host.name}</strong>, hébergeur du site, établi à
+          {' '}{legal.host.address.replace(', France', '')}. Ses journaux serveur enregistrent
+          les adresses IP des visiteurs. Les données restent en France.
+        </li>
+      </ul>
+
+      <h2>Transferts hors de l’Union européenne</h2>
+      <p>
+        Le site est hébergé en France, à Clermont-Ferrand : les journaux techniques du serveur
+        ne quittent pas l’Union européenne.
+      </p>
+      <p>
+        Deux flux restent susceptibles d’être traités aux États-Unis, tous deux liés à Google
+        LLC : les messages reçus à l’adresse de contact, hébergés sur sa messagerie, et, si vous
+        l’avez accepté, les données de mesure publicitaire. Refuser la mesure publicitaire
+        supprime le second.
+      </p>
+      <p>
+        L’encadrement précis de ces transferts relève des garanties publiées par chacun de ces
+        prestataires — certification au titre du cadre de protection des données UE–États-Unis ou
+        clauses contractuelles types de la Commission européenne. Cette page sera mise à jour
+        pour nommer la garantie applicable à chacun dès que cette vérification sera terminée.
+      </p>
+
+      <h2>Cookies et stockage sur votre appareil</h2>
+      <p>
+        Le site n’a besoin d’aucun cookie pour fonctionner : toutes les pages, le formulaire de
+        devis et le numéro d’appel restent pleinement utilisables si vous refusez tout dépôt.
+      </p>
+      <p>
+        Un seul traceur peut être déposé, celui de la régie <strong>Google Ads</strong>. Il
+        indique si votre visite fait suite à une annonce, ce qui permet de savoir quelles
+        annonces amènent réellement des demandes. Il est soumis à votre consentement : à votre
+        première visite, un bandeau vous propose de l’accepter ou de le refuser, et les deux
+        réponses demandent le même effort. La balise reste en mode refus, sans rien écrire sur
+        votre appareil, aussi longtemps que vous n’avez pas accepté.
+      </p>
+      <dl>
+        <div>
+          <dt>Nom du cookie</dt>
+          <dd><code>_gcl_au</code>, déposé par ce site pour le compte de Google Ads.</dd>
+        </div>
+        <div>
+          <dt>Finalité</dt>
+          <dd>Attribuer un appel ou une demande de devis à l’annonce qui l’a précédé.</dd>
+        </div>
+        <div>
+          <dt>Durée</dt>
+          <dd>Quatre-vingt-dix jours.</dd>
+        </div>
+        <div>
+          <dt>Votre choix</dt>
+          <dd>
+            Conservé dans le stockage local de votre navigateur, sur votre seul appareil. Le lien
+            <strong>Cookies</strong> en bas de chaque page rouvre le bandeau : vous pouvez
+            revenir sur votre décision quand vous le souhaitez, dans un sens comme dans l’autre.
+          </dd>
+        </div>
+      </dl>
+      <p>
+        Par transparence, un point mérite d’être signalé : la plateforme d’hébergement insère
+        automatiquement dans chaque page un script technique qui lit et écrit une information
+        dans le stockage local (<code>localStorage</code>) de votre navigateur. Ce comportement
+        relève du fonctionnement de la plateforme et non d’un choix de l’éditeur. Cette
+        information reste sur votre appareil et sert au fonctionnement de la plateforme. Vous
+        pouvez l’effacer à tout moment en vidant les données de site depuis les paramètres de
+        votre navigateur.
+      </p>
+
+      <h3>Numéro de téléphone affiché</h3>
+      <p>
+        Si votre visite fait suite à une annonce et que vous avez accepté la mesure des
+        conversions, le numéro affiché sur le site est remplacé par un numéro de transfert
+        fourni par Google. Il sonne sur le même téléphone et la conversation se déroule
+        normalement : le remplacement sert uniquement à savoir quelle annonce a donné lieu à
+        un appel. Google relève alors la date, l’heure et la durée de l’appel, ainsi que les
+        premiers chiffres de votre numéro ; le contenu de la conversation ne lui parvient pas
+        et n’est pas enregistré.
+      </p>
+      <p>
+        Tous les autres visiteurs, et tous ceux qui refusent la mesure des conversions, voient
+        le numéro direct de l’entreprise, celui qui figure sur la page
+        {' '}<a href="/mentions-legales/">mentions légales</a> et sur la page
+        {' '}<a href="/contact/">contact</a>.
+      </p>
+
+      <h2>Sécurité</h2>
+      <p>
+        Les pages de ce site sont servies en HTTPS : les échanges entre votre navigateur et le
+        serveur sont chiffrés. Les demandes que vous nous adressez sont reçues et conservées
+        dans une boîte de messagerie professionnelle.
+      </p>
+
+      <h2>Vos droits</h2>
+      <p>
+        Le RGPD vous reconnaît les droits suivants sur les données qui vous concernent.
+      </p>
+      <dl class="rights-list">
+        {rights.map((right) => (
+          <div>
+            <dt>{right.name}</dt>
+            <dd>{right.text}</dd>
+          </div>
+        ))}
+      </dl>
+      <p>
+        Pour exercer l’un de ces droits, écrivez à
+        {' '}<a href={`mailto:${site.email}`}>{site.email}</a> ou appelez le
+        {' '}<a href={site.phoneHref}>{site.phoneDisplay}</a>. Une réponse vous parvient dans le
+        mois qui suit la réception de votre demande. Un justificatif d’identité peut vous être
+        demandé lorsqu’un doute subsiste sur l’identité du demandeur.
+      </p>
+
+      <h2>Réclamation auprès de la CNIL</h2>
+      <p>
+        Si la réponse apportée vous laisse insatisfait, vous avez le droit d’introduire une
+        réclamation auprès de la Commission nationale de l’informatique et des libertés (CNIL),
+        autorité de contrôle compétente en France, depuis la page
+        {' '}<a href="https://www.cnil.fr/fr/plaintes" rel="noopener noreferrer" target="_blank">
+          https://www.cnil.fr/fr/plaintes
+        </a>.
+      </p>
+
+      <h2>Évolution de cette politique</h2>
+      <p>
+        Cette politique est révisée chaque fois que les traitements décrits évoluent, par exemple
+        à l’ajout d’un outil ou au changement d’un prestataire. La date de dernière mise à jour
+        indiquée en haut de page permet de repérer la version en vigueur.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero p {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .page-hero-date {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    color: var(--color-text-muted);
+  }
+
+  .legal-content {
+    max-width: 80ch;
+  }
+
+  .legal-content h2 {
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    margin-top: var(--space-lg);
+  }
+
+  .legal-content h2:first-child {
+    margin-top: 0;
+  }
+
+  .legal-content p,
+  .legal-content li {
+    color: var(--color-text-muted);
+  }
+
+  .legal-content ul {
+    margin: 0 0 var(--space-sm);
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .legal-content strong {
+    color: var(--color-text-muted);
+  }
+
+  .legal-content code {
+    font-size: 0.9em;
+    color: var(--color-text-muted);
+    background: var(--color-surface-alt);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+  }
+
+  .legal-content dl {
+    margin: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .legal-content dl div {
+    display: grid;
+    grid-template-columns: 15rem 1fr;
+    gap: var(--space-sm);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .legal-content dt {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+  }
+
+  .legal-content dd {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .processing-list {
+    display: grid;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .processing-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+  }
+
+  .processing-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .processing-card dl div:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .rights-list dt {
+    color: var(--color-gold-text);
+  }
+
+  @media (max-width: 640px) {
+    .legal-content dl div {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+  }
+</style>

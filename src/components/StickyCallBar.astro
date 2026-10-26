@@ -1,0 +1,63 @@
+---
+// Barre d'appel fixe en bas d'écran sur mobile : le téléphone reste atteignable
+// quel que soit le point de la page. Masquée sur grand écran, où le bouton
+// d'appel du header est déjà visible en permanence (header sticky).
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+---
+
+<div class="sticky-call">
+  <a class="sticky-call-primary" href={site.phoneHref}>
+    <Icon name="phone" size={18} />
+    <span>{site.phoneDisplay}</span>
+  </a>
+  <a class="sticky-call-secondary" href="/contact/">Devis gratuit</a>
+</div>
+
+<style>
+  .sticky-call {
+    display: none;
+  }
+
+  @media (max-width: 1100px) {
+    .sticky-call {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.6rem 0.75rem;
+      padding-bottom: max(0.6rem, env(safe-area-inset-bottom));
+      background: var(--band-surface);
+      border-top: 1px solid var(--band-border-ui);
+    }
+
+    .sticky-call a {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.75rem 0.9rem;
+      border-radius: var(--radius);
+      border: 2px solid transparent;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .sticky-call-primary {
+      background: var(--color-gold);
+      color: var(--color-black);
+    }
+
+    .sticky-call-secondary {
+      color: var(--color-white);
+      border-color: var(--band-border-ui);
+    }
+  }
+</style>

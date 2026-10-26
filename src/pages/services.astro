@@ -1,0 +1,197 @@
+﻿---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import Faq from '../components/Faq.astro';
+import Icon from '../components/Icon.astro';
+import { services } from '../data/services';
+import { featuredFaq } from '../data/faq';
+import { site } from '../data/site';
+
+const crumbs = [{ label: 'Accueil', href: '/' }, { label: 'Services' }];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Prestations de serrurerie',
+  itemListElement: services.map((service, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: service.title,
+    url: new URL(`/services/${service.slug}/`, Astro.site).href,
+  })),
+};
+---
+
+<BaseLayout
+  title="Serrurerie à Meaux : ouverture, serrure, blindage"
+  description="Ouverture de porte, changement de serrure, blindage, dépannage, urgence 24h/24 à Meaux. Interventions à partir de 69 €, devis gratuit."
+  jsonLd={jsonLd}
+  suffix={false}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>Nos services de serrurerie</h1>
+      <p>
+        Intervention à Meaux et dans tout le Pays de Meaux à partir de <strong>{site.startingPrice}</strong>,
+        avec un devis gratuit avant toute intervention non urgente. Chaque prestation a sa page
+        détaillée : ce qu'elle recouvre, dans quels cas y recourir et ce qui détermine le prix.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      {/* Les cartes de prestation portent un h3. Sans ce h2, la page passait
+          directement du h1 au h3 : un lecteur d'écran qui navigue de titre en
+          titre y perd un niveau. Les autres pages qui affichent cette grille
+          ont déjà leur h2 (« Nos prestations à … »). */}
+      <h2>Les cinq prestations</h2>
+      <div class="services-grid">
+        {services.map((service) => (
+          <ServiceCard
+            icon={service.icon}
+            title={service.title}
+            description={service.teaser}
+            price={service.price}
+            href={`/services/${service.slug}/`}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2>Tarifs indicatifs</h2>
+      <p class="pricing-note">
+        Le tarif exact est toujours annoncé et confirmé par téléphone avant tout déplacement, et
+        c'est ce montant qui figure sur votre facture. Les interventions de nuit, le week-end et
+        les jours fériés sont facturées à un tarif supérieur, qui vous est communiqué au moment de
+        l'appel.
+      </p>
+      <div class="pricing-table-wrapper">
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th scope="col">Prestation</th>
+              <th scope="col">Tarif indicatif</th>
+            </tr>
+          </thead>
+          <tbody>
+            {services.map((service) => (
+              <tr>
+                <th scope="row">
+                  <a href={`/services/${service.slug}/`}>{service.title}</a>
+                </th>
+                <td>{service.price}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="pricing-cta">
+        <a class="btn btn-primary" href={site.phoneHref}>
+          <Icon name="phone" size={18} />
+          <span>Obtenir un tarif précis au {site.phoneDisplay}</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <Faq
+    items={featuredFaq}
+    title="Questions fréquentes sur nos interventions"
+    intro="Prix, délais, justificatifs : ce que les clients demandent le plus souvent avant d'appeler."
+  />
+
+  <CtaBanner
+    title="Une urgence de serrurerie ?"
+    description="Appelez-nous 24h/24 et 7j/7, ou décrivez votre besoin par email pour un devis rapide."
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero p {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .pricing-note {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+  }
+
+  .pricing-table-wrapper {
+    overflow-x: auto;
+    margin-top: var(--space-md);
+  }
+
+  .pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+  }
+
+  .pricing-table th,
+  .pricing-table td {
+    text-align: left;
+    padding: 0.9rem 1.2rem;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .pricing-table thead th {
+    font-family: var(--font-heading);
+    /* Etait une rangee noire a texte dore, heritee du theme sombre : le
+       dore y retombait a 3,56:1. Bandeau clair, texte normal. */
+    background: var(--color-bg-alt);
+    color: var(--color-text);
+  }
+
+  .pricing-table tbody th {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .pricing-table tbody th a {
+    color: var(--color-text);
+  }
+
+  .pricing-table tbody th a:hover,
+  .pricing-table tbody th a:focus-visible {
+    color: var(--color-gold-text);
+  }
+
+  .pricing-table tbody td {
+    color: var(--color-gold-text);
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+
+  .pricing-table tbody tr:last-child th,
+  .pricing-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .pricing-cta {
+    margin-top: var(--space-md);
+  }
+</style>

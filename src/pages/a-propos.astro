@@ -1,0 +1,277 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Icon from '../components/Icon.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import { brands } from '../data/brands';
+import { quartiers, communes } from '../data/zones';
+import { site } from '../data/site';
+
+const crumbs = [{ label: 'Accueil', href: '/' }, { label: 'À propos' }];
+
+const { legal, pricing, credentials } = site;
+
+// Ces lignes viennent une à une de src/data/site.ts, jamais d'une valeur écrite
+// ici : ce sont des mentions légales, vérifiables par le client sur l'annuaire
+// des entreprises. Une page « à propos » qui les affiche se distingue seule des
+// plateformes d'intermédiation qui n'en publient aucune.
+const identity = [
+  // Le nom du gérant est volontairement absent de cette page : Rayane ne
+  // souhaite pas le voir apparaître ailleurs que là où la loi l'impose. Une
+  // entreprise individuelle s'identifie sans ambiguïté par son enseigne et son
+  // SIRET, qui est unique et public. Ne pas réintroduire legal.legalName ici.
+  { term: 'Enseigne', value: legal.tradeName },
+  { term: 'Forme juridique', value: legal.legalForm },
+  { term: 'SIRET', value: legal.siret },
+  { term: 'Activité (code APE)', value: legal.ape },
+  { term: "Date de création de l'entreprise", value: legal.createdOn },
+  { term: 'Qualification', value: credentials.diplomaExact || credentials.diploma },
+  {
+    term: 'Assurance décennale',
+    value: credentials.decennale
+      ? [
+          'Souscrite',
+          legal.insurer && `auprès de ${legal.insurer}`,
+          legal.insurancePolicy && `contrat n° ${legal.insurancePolicy}`,
+          legal.insuranceCoverage,
+        ]
+          .filter(Boolean)
+          .join(' — ')
+      : '',
+  },
+  { term: 'TVA', value: legal.vatNumber },
+  // Une ligne sans valeur ne s'affiche pas. Sur une page dont tout l'argument est
+  // la vérifiabilité, une information absente vaut mieux qu'une information vague.
+].filter((line) => line.value);
+
+const values = [
+  {
+    icon: 'clock' as const,
+    title: 'Réactivité',
+    description: "Une équipe joignable 24h/24 et 7j/7 pour les urgences de serrurerie à Meaux.",
+  },
+  {
+    icon: 'shield' as const,
+    title: 'Transparence',
+    description: "Un tarif annoncé et confirmé par téléphone avant intervention : le prix convenu est celui de la facture.",
+  },
+  {
+    icon: 'wrench' as const,
+    title: 'Savoir-faire',
+    description: "Ouverture de porte, changement de serrure, blindage et dépannage traités avec soin.",
+  },
+  {
+    icon: 'map-pin' as const,
+    title: 'Proximité',
+    description: "Une connaissance du terrain à Meaux et dans le Pays de Meaux pour intervenir rapidement.",
+  },
+];
+---
+
+<BaseLayout
+  title="À propos de votre serrurier à Meaux"
+  description="Réactivité, transparence tarifaire et savoir-faire : nos engagements pour toutes vos urgences de serrurerie à Meaux et dans le Pays de Meaux."
+  suffix={false}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>À propos de Serrurier</h1>
+      <p>
+        Serrurier est votre artisan de confiance à Meaux, disponible 24h/24 et 7j/7 pour toute urgence de
+        serrurerie : porte claquée, serrure à changer, dépannage ou blindage. Notre priorité :
+        intervenir vite, avec un tarif clair annoncé avant travaux.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Nos engagements</h2>
+      <div class="values-grid">
+        {values.map((value) => (
+          <div class="value-card">
+            <div class="value-icon">
+              <Icon name={value.icon} size={28} />
+            </div>
+            <h3>{value.title}</h3>
+            <p>{value.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2>L’entreprise, en clair</h2>
+      <p class="section-intro">
+        Dans un métier où la première crainte du client est de tomber sur un intermédiaire
+        injoignable, les informations ci-dessous sont vérifiables par n’importe qui sur
+        l’annuaire des entreprises. Elles figurent aussi sur nos devis et nos factures.
+      </p>
+      <dl class="identity">
+        {identity.map((line) => (
+          <div class="identity-row">
+            <dt>{line.term}</dt>
+            <dd>{line.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="note">
+        Nous affichons la date d’immatriculation plutôt qu’un nombre d’années de métier :
+        c’est la seule ancienneté que le client peut vérifier lui-même.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Comment nos prix sont construits</h2>
+      <p>
+        Le devis est {pricing.quote.charAt(0).toLowerCase() + pricing.quote.slice(1)}. Une
+        ouverture de porte démarre à {site.startingPrice}, déplacement et première heure de
+        main-d’œuvre compris. Facturées séparément, ces deux lignes coûteraient davantage :
+        le déplacement vaut {pricing.callOut} et l’heure de main-d’œuvre
+        {' '}{pricing.hourlyRate}. {pricing.timeAccounting}
+      </p>
+      <p>
+        Les majorations sont annoncées avant le déplacement : {pricing.surchargeEvening},
+        {' '}{pricing.surchargeNight}. {pricing.surchargeBase}
+      </p>
+      <p>
+        Le détail complet, ligne par ligne, est publié sur la page
+        {' '}<a href="/tarifs/">tarifs de serrurerie à Meaux</a>. Aucun montant n’y est
+        approximatif : un prix affiché est un prix opposable, que le client peut exiger.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2>Ce que nous posons</h2>
+      <p>
+        Nous installons des serrures et des cylindres {brands.map((brand, index) => (
+          <>{index > 0 ? (index === brands.length - 1 ? ' et ' : ', ') : ''}{brand.name}</>
+        ))}. Nous ne revendiquons aucune autre marque : annoncer un matériel que l’on ne pose
+        pas est une pratique commerciale trompeuse, et cela se vérifie en une intervention.
+      </p>
+      <p>
+        Le choix dépend de la porte, du niveau de sécurité recherché et de ce qu’exige votre
+        contrat d’assurance. Nos repères sur les gammes et sur la certification A2P sont
+        réunis sur la page <a href="/marques-de-serrures/">marques de serrures</a>. Le prix
+        dépendant du modèle, il se chiffre au devis plutôt qu’en grille.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Où nous intervenons</h2>
+      <p>
+        Nous couvrons {quartiers.length} quartiers de Meaux et
+        {' '}{communes.length} communes du Pays de Meaux, {site.hours}. Chaque secteur a sa
+        page, avec les secteurs desservis : voir
+        {' '}<a href="/zones-intervention/">nos zones d’intervention</a>.
+      </p>
+      <p>
+        Nous annonçons un délai de {site.responseTime} parce que la zone est resserrée
+        autour de Meaux. Un serrurier qui promet le même délai sur trois départements ne
+        tient cette promesse pour personne.
+      </p>
+    </div>
+  </section>
+
+  <CtaBanner
+    title="Une question, un besoin urgent ?"
+    description="Contactez-nous par téléphone ou par email, nous vous répondons rapidement."
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .section p,
+  .section-intro {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+  }
+
+  .identity {
+    margin: var(--space-md) 0 0;
+    max-width: 68ch;
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .identity-row {
+    display: grid;
+    grid-template-columns: minmax(12rem, 18rem) 1fr;
+    gap: var(--space-sm);
+    padding-block: 0.7rem;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .identity dt {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  .identity dd {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .note {
+    margin-top: var(--space-md);
+    font-size: 0.92rem;
+  }
+
+  @media (max-width: 600px) {
+    .identity-row {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+  }
+
+  .page-hero p {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  .value-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-card);
+  }
+
+  .value-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--color-bg-alt);
+    color: var(--color-gold-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-sm);
+  }
+
+  .value-card p {
+    color: var(--color-text-muted);
+    margin-bottom: 0;
+  }
+</style>

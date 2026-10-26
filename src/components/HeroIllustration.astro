@@ -1,0 +1,158 @@
+---
+// Illustration du hero : silhouette de Meaux, ciel coupé jour / nuit.
+//
+// Pourquoi une illustration et pas une photo : la règle du projet interdit les
+// photos de technicien en situation, parce qu'une photo de banque d'images
+// laisse croire à un chantier de l'entreprise. Un dessin ne trompe personne —
+// il apporte la chaleur qui manquait sans le mensonge implicite de la photo.
+//
+// Pourquoi ce motif : la coupure jour / nuit dit « 24h/24 » sans l'écrire, et
+// la cathédrale Saint-Étienne situe Meaux en une seconde. Son trait le plus
+// reconnaissable est l'asymétrie de sa façade : la tour nord est achevée et
+// porte sa flèche, la tour sud est restée arasée. C'est ce déséquilibre qui est
+// dessiné ici — une façade symétrique ressemblerait à n'importe quelle
+// cathédrale gothique et ne situerait rien.
+//
+// Tracé en SVG inline : aucune requête réseau, net à toutes les tailles, et les
+// couleurs viennent des variables de la charte — pas de valeur en dur.
+//
+// Décoratif : le texte du hero porte déjà l'information, d'où aria-hidden.
+---
+
+<svg
+  class="hero-illu"
+  viewBox="0 0 640 440"
+  role="presentation"
+  aria-hidden="true"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+    <linearGradient id="ciel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="var(--band-surface-alt)" />
+      <stop offset="45%" stop-color="var(--band-surface)" />
+      <stop offset="100%" stop-color="var(--color-black)" />
+    </linearGradient>
+
+    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="var(--color-gold)" stop-opacity="0.45" />
+      <stop offset="100%" stop-color="var(--color-gold)" stop-opacity="0" />
+    </radialGradient>
+
+    <linearGradient id="plaine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--band-border-ui)" />
+      <stop offset="100%" stop-color="var(--band-border)" />
+    </linearGradient>
+  </defs>
+
+  {/* Ciel */}
+  <rect width="640" height="440" rx="14" fill="url(#ciel)" />
+
+  {/* Soleil bas, côté jour. Volontairement écarté de la cathédrale : les deux
+      éléments se chevauchaient et la silhouette devenait illisible. */}
+  <circle cx="74" cy="126" r="76" fill="url(#halo)" />
+  <circle cx="74" cy="126" r="25" fill="var(--color-gold)" opacity="0.9" />
+
+  {/* Lune, côté nuit */}
+  <path
+    d="M520 112a30 30 0 1 0 26 44 34 34 0 0 1-26-44Z"
+    fill="var(--color-silver)"
+    opacity="0.85"
+  />
+
+  {/* Étoiles */}
+  <g fill="var(--color-silver)">
+    <circle cx="452" cy="70" r="1.6" opacity="0.8" />
+    <circle cx="588" cy="96" r="2" opacity="0.65" />
+    <circle cx="612" cy="188" r="1.4" opacity="0.5" />
+    <circle cx="486" cy="206" r="1.5" opacity="0.45" />
+    <circle cx="556" cy="52" r="1.3" opacity="0.6" />
+    <circle cx="398" cy="128" r="1.2" opacity="0.35" />
+  </g>
+
+  {/* Horizon. Meaux est dans la plaine de la Brie, pas entre deux collines :
+      la ligne est franchement plus basse et plus tendue que sur le site de
+      Lyon, où elle dessinait Fourvière et la Croix-Rousse. */}
+  <path
+    d="M0 344c110-18 196-6 262 4 76 12 148 2 214-6 60-8 116-4 164 6v96H0Z"
+    fill="url(#plaine)"
+    opacity="0.55"
+  />
+
+  {/* Cathédrale Saint-Étienne — façade asymétrique */}
+  <g stroke="var(--color-gold)" stroke-width="2.4" fill="none" stroke-linejoin="round">
+    {/* Tour nord, achevée, avec sa flèche */}
+    <rect x="172" y="160" width="26" height="116" />
+    <path d="M172 160l13-36 13 36" />
+    <path d="M178 192v22M192 192v22M178 230v20M192 230v20" />
+
+    {/* Nef et sa toiture */}
+    <rect x="198" y="212" width="70" height="64" />
+    <path d="M198 212h70l-35-28-35 28Z" />
+
+    {/* Tour sud, restée arasée : c'est elle qui signe la façade */}
+    <rect x="268" y="178" width="26" height="98" />
+    <path d="M268 190h26" />
+    <path d="M274 208v24M288 208v24" />
+
+    {/* Rosace */}
+    <circle cx="233" cy="238" r="12" />
+
+    {/* Portail en arc brisé */}
+    <path d="M220 276v-18a13 13 0 0 1 26 0v18" />
+  </g>
+
+  {/* Immeubles du centre */}
+  <g fill="var(--band-border)" stroke="var(--band-border-ui)" stroke-width="1.5">
+    <rect x="352" y="252" width="56" height="124" />
+    <rect x="414" y="286" width="44" height="90" />
+    <rect x="464" y="264" width="62" height="112" />
+    <rect x="532" y="300" width="48" height="76" />
+    <rect x="86" y="300" width="42" height="76" />
+    <rect x="130" y="318" width="34" height="58" />
+  </g>
+
+  {/* Fenêtres allumées, plus denses côté nuit */}
+  <g fill="var(--color-gold)">
+    <rect x="364" y="266" width="7" height="10" opacity="0.75" />
+    <rect x="382" y="266" width="7" height="10" opacity="0.4" />
+    <rect x="364" y="292" width="7" height="10" opacity="0.55" />
+    <rect x="389" y="292" width="7" height="10" opacity="0.8" />
+    <rect x="424" y="302" width="7" height="10" opacity="0.7" />
+    <rect x="441" y="302" width="7" height="10" opacity="0.35" />
+    <rect x="424" y="328" width="7" height="10" opacity="0.6" />
+    <rect x="476" y="280" width="7" height="10" opacity="0.85" />
+    <rect x="496" y="280" width="7" height="10" opacity="0.45" />
+    <rect x="476" y="306" width="7" height="10" opacity="0.7" />
+    <rect x="505" y="306" width="7" height="10" opacity="0.8" />
+    <rect x="544" y="316" width="7" height="10" opacity="0.6" />
+    <rect x="562" y="316" width="7" height="10" opacity="0.4" />
+    <rect x="98" y="316" width="7" height="10" opacity="0.3" />
+    <rect x="114" y="316" width="7" height="10" opacity="0.25" />
+    <rect x="98" y="342" width="7" height="10" opacity="0.2" />
+  </g>
+
+  {/* La Marne, ramenée à une bande basse pour dégager le premier plan */}
+  <path d="M0 398h640v42H0Z" fill="var(--color-black)" opacity="0.8" />
+  <g stroke="var(--color-silver)" stroke-width="1.4" opacity="0.22" fill="none">
+    <path d="M232 414h86M352 414h120M498 414h74" />
+    <path d="M286 428h92M402 428h70M500 428h96" />
+  </g>
+
+  {/* Clé posée au premier plan — signature du métier. Posée sur la berge et non
+      dans l'eau : au premier essai elle se confondait avec les reflets. */}
+  <g stroke="var(--color-gold)" stroke-width="3.4" fill="none" stroke-linecap="round">
+    <circle cx="58" cy="384" r="16" />
+    <path d="M74 384h92" />
+    <path d="M142 384v15M160 384v11" />
+  </g>
+</svg>
+
+<style>
+  .hero-illu {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    border: 1px solid var(--band-border);
+  }
+</style>

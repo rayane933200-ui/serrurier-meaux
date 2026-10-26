@@ -1,0 +1,136 @@
+---
+// Bloc « vérifier à qui vous avez affaire », placé sur les pages d'arrivée.
+//
+// Pourquoi ce bloc existe : le dépannage de serrurerie est un secteur où la
+// défiance est le point de départ du client, et où la DGCCRF relève des taux
+// d'anomalie élevés. Les concurrents traitent le sujet par des slogans. Nous
+// pouvons le traiter par des faits vérifiables — SIRET, grille publiée, devis
+// signé avant intervention — ce qu'un intermédiaire ne peut pas faire.
+//
+// Chaque ligne ci-dessous est opposable : elle décrit ce que nous faisons, et
+// le visiteur peut la contrôler. Ne jamais y ajouter une promesse qui ne soit
+// pas déjà publiée sur le site.
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+
+const { legal, pricing, credentials } = site;
+
+// L'assureur, le numéro de contrat et la couverture figurent sur l'attestation —
+// la loi impose déjà de les porter sur chaque devis et chaque facture. Tant qu'ils
+// ne sont pas renseignés dans site.ts, on annonce la couverture sans la détailler,
+// et on s'engage à produire l'attestation : un argument que le client peut vérifier
+// vaut mieux qu'un argument qu'il doit croire.
+const assurance = legal.insurer
+  ? `Décennale souscrite auprès de ${legal.insurer}. Attestation remise sur simple demande.`
+  : 'Assurance décennale souscrite. L’attestation vous est remise sur simple demande, avant intervention.';
+
+const points = [
+  {
+    icon: 'phone' as const,
+    title: 'Le prix s’annonce au téléphone',
+    description: `Avant tout déplacement, pas sur votre palier. Nos interventions démarrent à ${site.startingPrice}, déplacement compris.`,
+  },
+  {
+    icon: 'shield' as const,
+    title: 'Le devis est écrit et signé avant',
+    description: `${pricing.quote}. Un professionnel qui commence sans devis signé est en infraction.`,
+  },
+  {
+    icon: 'key' as const,
+    title: 'L’entreprise est identifiable',
+    description: `SIRET ${legal.siret}, vérifiable en une minute sur l’annuaire des entreprises depuis votre téléphone.`,
+  },
+  {
+    icon: 'wrench' as const,
+    title: 'Rien n’est payé avant signature',
+    description: 'Aucun acompte, aucun paiement réclamé avant que vous ayez lu et signé le devis.',
+  },
+  {
+    icon: 'lock' as const,
+    title: 'Artisan diplômé et assuré',
+    description: `${credentials.diplomaExact || credentials.diploma}. ${assurance}`,
+  },
+];
+---
+
+<section class="verif" aria-labelledby="verif-titre">
+  <div class="container">
+    <h2 id="verif-titre">Comment vérifier à qui vous avez affaire</h2>
+    <p class="verif-intro">
+      La serrurerie d’urgence attire des intervenants peu scrupuleux, qui profitent de ce que
+      personne ne compare les prix devant une porte fermée. Quatre points se contrôlent avant
+      même que quelqu’un se déplace — chez nous comme ailleurs.
+    </p>
+
+    <ul class="verif-list">
+      {points.map((point) => (
+        <li>
+          <Icon name={point.icon} size={22} />
+          <div>
+            <span class="verif-title">{point.title}</span>
+            <span class="verif-text">{point.description}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
+
+    <p class="verif-more">
+      <a href="/blog/reconnaitre-serrurier-serieux/">
+        Reconnaître un serrurier sérieux : les pièges à éviter →
+      </a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .verif {
+    background: var(--color-bg-alt);
+    border-block: 1px solid var(--color-border-soft);
+    padding-block: var(--space-lg);
+  }
+
+  .verif-intro {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+  }
+
+  .verif-list {
+    list-style: none;
+    margin: var(--space-md) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .verif-list li {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .verif-list :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  .verif-title {
+    display: block;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    margin-bottom: 0.2rem;
+  }
+
+  .verif-text {
+    display: block;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+
+  .verif-more {
+    margin-top: var(--space-md);
+  }
+</style>

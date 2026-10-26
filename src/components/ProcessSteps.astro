@@ -1,0 +1,82 @@
+---
+const steps = [
+  {
+    number: '1',
+    title: 'Vous appelez',
+    description: 'Décrivez votre besoin par téléphone, à toute heure du jour ou de la nuit.',
+  },
+  {
+    number: '2',
+    title: 'Diagnostic rapide',
+    description: 'On identifie le problème et le type d’intervention nécessaire.',
+  },
+  {
+    number: '3',
+    title: 'Tarif annoncé',
+    description: 'Un prix ferme est annoncé avant le déplacement, et c’est celui de la facture.',
+  },
+  {
+    number: '4',
+    title: 'Intervention en - de 30 min',
+    description: 'Un serrurier arrive chez vous en moins de 30 minutes, à Meaux comme dans le Pays de Meaux.',
+  },
+];
+---
+
+<section class="section process">
+  <div class="container">
+    <h2>Comment ça marche ?</h2>
+    <ol class="process-steps">
+      {steps.map((step) => (
+        <li>
+          <span class="process-number" aria-hidden="true">{step.number}</span>
+          <h3>{step.title}</h3>
+          <p>{step.description}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .process h2 {
+    text-align: center;
+  }
+
+  .process-steps {
+    list-style: none;
+    margin: var(--space-lg) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .process-steps li {
+    text-align: center;
+  }
+
+  .process-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-gold);
+    color: var(--color-black);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .process-steps h3 {
+    margin-bottom: 0.35rem;
+  }
+
+  .process-steps p {
+    color: var(--color-text-muted);
+    margin-bottom: 0;
+  }
+</style>

@@ -1,0 +1,84 @@
+---
+// Logo "SERRURIER" : bouclier or, cadenas et clé argent, fourni par l'utilisateur.
+// Le libellé texte reprend la typo de la charte.
+//
+// On charge la version DÉTOURÉE, pas l'originale. Le fichier fourni
+// (logo-icon.png) est entièrement opaque : son champ noir #010206 formait un
+// rectangle visible sur le bandeau sombre #17181c, légèrement plus foncé que
+// lui. Le détourage ne touche pas aux couleurs, il n'ajoute qu'un canal alpha,
+// calculé depuis l'histogramme de luminance : 82,6 % des pixels sont sous la
+// luminance 8 (le champ), le sujet commence au-dessus de 93, et la rampe
+// 8 → 60 donne aux 0,6 % de pixels de bord une opacité proportionnelle plutôt
+// qu'un escalier.
+//
+// L'original reste dans src/assets/, intact : il sert toujours de source si le
+// détourage doit être refait, et logo-full.png (données structurées, image de
+// partage) n'est pas concerné — un fond opaque y est souhaitable.
+//
+// Effet de bord utile : la version détourée passe aussi sur fond clair, sans
+// halo. Rien n'oblige donc plus l'en-tête à rester sombre, si ce choix revient
+// un jour sur la table.
+import { Image } from 'astro:assets';
+import logoIcon from '../assets/logo-icon-detoure.png';
+
+interface Props {
+  iconOnly?: boolean;
+  class?: string;
+}
+
+const { iconOnly = false, class: className = '' } = Astro.props;
+---
+
+<span class={`logo ${className}`}>
+  <Image src={logoIcon} alt="" width={44} height={36} class="logo-icon" />
+  {!iconOnly && (
+    <span class="logo-text">
+      <span class="logo-title">SERRURIER</span>
+      <span class="logo-subtitle">Sécurité · Rapidité · Confiance</span>
+    </span>
+  )}
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 36px;
+    object-fit: contain;
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .logo-title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    /* Le logo ne vit que dans les bandeaux sombres (en-tête, pied de page) :
+       son PNG a un fond noir incrusté, il serait un rectangle noir sur clair.
+       L'argent reprend la clé du logo — ne pas basculer sur --color-text. */
+    color: var(--color-silver);
+  }
+
+  .logo-subtitle {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    white-space: nowrap;
+  }
+</style>

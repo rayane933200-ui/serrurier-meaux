@@ -1,0 +1,125 @@
+# Configuration Apache pour un hébergement mutualisé (o2switch, cPanel).
+#
+# Ce fichier remplace netlify.toml : les en-têtes qu'on avait réglés côté
+# Netlify ne suivent PAS le site. Sans ce fichier, le site perdrait d'un coup
+# le HTTPS forcé, tous ses en-têtes de sécurité, sa politique de contenu et sa
+# page 404 — sans qu'aucune erreur ne s'affiche nulle part.
+#
+# Astro copie automatiquement le contenu de public/ dans dist/ : ce fichier se
+# retrouve donc à la racine du site publié, là où Apache le lit.
+# Sur Netlify il est simplement ignoré, il peut rester en place pendant la
+# transition.
+
+# ---------------------------------------------------------------------------
+# 1. HTTPS obligatoire
+# ---------------------------------------------------------------------------
+# Écrit sans nommer le domaine : la règle fonctionnera telle quelle quel que
+# soit le nom retenu. o2switch fournit le certificat via AutoSSL (Let's
+# Encrypt) ; attendre qu'il soit délivré avant d'activer cette redirection,
+# sinon le site devient inaccessible le temps de l'émission.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Forme canonique retenue : SANS www, la même que celle déclarée dans
+  # astro.config.mjs et donc dans le sitemap et les URL canoniques. Les deux
+  # versions accessibles créeraient deux adresses pour chaque page aux yeux
+  # d'un moteur de recherche.
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# 1 bis. Anciennes adresses
+# ---------------------------------------------------------------------------
+# /assurances-les-plus-souscrites/ a été publiée le 30 septembre 2026 puis
+# réorientée le jour même vers /assureurs-habitation/. Elle est restée en ligne
+# assez longtemps pour figurer dans un sitemap récupéré par Google : on la
+# redirige plutôt que de la laisser tomber en 404.
+<IfModule mod_rewrite.c>
+  RewriteRule ^assurances-les-plus-souscrites/?$ /assureurs-habitation/ [L,R=301]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# 2. Page 404 du site
+# ---------------------------------------------------------------------------
+# Sans cette ligne, Apache afficherait sa page grise par défaut au lieu de la
+# nôtre, qui propose le numéro d'appel et les liens principaux.
+ErrorDocument 404 /404.html
+
+# ---------------------------------------------------------------------------
+# 3. En-têtes de sécurité — repris à l'identique de netlify.toml
+# ---------------------------------------------------------------------------
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Le site n'utilise aucune de ces interfaces : on les refuse explicitement.
+  Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=(), usb=(), magnetometer=(), gyroscope=()"
+
+  # HTTPS imposé pour un an. Volontairement SANS le jeton preload, qui engage
+  # le domaine de façon quasi irréversible : une fois inscrit sur la liste de
+  # préchargement des navigateurs, en sortir prend des mois. Netlify ajoutait
+  # ce jeton d'office sur netlify.app ; sur un domaine propre, c'est un choix.
+  # Activée le 28 septembre 2026, une fois le certificat Let's Encrypt délivré
+  # et les redirections vérifiées. Un an d'engagement : si le HTTPS venait à
+  # tomber, les navigateurs refuseraient d'afficher le site en clair plutôt que
+  # de le servir sans chiffrement. o2switch renouvelle le certificat tout seul.
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  # Politique de contenu, en observation seule : elle ne bloque rien et sert à
+  # repérer ce que la page charge vraiment. Les domaines Google sont ceux de la
+  # balise Ads, relevés sur le site en production et non dans la documentation.
+  # Refaire ce relevé dans la console du navigateur avant de renommer cet
+  # en-tête en Content-Security-Policy : une conversion bloquée par la CSP
+  # échoue en silence.
+  Header always set Content-Security-Policy-Report-Only "default-src 'self'; img-src 'self' data: https://www.google.com https://www.google.fr https://www.googleadservices.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.gstatic.com https://www.googleadservices.com https://googleads.g.doubleclick.net; font-src 'self'; connect-src 'self' https://www.google.com https://www.google.fr https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://ad.doubleclick.net; frame-src https://td.doubleclick.net https://www.googletagmanager.com; frame-ancestors 'self'; base-uri 'self'; object-src 'none'"
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# 4. Cache
+# ---------------------------------------------------------------------------
+# Les fichiers de /_astro/ portent un hachage dans leur nom : leur contenu ne
+# change jamais, on peut les garder un an. Le HTML, lui, doit être revalidé à
+# chaque visite, sinon une correction mettrait des jours à apparaître.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\.(js|css|woff2|webp|avif|jpg|jpeg|png|svg|gif|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  # Le sitemap et robots.txt doivent rester frais malgré la règle ci-dessus.
+  <FilesMatch "^(robots\.txt|sitemap.*\.xml)$">
+    Header set Cache-Control "public, max-age=3600"
+  </FilesMatch>
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# 5. Compression
+# ---------------------------------------------------------------------------
+# Les images et les polices woff2 sont déjà compressées, les recompresser
+# coûterait du processeur pour rien.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE application/xml image/svg+xml
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# 6. Divers
+# ---------------------------------------------------------------------------
+# Empêche Apache de lister le contenu d'un dossier sans page d'accueil.
+Options -Indexes
+
+# Types corrects pour les formats servis par Astro, au cas où la configuration
+# du serveur serait ancienne.
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType image/avif .avif
+  AddType font/woff2 .woff2
+  AddType application/manifest+json .webmanifest
+</IfModule>

@@ -1,0 +1,436 @@
+﻿---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import HeroIllustration from '../components/HeroIllustration.astro';
+import ReassuranceBar from '../components/ReassuranceBar.astro';
+import Faq from '../components/Faq.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import { services } from '../data/services';
+import { quartiers, communes } from '../data/zones';
+import { featuredFaq } from '../data/faq';
+import { site } from '../data/site';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: featuredFaq.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+---
+
+<BaseLayout
+  title="Serrurier à Meaux 24h/24 — intervention en 30 minutes"
+  description="Serrurier à Meaux et Pays de Meaux, 24h/24 et 7j/7. Ouverture de porte, changement de serrure, blindage, dépannage dès 69 €. Tarif annoncé avant déplacement."
+  jsonLd={jsonLd}
+  suffix={false}
+>
+  <section class="hero">
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <h1>Serrurier à Meaux, intervention garantie en moins de 30 minutes</h1>
+        <p>
+          Ouverture de porte, changement de serrure, blindage, dépannage : une équipe réactive
+          se déplace chez vous à Meaux et dans tout le Pays de Meaux, 24h/24 et 7j/7.
+        </p>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <Icon name="clock" size={26} />
+            <div>
+              <span class="hero-stat-value">&lt; 30 min</span>
+              <span class="hero-stat-label">Intervention garantie</span>
+            </div>
+          </div>
+          <div class="hero-stat">
+            <Icon name="shield" size={26} />
+            <div>
+              <span class="hero-stat-value">Dès {site.startingPrice}</span>
+              <span class="hero-stat-label">Tarif annoncé avant intervention</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href={site.phoneHref}>
+            <Icon name="phone" size={18} />
+            <span>Appeler le {site.phoneDisplay}</span>
+          </a>
+          <a class="btn btn-secondary" href="/contact/">Demander un devis gratuit</a>
+        </div>
+        <ul class="hero-badges">
+          <li><Icon name="clock" size={18} /> Disponible 24h/24, 7j/7</li>
+          <li><Icon name="map-pin" size={18} /> Meaux et Pays de Meaux</li>
+        </ul>
+      </div>
+
+      <div class="hero-visual">
+        <HeroIllustration />
+      </div>
+    </div>
+  </section>
+
+  <ReassuranceBar />
+
+  <ProcessSteps />
+
+  <section class="section">
+    <div class="container">
+      <h2>Nos services de serrurerie</h2>
+      <p class="section-intro">
+        Intervention à partir de <strong>{site.startingPrice}</strong>, ou sur devis gratuit selon la
+        nature de l'intervention. Chaque prestation a sa page détaillée.
+      </p>
+      <div class="services-grid">
+        {services.map((service) => (
+          <ServiceCard
+            icon={service.icon}
+            title={service.title}
+            description={service.teaser}
+            href={`/services/${service.slug}/`}
+          />
+        ))}
+      </div>
+      <p class="services-more">
+        <a href="/services/">Voir le détail de tous nos services →</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container why-grid">
+      <div>
+        <h2>Pourquoi choisir Serrurier ?</h2>
+        <ul class="why-list">
+          <li>
+            <Icon name="clock" size={22} />
+            <div>
+              <h3>Disponible 24h/24 et 7j/7</h3>
+              <p>Une urgence de serrurerie appelle une réponse immédiate : nous décrochons à toute heure.</p>
+            </div>
+          </li>
+          <li>
+            <Icon name="map-pin" size={22} />
+            <div>
+              <h3>Intervention locale à Meaux</h3>
+              <p>Une équipe qui connaît Meaux et le Pays de Meaux pour se déplacer rapidement.</p>
+            </div>
+          </li>
+          <li>
+            <Icon name="shield" size={22} />
+            <div>
+              <h3>Le prix annoncé est le prix payé</h3>
+              <p>Le tarif est annoncé et confirmé par téléphone avant tout déplacement, à partir de {site.startingPrice}, et c'est ce montant qui figure sur votre facture.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Où nous intervenons</h2>
+      <p class="section-intro">
+        Les quartiers de Meaux et les communes du Pays de Meaux. Chaque secteur a sa page, avec
+        les délais et les secteurs desservis.
+      </p>
+      <div class="zones-columns">
+        <div>
+          <h3>Meaux par quartier</h3>
+          <ul class="zones-inline">
+            {quartiers.map((zone) => (
+              <li><a href={`/zones/${zone.slug}/`}>{zone.name}</a></li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3>Pays de Meaux</h3>
+          <ul class="zones-inline">
+            {communes.map((zone) => (
+              <li><a href={`/zones/${zone.slug}/`}>{zone.name}</a></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <p class="services-more">
+        <a href="/zones-intervention/">Voir toutes les zones d'intervention →</a>
+      </p>
+    </div>
+  </section>
+
+  <Faq
+    items={featuredFaq}
+    title="Questions fréquentes"
+    intro="Ce que les clients demandent le plus souvent avant de faire intervenir un serrurier."
+  />
+  <p class="faq-more container">
+    <a href="/faq/">Voir toutes les questions →</a>
+  </p>
+
+  <section class="section section-alt" id="devis">
+    <div class="container quote-layout">
+      <div>
+        <h2>Demander un devis gratuit</h2>
+        <p class="quote-intro">
+          Décrivez votre besoin en quelques lignes : nous revenons vers vous avec un tarif clair,
+          sans engagement. Pour une urgence, l'appel reste le plus rapide.
+        </p>
+        <ul class="quote-points">
+          <li><Icon name="clock" size={20} /> <span>Intervention en moins de {site.responseTime}</span></li>
+          <li><Icon name="shield" size={20} /> <span>Tarif annoncé avant déplacement</span></li>
+          <li><Icon name="van" size={20} /> <span>Disponible {site.hours}</span></li>
+        </ul>
+        <a class="btn btn-primary quote-call" href={site.phoneHref}>
+          <Icon name="phone" size={18} />
+          <span>Appeler le {site.phoneDisplay}</span>
+        </a>
+      </div>
+      <QuoteForm />
+    </div>
+  </section>
+
+  <CtaBanner
+    title="Besoin d'un serrurier à Meaux ?"
+    description="Appelez-nous directement ou envoyez-nous un message : nous vous répondons rapidement."
+  />
+</BaseLayout>
+
+<style>
+  /* Le hero reste un bandeau sombre dans un site clair, et ce n'est pas un
+     reste du theme precedent : l'illustration est une scene de nuit, et le
+     bloc fait la transition entre l'en-tete sombre -- impose par le fond noir
+     incruste du logo -- et le corps de page clair. Les variables --band-*
+     sont faites pour ce contexte ; n'y jamais employer --color-text. */
+  .hero {
+    background: linear-gradient(135deg, var(--band-surface) 0%, var(--band-bg) 100%);
+    color: var(--color-white);
+    padding-block: var(--space-xl);
+    border-bottom: 1px solid var(--band-border);
+  }
+
+  /* Les titres du corps sont sombres : ici il faut les reclaircir. */
+  .hero h1,
+  .hero h2,
+  .hero h3 {
+    color: var(--color-white);
+  }
+
+  .hero-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: var(--space-lg);
+    align-items: center;
+  }
+
+  /* Sous 980px la colonne de texte reprend toute la largeur : l illustration
+     passe dessous plutot que de comprimer les titres. */
+  @media (max-width: 980px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-visual {
+      order: -1;
+    }
+  }
+
+  .hero-text {
+    max-width: 640px;
+  }
+
+  .hero h1 {
+    color: var(--color-white);
+  }
+
+  .hero-text p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    margin: var(--space-md) 0;
+  }
+
+  .hero-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: var(--radius);
+    padding: 0.75rem 1.1rem;
+  }
+
+  /* Le hero est un bandeau sombre : l'or pur y est a 8,98:1. */
+  .hero-stat :global(svg) {
+    color: var(--color-gold);
+    flex-shrink: 0;
+  }
+
+  .hero-stat-value {
+    display: block;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.4rem;
+    line-height: 1.1;
+  }
+
+  .hero-stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    margin: var(--space-md) 0;
+  }
+
+  .hero-badges {
+    list-style: none;
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    padding: 0;
+    margin: var(--space-sm) 0 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+  }
+
+  .hero-badges li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .section-intro {
+    max-width: 60ch;
+    color: var(--color-text-muted);
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  .services-more {
+    margin-top: var(--space-md);
+  }
+
+  .services-more a {
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+
+  .why-list {
+    list-style: none;
+    margin: var(--space-md) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .why-list li {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: flex-start;
+  }
+
+  .why-list :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .why-list h3 {
+    margin-bottom: 0.25rem;
+  }
+
+  .why-list p {
+    color: var(--color-text-muted);
+    margin-bottom: 0;
+  }
+
+  .zones-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-top: var(--space-md);
+  }
+
+  .zones-columns h3 {
+    font-size: 1.02rem;
+  }
+
+  .zones-inline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .faq-more {
+    margin-top: calc(-1 * var(--space-lg));
+    margin-bottom: var(--space-xl);
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+
+  .quote-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: var(--space-lg);
+    align-items: start;
+  }
+
+  .quote-intro {
+    color: var(--color-text-muted);
+    max-width: 50ch;
+  }
+
+  .quote-points {
+    list-style: none;
+    margin: var(--space-md) 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .quote-points li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .quote-points :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+  }
+
+  .quote-call {
+    margin-top: var(--space-xs);
+  }
+
+  @media (max-width: 900px) {
+    .zones-columns,
+    .quote-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

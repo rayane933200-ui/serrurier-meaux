@@ -1,0 +1,360 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Icon from '../../components/Icon.astro';
+import QuoteForm from '../../components/QuoteForm.astro';
+import Faq from '../../components/Faq.astro';
+import VerifierUnSerrurier from '../../components/VerifierUnSerrurier.astro';
+import ProcessSteps from '../../components/ProcessSteps.astro';
+import { services } from '../../data/services';
+import { articlesForService } from '../../data/articles';
+import { quartiers, communes } from '../../data/zones';
+import { featuredFaq } from '../../data/faq';
+import { site } from '../../data/site';
+
+export function getStaticPaths() {
+  return services.map((service) => ({
+    params: { slug: service.slug },
+    props: { service },
+  }));
+}
+
+const { service } = Astro.props;
+const otherServices = services.filter((item) => item.slug !== service.slug);
+
+// Maillage retour : sans ces liens, les articles pointent vers les prestations
+// mais rien ne repart dans l'autre sens et le maillage ne circule qu'à sens unique.
+const articlesLies = articlesForService(service.slug);
+
+const crumbs = [
+  { label: 'Accueil', href: '/' },
+  { label: 'Services', href: '/services/' },
+  { label: service.title },
+];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: service.h1,
+    serviceType: service.title,
+    description: service.metaDescription,
+    provider: { '@id': new URL('/#business', Astro.site).href },
+    // La page liste déjà les vingt secteurs desservis et pointe vers chacun.
+    // N'en déclarer qu'un — « City: Meaux » — revenait à taire les communes voisines,
+    // alors que onze communes y figurent noir sur blanc. La liste est dérivée
+    // des données de zones, donc elle suit toute commune ajoutée ou retirée.
+    areaServed: [...quartiers, ...communes].map((zone) => ({
+      '@type': 'Place',
+      name: zone.name,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: zone.type === 'quartier' ? 'Meaux' : zone.name,
+        postalCode: zone.postalCode,
+        addressRegion: 'Île-de-France',
+        addressCountry: 'FR',
+      },
+    })),
+    availableChannel: {
+      '@type': 'ServiceChannel',
+      servicePhone: site.phoneE164,
+      serviceUrl: new URL(`/services/${service.slug}/`, Astro.site).href,
+    },
+  },
+];
+---
+
+<BaseLayout
+  title={service.metaTitle}
+  description={service.metaDescription}
+  jsonLd={jsonLd}
+  suffix={false}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <div class="page-hero-icon">
+        <Icon name={service.icon} size={30} />
+      </div>
+      <h1>{service.h1}</h1>
+      <p>{service.intro}</p>
+      <p class="page-hero-price">{service.price}</p>
+      <div class="page-hero-actions">
+        <a class="btn btn-primary" href={site.phoneHref}>
+          <Icon name="phone" size={18} />
+          <span>Appeler le {site.phoneDisplay}</span>
+        </a>
+        <a class="btn btn-outline" href="#devis">Demander un devis</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container service-layout">
+      <div class="service-main">
+        <h2>Dans quels cas nous appeler</h2>
+        <ul class="situations">
+          {service.situations.map((situation) => (
+            <li>
+              <Icon name="key" size={18} />
+              <span>{situation}</span>
+            </li>
+          ))}
+        </ul>
+
+        {service.details.map((detail) => (
+          <div class="service-detail">
+            <h2>{detail.title}</h2>
+            <p>{detail.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <aside class="service-aside">
+        <div class="aside-card">
+          <h2>Intervention {site.hours}</h2>
+          <p>
+            Nous couvrons {site.area}, avec un objectif d'intervention en moins de{' '}
+            {site.responseTime} et un tarif annoncé avant tout déplacement.
+          </p>
+          <a class="btn btn-primary" href={site.phoneHref}>
+            <Icon name="phone" size={18} />
+            <span>{site.phoneDisplay}</span>
+          </a>
+        </div>
+
+        <div class="aside-card">
+          <h2>Nos autres prestations</h2>
+          <ul class="aside-links">
+            {otherServices.map((item) => (
+              <li>
+                <a href={`/services/${item.slug}/`}>{item.title}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {articlesLies.length > 0 && (
+          <div class="aside-card">
+            <h2>Nos conseils sur le sujet</h2>
+            <ul class="aside-links">
+              {articlesLies.map((article) => (
+                <li>
+                  <a href={`/blog/${article.slug}/`}>{article.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div class="aside-card">
+          <h2>{service.title} près de chez vous</h2>
+          <ul class="aside-links aside-links-inline">
+            {[...quartiers, ...communes].map((zone) => (
+              <li>
+                <a href={`/zones/${zone.slug}/`}>{zone.name}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <VerifierUnSerrurier />
+
+  <ProcessSteps />
+
+  <Faq
+    items={featuredFaq}
+    title="Questions fréquentes"
+    intro="Les réponses aux questions que l'on nous pose le plus souvent avant une intervention."
+  />
+
+  <section class="section section-alt" id="devis">
+    <div class="container quote-layout">
+      <div>
+        <h2>Un doute sur votre situation ?</h2>
+        <p class="quote-intro">
+          Décrivez votre besoin : nous vous répondons avec un tarif clair. Pour une urgence,
+          l'appel reste le plus rapide.
+        </p>
+        <ul class="quote-points">
+          <li><Icon name="clock" size={20} /> <span>Intervention en moins de {site.responseTime}</span></li>
+          <li><Icon name="shield" size={20} /> <span>Tarif annoncé avant déplacement</span></li>
+          <li><Icon name="van" size={20} /> <span>Disponible {site.hours}</span></li>
+        </ul>
+      </div>
+      <QuoteForm context={service.title} />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-gold-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-sm);
+  }
+
+  .page-hero p {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .page-hero-price {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-gold-text);
+  }
+
+  .page-hero-actions {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    margin-top: var(--space-sm);
+  }
+
+  .service-layout {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: var(--space-lg);
+    align-items: start;
+  }
+
+  .situations {
+    list-style: none;
+    margin: 0 0 var(--space-lg);
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .situations li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 0.7rem 1rem;
+  }
+
+  .situations :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  .service-detail {
+    margin-bottom: var(--space-lg);
+  }
+
+  .service-detail h2 {
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+  }
+
+  .service-detail p {
+    color: var(--color-text-muted);
+    max-width: 75ch;
+    margin-bottom: 0;
+  }
+
+  .service-aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    position: sticky;
+    top: 7.5rem;
+  }
+
+  .aside-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+  }
+
+  .aside-card h2 {
+    font-size: 1.05rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .aside-card p {
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+  }
+
+  .aside-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.92rem;
+  }
+
+  .aside-links-inline {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.4rem 0.9rem;
+  }
+
+  .quote-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: var(--space-lg);
+    align-items: start;
+  }
+
+  .quote-intro {
+    color: var(--color-text-muted);
+    max-width: 50ch;
+  }
+
+  .quote-points {
+    list-style: none;
+    margin: var(--space-md) 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .quote-points li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .quote-points :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 900px) {
+    .service-layout,
+    .quote-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .service-aside {
+      position: static;
+    }
+  }
+</style>

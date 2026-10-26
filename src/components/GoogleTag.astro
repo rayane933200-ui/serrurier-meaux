@@ -1,0 +1,87 @@
+---
+// Balise Google (gtag.js) du compte Google Ads — suivi des conversions des
+// campagnes payantes.
+//
+// Conformité : cette balise dépose un cookie publicitaire (_gcl_au) et adresse
+// des requêtes à Google. L'article 82 de la loi Informatique et Libertés impose
+// le consentement PRÉALABLE du visiteur. Le mode consentement de Google
+// (Consent Mode v2) est donc initialisé à « denied » avant le chargement de la
+// bibliothèque : tant que le visiteur n'a pas accepté, gtag n'écrit rien sur son
+// appareil. Le bandeau (CookieBanner.astro) envoie ensuite la mise à jour.
+//
+// wait_for_update laisse 500 ms à un choix déjà enregistré pour remonter avant
+// que le premier événement ne parte, ce qui évite de perdre la conversion d'un
+// visiteur qui avait accepté lors d'une visite précédente.
+import { site } from '../data/site';
+
+const { googleAdsId, callConversionLabel, callClickLabel, consentKey } = site.analytics;
+
+// Le numéro passé à Google doit être écrit exactement comme il apparaît dans la
+// page, sinon le remplacement ne trouve rien. On le lit donc dans site.ts plutôt
+// que de le recopier : les deux ne peuvent pas diverger.
+const phoneDisplay = site.phoneDisplay;
+---
+
+{/* is:inline : ce script doit s'exécuter pendant l'analyse du document, avant
+    la bibliothèque gtag. Astro le laisserait sinon en module différé. */}
+<script is:inline define:vars={{ googleAdsId, callConversionLabel, phoneDisplay, consentKey }}>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  window.gtag = gtag;
+
+  var choixEnregistre = null;
+  try {
+    choixEnregistre = window.localStorage.getItem(consentKey);
+  } catch (e) {
+    // Navigation privée ou stockage bloqué : on reste sur le refus par défaut.
+  }
+  var accorde = choixEnregistre === 'accepte' ? 'granted' : 'denied';
+
+  gtag('consent', 'default', {
+    ad_storage: accorde,
+    ad_user_data: accorde,
+    ad_personalization: accorde,
+    analytics_storage: accorde,
+    wait_for_update: 500,
+  });
+
+  gtag('js', new Date());
+  gtag('config', googleAdsId);
+
+  // Suivi des appels : pour un visiteur venu d'une annonce, Google remplace le
+  // numéro affiché par un numéro de transfert qui sonne sur le même portable.
+  // Les autres visiteurs voient le numéro habituel. Le remplacement suit le même
+  // consentement que le reste : refusé par défaut, il n'a pas lieu.
+  gtag('config', callConversionLabel, {
+    phone_conversion_number: phoneDisplay,
+  });
+</script>
+
+<script
+  is:inline
+  async
+  src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsId}`}
+></script>
+
+{/* Conversion « clic sur le numéro » : un seul écouteur délégué sur le document
+    couvre tous les liens d'appel du site — header, barre fixe, bandeaux, pied de
+    page, articles — y compris ceux qui apparaîtraient plus tard.
+
+    Volontairement sans event_callback ni report de la navigation : sur un site
+    de dépannage d'urgence, retarder le déclenchement du téléphone pour attendre
+    la confirmation de Google serait payer une statistique avec un appel.
+
+    Le consentement est déjà géré en amont : refusé, gtag n'attribue rien. */}
+<script is:inline define:vars={{ callClickLabel }}>
+  document.addEventListener('click', function (evenement) {
+    var cible = evenement.target;
+    if (!cible || typeof cible.closest !== 'function') return;
+
+    var lien = cible.closest('a[href^="tel:"]');
+    if (!lien || typeof window.gtag !== 'function') return;
+
+    window.gtag('event', 'conversion', { send_to: callClickLabel });
+  });
+</script>

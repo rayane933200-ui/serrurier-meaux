@@ -1,0 +1,434 @@
+﻿---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import VerifierUnSerrurier from '../components/VerifierUnSerrurier.astro';
+import RelatedArticles from '../components/RelatedArticles.astro';
+import Icon from '../components/Icon.astro';
+import { services } from '../data/services';
+import { site } from '../data/site';
+
+const { legal } = site;
+const crumbs = [{ label: 'Accueil', href: '/' }, { label: 'Tarifs' }];
+
+// Une ligne laissée vide s'affiche « [À COMPLÉTER] » plutôt que d'être remplie
+// au jugé. Ces montants sont opposables au professionnel comme au consommateur :
+// ils viennent tous de src/data/site.ts, jamais d'une valeur écrite ici.
+type PriceRow = { term: string; value: string; note: string };
+
+// Les cinq premières lignes reprennent une à une les informations énumérées par
+// l'article 2 de l'arrêté du 24 janvier 2017. Les suivantes complètent les
+// « autres conditions de rémunération » prévues par le même article.
+const { pricing } = site;
+
+const priceRows: PriceRow[] = [
+  {
+    term: 'Taux horaire de main-d’œuvre',
+    value: `${pricing.hourlyRate} de l’heure`,
+    note: 'Taux de journée, du lundi au vendredi de 8 h à 20 h. Appliqué aux interventions facturées au temps passé, hors frais de déplacement.',
+  },
+  {
+    term: 'Mode de décompte du temps passé',
+    value: 'Première heure comprise dans le forfait',
+    note: pricing.timeAccounting,
+  },
+  {
+    term: 'Prix des prestations forfaitaires',
+    value: `À partir de ${site.startingPrice}`,
+    note: 'Le forfait d’ouverture de porte est un prix de package : il couvre le déplacement et la première heure de main-d’œuvre sur place, soit moins cher que ces deux lignes facturées séparément. Au-delà de cette première heure seulement, le temps est décompté au taux horaire. Le détail prestation par prestation figure dans le tableau suivant.',
+  },
+  {
+    term: 'Frais de déplacement',
+    value: pricing.callOut,
+    note: 'Sur Meaux et les communes du Pays de Meaux, en journée. Déjà compris dans le forfait d’ouverture de porte — il ne s’y ajoute pas — et facturé à part pour les seules interventions décomptées au temps passé.',
+  },
+  {
+    term: 'Devis',
+    value: 'Gratuit',
+    note: pricing.quote,
+  },
+  {
+    term: 'Majoration soirée et samedi',
+    value: pricing.surchargeEvening,
+    note: pricing.surchargeBase,
+  },
+  {
+    term: 'Majoration nuit, dimanche et jours fériés',
+    value: pricing.surchargeNight,
+    note: pricing.surchargeBase,
+  },
+  {
+    term: 'TVA',
+    value: legal.vatNumber,
+    note: 'Les montants de cette page sont les prix réellement payés : aucune taxe ne s’y ajoute.',
+  },
+  {
+    term: 'Annonce du tarif',
+    value: 'Par téléphone, avant tout déplacement',
+    note: 'Le montant annoncé au téléphone est confirmé sur place avant l’intervention, et c’est celui qui figure sur la facture.',
+  },
+];
+
+const pendingCount = priceRows.filter((row) => row.value.trim() === '').length;
+
+const commitments = [
+  {
+    icon: 'phone' as const,
+    title: 'Un tarif annoncé avant le déplacement',
+    body: `Vous décrivez votre situation au téléphone, nous vous annonçons le tarif correspondant. Le diagnostic par téléphone est gratuit et vous restez libre de votre décision.`,
+  },
+  {
+    icon: 'mail' as const,
+    title: 'Un devis gratuit pour les travaux',
+    body: `Pour un blindage, un changement de serrure planifié ou toute intervention qui dépasse le dépannage simple, vous recevez un devis écrit et gratuit avant que les travaux commencent.`,
+  },
+  {
+    icon: 'lock' as const,
+    title: 'Une facture détaillée à la fin',
+    body: `La facture reprend la main-d’œuvre, les pièces remplacées et le déplacement, ligne par ligne. C’est le document que votre assureur ou votre bailleur vous demandera.`,
+  },
+];
+---
+
+<BaseLayout
+  title="Tarifs serrurier à Meaux : prix et devis gratuit"
+  description="Nos tarifs de serrurerie à Meaux : interventions à partir de 69 €, devis gratuit, tarif annoncé et confirmé par téléphone avant tout déplacement."
+  suffix={false}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>Tarifs de serrurerie à Meaux</h1>
+      <p>
+        Cette page rassemble ce qu'une intervention vous coûte : le taux horaire, les frais de
+        déplacement, le prix des prestations courantes et la façon dont le montant final est
+        calculé, comme la réglementation du dépannage à domicile le prévoit. Les éléments encore
+        en cours de publication sont signalés comme tels ; pour ceux-là, le montant vous est
+        communiqué au téléphone avant tout déplacement.
+      </p>
+      <p>
+        Le principe reste le même dans tous les cas : le tarif vous est annoncé par téléphone
+        avant le déplacement, confirmé sur place avant l'intervention, et c'est ce montant qui
+        figure sur votre facture.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container price-content">
+      <h2>Informations tarifaires</h2>
+      <p class="lead">
+        Les éléments ci-dessous sont ceux que tout professionnel du dépannage communique au client
+        avant la conclusion du contrat.
+      </p>
+
+      {pendingCount > 0 && (
+        <p class="pending-note">
+          Les lignes marquées <span class="pending-inline">[À COMPLÉTER]</span> correspondent à des
+          montants en cours de publication sur ce site. En attendant, ils vous sont communiqués au
+          téléphone, avant tout déplacement, au même titre que les autres.
+        </p>
+      )}
+
+      <div class="table-wrapper">
+        <table class="price-table">
+          <thead>
+            <tr>
+              <th scope="col">Information</th>
+              <th scope="col">Valeur</th>
+            </tr>
+          </thead>
+          <tbody>
+            {priceRows.map((row) => (
+              <tr>
+                <th scope="row">
+                  <span class="row-term">{row.term}</span>
+                  <span class="row-note">{row.note}</span>
+                </th>
+                <td>
+                  {row.value.trim() !== '' ? (
+                    <span class="row-value">{row.value}</span>
+                  ) : (
+                    <span class="pending">[À COMPLÉTER]</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container price-content">
+      <h2>Tarifs indicatifs par prestation</h2>
+      <p class="lead">
+        Ces montants donnent un ordre de grandeur. Le prix exact dépend du type de porte, du modèle
+        de serrure, de la façon dont la porte est fermée et de l'heure de l'intervention : il vous
+        est confirmé au téléphone.
+      </p>
+
+      <div class="table-wrapper">
+        <table class="price-table">
+          <thead>
+            <tr>
+              <th scope="col">Prestation</th>
+              <th scope="col">Tarif indicatif</th>
+            </tr>
+          </thead>
+          <tbody>
+            {services.map((service) => (
+              <tr>
+                <th scope="row">
+                  <a href={`/services/${service.slug}/`}>{service.title}</a>
+                  <span class="row-note">{service.teaser}</span>
+                </th>
+                <td><span class="row-value">{service.price}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="table-cta">
+        <a class="btn btn-primary" href={site.phoneHref}>
+          <Icon name="phone" size={18} />
+          <span>Obtenir un tarif précis au {site.phoneDisplay}</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container price-content">
+      <h2>Ce sur quoi vous pouvez compter</h2>
+      <div class="commitments">
+        {commitments.map((item) => (
+          <article class="commitment">
+            <Icon name={item.icon} size={26} />
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container price-content">
+      <h2>Pourquoi ces informations sont publiées</h2>
+      <p>
+        L'arrêté du 24 janvier 2017 relatif à la publicité des prix des prestations de dépannage,
+        de réparation et d'entretien dans le secteur du bâtiment et de l'équipement de la maison
+        vise nommément la serrurerie. Son article 2 énumère les informations communiquées au
+        consommateur avant la conclusion du contrat : le taux horaire de main-d'œuvre, le mode
+        de décompte du temps passé, le prix des prestations forfaitaires, les frais de déplacement
+        le cas échéant, le caractère gratuit ou payant du devis et les autres conditions de
+        rémunération. Son article 3 demande que ces mêmes informations soient aisément accessibles
+        sur l'espace de communication en ligne du professionnel : c'est l'objet de cette page, que
+        nous complétons à mesure.
+      </p>
+      <p>
+        Le même texte encadre la suite de l'intervention. Le devis détaille la nature exacte des
+        réparations, le décompte des prestations et des produits, les frais de déplacement et le
+        montant total à payer. La facture, remise à l'achèvement des travaux, reprend ces éléments
+        et vous est délivrée gratuitement. Vos droits de consommateur, notamment le délai de
+        rétractation applicable aux prestations conclues à domicile, sont détaillés dans nos
+        <a href="/mentions-legales/">mentions légales</a>.
+      </p>
+      <p>
+        Ces règles servent le même objectif que notre façon de travailler : vous connaissez le prix
+        avant que nous intervenions, et la facture correspond à ce qui vous a été annoncé. Une
+        question sur un montant ? Posez-la au téléphone ou depuis la <a href="/contact/">page
+        contact</a>, nous y répondons avant de nous déplacer.
+      </p>
+    </div>
+  </section>
+
+  <VerifierUnSerrurier />
+
+  <RelatedArticles slugs={['prix-ouverture-de-porte', 'reconnaitre-serrurier-serieux']} />
+
+  <CtaBanner
+    title="Un tarif pour votre situation ?"
+    description="Décrivez-nous votre porte et votre serrure : le tarif vous est annoncé au téléphone avant tout déplacement, 24h/24 et 7j/7."
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero p {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .page-hero p:last-child {
+    margin-bottom: 0;
+  }
+
+  .price-content h2 {
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+  }
+
+  .price-content p {
+    color: var(--color-text-muted);
+    max-width: 78ch;
+  }
+
+  .lead {
+    max-width: 72ch;
+  }
+
+  .pending-note {
+    border-left: 3px solid var(--color-text-muted);
+    background: var(--color-surface);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.95rem;
+  }
+
+  .pending-inline {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+    margin-top: var(--space-md);
+  }
+
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+  }
+
+  .price-table th,
+  .price-table td {
+    text-align: left;
+    padding: 0.9rem 1.2rem;
+    border-bottom: 1px solid var(--color-border-soft);
+    vertical-align: top;
+  }
+
+  .price-table thead th {
+    font-family: var(--font-heading);
+    /* Etait une rangee noire a texte dore, heritee du theme sombre : le
+       dore y retombait a 3,56:1. Bandeau clair, texte normal. */
+    background: var(--color-bg-alt);
+    color: var(--color-text);
+  }
+
+  .price-table tbody th {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .price-table tbody th a {
+    color: var(--color-gold-text);
+  }
+
+  .price-table tbody th a:hover,
+  .price-table tbody th a:focus-visible {
+    color: var(--color-gold-text);
+  }
+
+  .row-term {
+    display: block;
+  }
+
+  .row-note {
+    display: block;
+    margin-top: 0.25rem;
+    max-width: 46ch;
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+
+  .row-value {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-gold-text);
+    white-space: nowrap;
+  }
+
+  .pending {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.03em;
+    color: var(--color-text-muted);
+    background: var(--color-border-soft);
+    border: 1px dashed var(--color-border-ui);
+    border-radius: var(--radius);
+    padding: 0.2rem 0.6rem;
+    white-space: nowrap;
+  }
+
+  .price-table tbody tr:last-child th,
+  .price-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .table-cta {
+    margin-top: var(--space-md);
+  }
+
+  .commitments {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  .commitment {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+  }
+
+  .commitment :global(svg) {
+    color: var(--color-gold-dark);
+  }
+
+  .commitment h3 {
+    font-size: 1.05rem;
+    margin-top: var(--space-xs);
+  }
+
+  .commitment p {
+    margin-bottom: 0;
+    font-size: 0.93rem;
+  }
+
+  @media (max-width: 560px) {
+    .price-table th,
+    .price-table td {
+      padding: 0.75rem 0.9rem;
+    }
+
+    .row-value,
+    .pending {
+      white-space: normal;
+    }
+  }
+</style>

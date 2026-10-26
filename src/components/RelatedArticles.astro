@@ -1,0 +1,84 @@
+---
+// Renvoi vers les articles du blog depuis une page thématique.
+//
+// Les pages de prestation tenaient déjà ce rôle via `articlesForService`, mais
+// les pages transverses — tarifs, marques, cambriolage, assurance, FAQ — ne
+// pointaient vers aucun article. Résultat : certains billets n'avaient que deux
+// liens entrants sur tout le site, contre quarante-quatre pour une page du pied
+// de page. Le lien se déclare ici par slug, choisi pour sa pertinence, plutôt
+// que par une liste automatique qui collerait les mêmes six liens partout.
+import { getArticle } from '../data/articles';
+
+interface Props {
+  slugs: string[];
+  title?: string;
+}
+
+const { slugs, title = 'À lire aussi' } = Astro.props;
+
+const items = slugs.map((slug) => getArticle(slug)).filter((article) => article !== undefined);
+---
+
+{items.length > 0 && (
+  <section class="section related">
+    <div class="container">
+      <h2>{title}</h2>
+      <ul class="related-list">
+        {items.map((article) => (
+          <li>
+            <a href={`/blog/${article.slug}/`}>
+              <span class="related-title">{article.title}</span>
+              <span class="related-excerpt">{article.excerpt}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+)}
+
+<style>
+  .related-list {
+    list-style: none;
+    margin: var(--space-md) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .related-list a {
+    display: block;
+    height: 100%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    text-decoration: none;
+  }
+
+  .related-list a:hover,
+  .related-list a:focus-visible {
+    border-color: var(--color-gold-text);
+  }
+
+  .related-title {
+    display: block;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .related-list a:hover .related-title,
+  .related-list a:focus-visible .related-title {
+    color: var(--color-gold-text);
+  }
+
+  .related-excerpt {
+    display: block;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+</style>

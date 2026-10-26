@@ -1,0 +1,364 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import RelatedArticles from '../components/RelatedArticles.astro';
+import Icon from '../components/Icon.astro';
+import { brands, lockGrades, doorGrades } from '../data/brands';
+import { site } from '../data/site';
+
+const crumbs = [{ label: 'Accueil', href: '/' }, { label: 'Marques et certification' }];
+
+const description =
+  'Picard, Fichet, Bricard, Vachette : ce que vaut chaque marque et ce que signifie la certification A2P. Repères pour choisir une serrure à Meaux.';
+
+---
+
+<BaseLayout
+  title="Marques de serrures et certification A2P"
+  description={description}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>Marques de serrures et certification A2P</h1>
+      <p>
+        Nous posons du Picard, du Fichet, du Bricard et du Vachette. Cette page explique ce qui
+        les distingue et, surtout, ce que veut dire la certification A2P — le seul repère qui
+        engage autre chose que le fabricant lui-même.
+      </p>
+      <div class="page-hero-actions">
+        <a class="btn btn-primary" href={site.phoneHref}>
+          <Icon name="phone" size={18} />
+          <span>Appeler le {site.phoneDisplay}</span>
+        </a>
+        <a class="btn btn-outline" href="/contact/">Demander un devis</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container content-column">
+      <h2>La certification A2P, c’est du temps, pas une étiquette</h2>
+      <p>
+        A2P est délivrée par le CNPP, le Centre national de prévention et de protection. Un
+        laboratoire attaque le produit avec des outils définis à l’avance et chronomètre. Le
+        nombre d’étoiles n’est donc pas un niveau de qualité déclaré par le fabricant : c’est un
+        nombre de minutes tenues face à quelqu’un qui sait s’y prendre.
+      </p>
+      <p>
+        Cette distinction compte au moment d’un sinistre. Un assureur qui exige de l’A2P
+        demandera le certificat, pas la plaquette commerciale.
+      </p>
+
+      <h3>Les étoiles concernent la serrure</h3>
+      <div class="table-wrap">
+        <table class="grade-table">
+          <thead>
+            <tr>
+              <th scope="col">Grade</th>
+              <th scope="col">Résistance</th>
+              <th scope="col">Ce que ça vaut en pratique</th>
+            </tr>
+          </thead>
+          <tbody>
+            {lockGrades.map((grade) => (
+              <tr>
+                <th scope="row">{grade.label}</th>
+                <td class="grade-time">{grade.resistance}</td>
+                <td>{grade.comment}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Les grades BP concernent le bloc-porte entier</h3>
+      <div class="table-wrap">
+        <table class="grade-table">
+          <thead>
+            <tr>
+              <th scope="col">Grade</th>
+              <th scope="col">Résistance</th>
+              <th scope="col">Portée du test</th>
+            </tr>
+          </thead>
+          <tbody>
+            {doorGrades.map((grade) => (
+              <tr>
+                <th scope="row">{grade.label}</th>
+                <td class="grade-time">{grade.resistance}</td>
+                <td>{grade.comment}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="note-box">
+        <Icon name="shield" size={18} />
+        <span>
+          Confondre les deux est l’erreur la plus fréquente. Une serrure A2P trois étoiles montée
+          sur une porte creuse et un bâti d’origine ne tient pas quinze minutes : on entre à côté
+          de la serrure. C’est pourquoi nous regardons la porte et le dormant avant de proposer
+          un modèle — voir le <a href="/services/blindage-de-porte/">blindage de porte</a>.
+        </span>
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2>Les marques que nous posons</h2>
+      <p class="section-lead">
+        Quatre fabricants français. Nous n’avons d’accord d’exclusivité avec aucun : le choix se
+        fait sur votre porte et sur votre budget, pas sur un catalogue imposé.
+      </p>
+      <div class="brand-grid">
+        {brands.map((brand) => (
+          <article class="brand-card">
+            <h3>{brand.name}</h3>
+            <p class="brand-positioning">{brand.positioning}</p>
+            <p class="brand-label">Gammes courantes</p>
+            <ul class="brand-ranges">
+              {brand.ranges.map((range) => (
+                <li>{range}</li>
+              ))}
+            </ul>
+            <p class="brand-label">Dans quel cas</p>
+            <p class="brand-use">{brand.useCase}</p>
+          </article>
+        ))}
+      </div>
+      <p class="areas-note">
+        Une autre marque est déjà posée chez vous et vous souhaitez la conserver ? Dites-le au
+        téléphone : remplacer un cylindre à l’identique évite souvent de toucher à la serrure.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container content-column">
+      <h2>Trois questions à poser avant d’acheter</h2>
+      <ul class="check-list">
+        <li>
+          <Icon name="key" size={18} />
+          <span>
+            <strong>Le certificat A2P existe-t-il pour ce modèle précis ?</strong> La
+            certification porte sur une référence, pas sur une marque. Un fabricant peut vendre
+            du certifié et du non certifié sous le même nom.
+          </span>
+        </li>
+        <li>
+          <Icon name="key" size={18} />
+          <span>
+            <strong>La carte de propriété est-elle fournie ?</strong> Sur les cylindres à clé
+            protégée, elle seule permet de faire refaire une clé — et empêche n’importe qui de le
+            faire à votre place. Elle vous est remise, jamais conservée par l’artisan.
+          </span>
+        </li>
+        <li>
+          <Icon name="key" size={18} />
+          <span>
+            <strong>Le devis distingue-t-il la fourniture de la main-d’œuvre ?</strong> C’est une
+            obligation, et c’est ce qui vous permet de comparer. Nos
+            {' '}<a href="/tarifs/">tarifs</a> sont publiés ligne par ligne pour cette raison.
+          </span>
+        </li>
+      </ul>
+
+      <p>
+        Une serrure certifiée change aussi votre relation à l’assureur : voir
+        {' '}<a href="/assurance-habitation/">assurance habitation et serrurerie</a>.
+      </p>
+    </div>
+  </section>
+
+  <RelatedArticles slugs={['cylindre-ou-serrure-complete', 'reconnaitre-serrurier-serieux']} />
+
+  <CtaBanner
+    title="Un doute sur le niveau de protection qu’il vous faut ?"
+    description="Décrivez votre porte au téléphone. Le conseil est gratuit et le tarif vous est annoncé avant tout déplacement."
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero p {
+    max-width: 70ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .page-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+
+  .content-column {
+    max-width: 78ch;
+  }
+
+  .content-column p,
+  .content-column li {
+    color: var(--color-text-muted);
+  }
+
+  .section-lead {
+    max-width: 70ch;
+    color: var(--color-text-muted);
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    margin-bottom: var(--space-md);
+  }
+
+  .grade-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 34rem;
+  }
+
+  .grade-table th,
+  .grade-table td {
+    text-align: left;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--color-border-soft);
+    vertical-align: top;
+  }
+
+  .grade-table thead th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  .grade-table tbody th {
+    font-family: var(--font-heading);
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+
+  .grade-table td {
+    color: var(--color-text-muted);
+  }
+
+  .grade-time {
+    color: var(--color-gold-text);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .note-box {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-gold);
+    border-radius: var(--radius);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .note-box :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .brand-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+
+  .brand-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+  }
+
+  .brand-card h3 {
+    font-size: 1.15rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .brand-positioning,
+  .brand-use {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .brand-label {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .brand-ranges {
+    list-style: none;
+    margin: 0 0 var(--space-sm);
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .brand-ranges li {
+    font-size: 0.82rem;
+    color: var(--color-gold-text);
+    border: 1px solid var(--color-border-ui);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+  }
+
+  .check-list {
+    list-style: none;
+    margin: 0 0 var(--space-md);
+    padding: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .check-list li {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+  }
+
+  .check-list :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+  }
+
+  .check-list strong {
+    color: var(--color-text);
+  }
+
+  .areas-note {
+    color: var(--color-text-muted);
+    max-width: 70ch;
+    margin-bottom: 0;
+  }
+</style>

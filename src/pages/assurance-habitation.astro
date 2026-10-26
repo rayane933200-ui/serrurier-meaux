@@ -1,0 +1,427 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import RelatedArticles from '../components/RelatedArticles.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+
+const crumbs = [{ label: 'Accueil', href: '/' }, { label: 'Assurance habitation' }];
+
+const description =
+  'Serrurerie et assurance habitation : ce qui est pris en charge après une effraction ou une perte de clés, les délais à respecter et les pièces à fournir.';
+
+// FAQ balisée : ce sont des questions réellement posées au téléphone, et elles
+// n'existent nulle part ailleurs sur le site — aucune duplication avec /faq/.
+const faq = [
+  {
+    question: 'Mon assurance rembourse-t-elle le changement de serrure après un cambriolage ?',
+    answer:
+      'Le plus souvent oui, lorsque le contrat comporte une garantie vol et que l’effraction est constatée. Le remplacement de la serrure forcée fait partie des dommages matériels causés par l’effraction. La prise en charge dépend de votre contrat, du plafond prévu et de la franchise applicable : seul votre assureur peut vous le confirmer.',
+  },
+  {
+    question: 'Et si j’ai simplement perdu mes clés ?',
+    answer:
+      'C’est une garantie distincte, souvent optionnelle. Certains contrats couvrent la perte ou le vol de clés, d’autres uniquement le vol avec dépôt de plainte, d’autres pas du tout. Vérifiez la ligne « perte de clés » ou « assistance serrurerie » de vos conditions particulières avant de conclure que ce sera à votre charge.',
+  },
+  {
+    question: 'Dois-je appeler mon assurance avant de faire intervenir un serrurier ?',
+    answer:
+      'Quand la situation le permet, oui. Beaucoup de contrats incluent une assistance serrurerie qui envoie son propre prestataire, et faire appel à un autre artisan peut réduire ou annuler la prise en charge. En pleine nuit, porte ouverte sur la rue, la sécurisation passe d’abord : conservez alors tous les justificatifs et déclarez dès que possible.',
+  },
+  {
+    question: 'Quel délai pour déclarer ?',
+    answer:
+      'Deux jours ouvrés en cas de vol, cinq jours ouvrés pour les autres sinistres. Ces délais figurent à l’article L. 113-2 du Code des assurances ; votre contrat peut être plus généreux, jamais plus strict. Le délai court à partir du moment où vous avez connaissance du sinistre, pas à partir des faits.',
+  },
+];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  },
+];
+
+const documents = [
+  {
+    term: 'Le devis signé',
+    note: 'Établi avant l’intervention, y compris en urgence. C’est la pièce qui prouve que le montant était connu et accepté.',
+  },
+  {
+    term: 'La facture détaillée',
+    note: 'Elle sépare le déplacement, la main-d’œuvre et chaque fourniture. Un assureur refuse rarement une facture lisible ; il discute volontiers une facture forfaitaire.',
+  },
+  {
+    term: 'Le récépissé de dépôt de plainte',
+    note: 'Indispensable dès qu’il y a vol ou effraction. Sans lui, la garantie vol ne s’applique pas.',
+  },
+  {
+    term: 'Des photos des dégâts',
+    note: 'Prises avant la réparation, porte fermée puis ouverte. Deux minutes de téléphone qui évitent des semaines de discussion.',
+  },
+  {
+    term: 'L’ancienne serrure',
+    note: 'Nous vous la laissons systématiquement. Un expert peut demander à voir la pièce forcée.',
+  },
+];
+---
+
+<BaseLayout
+  title="Assurance habitation et serrurerie"
+  description={description}
+  jsonLd={jsonLd}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>Assurance habitation et serrurerie</h1>
+      <p>
+        Une bonne partie de ce que vous payez à un serrurier peut vous être remboursée. Encore
+        faut-il savoir ce qui est couvert, dans quel délai déclarer et quelles pièces conserver.
+        Voici les repères, sans promesse à votre place : votre contrat reste le seul texte qui
+        décide.
+      </p>
+      <div class="page-hero-actions">
+        <a class="btn btn-primary" href={site.phoneHref}>
+          <Icon name="phone" size={18} />
+          <span>Appeler le {site.phoneDisplay}</span>
+        </a>
+        <a class="btn btn-outline" href="/contact/">Demander un devis</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container content-column">
+      <h2>Deux situations, deux garanties différentes</h2>
+      <p>
+        C’est la confusion la plus fréquente, et elle coûte cher. Une porte fracturée et une clé
+        perdue ne relèvent pas de la même ligne de contrat.
+      </p>
+
+      <div class="case-grid">
+        <article class="case-card">
+          <h3><Icon name="shield" size={20} /> Effraction ou tentative</h3>
+          <p>
+            Relève de la <strong>garantie vol</strong>. Les dommages causés à la porte, au bâti et
+            à la serrure sont des dommages matériels liés à l’effraction, y compris lorsque rien
+            n’a été volé : une tentative qui échoue laisse une serrure à remplacer.
+          </p>
+          <p class="case-need">Dépôt de plainte obligatoire.</p>
+        </article>
+
+        <article class="case-card">
+          <h3><Icon name="key" size={20} /> Perte ou vol de clés</h3>
+          <p>
+            Relève d’une <strong>garantie distincte</strong>, souvent optionnelle, parfois logée
+            dans une assistance. Le vol de clés avec plainte est plus fréquemment couvert que la
+            simple perte. Certaines cartes bancaires haut de gamme prévoient aussi une assistance
+            serrurerie.
+          </p>
+          <p class="case-need">Vérifiez vos conditions particulières.</p>
+        </article>
+      </div>
+
+      <h2>Le réflexe qui change tout : appeler l’assurance d’abord</h2>
+      <p>
+        Beaucoup de contrats incluent une assistance serrurerie qui mandate <em>son</em>
+        prestataire. Si vous appelez un artisan de votre côté, la prise en charge peut être
+        réduite, voire refusée — non pas parce que la facture est trop élevée, mais parce que la
+        procédure n’a pas été suivie.
+      </p>
+      <p>
+        Nous préférons vous le dire avant l’intervention plutôt qu’après. Quand la situation
+        l’autorise — vous êtes en sécurité, la porte tient, il fait jour — le meilleur premier
+        appel est celui de votre assureur.
+      </p>
+      <p class="note-box">
+        <Icon name="clock" size={18} />
+        <span>
+          La nuit, porte ouverte sur le palier ou serrure arrachée, la sécurisation passe
+          évidemment d’abord. Dans ce cas, conservez tout, photographiez tout, et déclarez dès
+          l’ouverture des bureaux. Un sinistre déclaré dans les délais avec des pièces complètes
+          se défend très bien.
+        </span>
+      </p>
+
+      <h2>Les délais de déclaration</h2>
+      <div class="delay-grid">
+        <div class="delay-card">
+          <p class="delay-value">2 jours ouvrés</p>
+          <p class="delay-label">En cas de vol ou de cambriolage</p>
+        </div>
+        <div class="delay-card">
+          <p class="delay-value">5 jours ouvrés</p>
+          <p class="delay-label">Pour les autres sinistres</p>
+        </div>
+      </div>
+      <p>
+        Ces délais sont fixés par l’article L. 113-2 du Code des assurances. Votre contrat peut
+        vous en accorder davantage, jamais moins. Ils démarrent au moment où vous prenez
+        connaissance du sinistre : si vous rentrez de vacances, c’est le jour du retour qui
+        compte, pas celui de l’effraction.
+      </p>
+      <p>
+        Après un cambriolage, la déclaration n’est qu’une étape parmi d’autres, et l’ordre compte.
+        Le détail est sur la page <a href="/apres-un-cambriolage/">que faire après un
+        cambriolage</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2>Les cinq pièces à conserver</h2>
+      <p class="section-lead">
+        Un dossier complet se monte pendant l’intervention, pas trois semaines après.
+      </p>
+      <dl class="doc-list">
+        {documents.map((doc) => (
+          <div>
+            <dt>{doc.term}</dt>
+            <dd>{doc.note}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container content-column">
+      <h2>Ce que nous vous remettons</h2>
+      <p>
+        Un devis détaillé avant toute intervention, y compris la nuit, et une facture qui sépare
+        le déplacement, la main-d’œuvre et chaque fourniture, conformément à la réglementation du
+        dépannage à domicile. Nos <a href="/tarifs/">tarifs sont publiés</a> : le montant du
+        devis est celui de la grille, ce qui rend la facture facile à justifier auprès d’un
+        expert.
+      </p>
+      <p>
+        Si votre assureur exige une serrure certifiée en remplacement, dites-le au téléphone : le
+        choix du modèle en dépend. Les niveaux de certification sont expliqués sur la page
+        <a href="/marques-de-serrures/">marques et certification A2P</a>.
+      </p>
+
+      <h2>Questions fréquentes</h2>
+      <div class="faq-list">
+        {faq.map((item) => (
+          <details class="faq-item">
+            <summary>{item.question}</summary>
+            <p>{item.answer}</p>
+          </details>
+        ))}
+      </div>
+
+      <p class="disclaimer">
+        Cette page rassemble des repères généraux et ne remplace pas la lecture de votre contrat.
+        Seul votre assureur peut vous confirmer l’étendue de vos garanties, votre franchise et vos
+        plafonds.
+      </p>
+    </div>
+  </section>
+
+  <RelatedArticles slugs={['apres-un-cambriolage-demarches', 'cle-perdue-changer-la-serrure']} />
+
+  <CtaBanner
+    title="Une porte forcée à sécuriser à Meaux ?"
+    description="Devis détaillé avant intervention, facture conforme aux attentes d’un assureur. Le diagnostic par téléphone est gratuit."
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero p {
+    max-width: 70ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .page-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+
+  .content-column {
+    max-width: 78ch;
+  }
+
+  .content-column p,
+  .content-column li {
+    color: var(--color-text-muted);
+  }
+
+  .section-lead {
+    max-width: 70ch;
+    color: var(--color-text-muted);
+  }
+
+  .case-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .case-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+  }
+
+  .case-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .case-card :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+  }
+
+  .case-card p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .case-card strong {
+    color: var(--color-text);
+  }
+
+  .case-need {
+    margin-bottom: 0;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--color-border-soft);
+    color: var(--color-gold-text) !important;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.88rem !important;
+  }
+
+  .note-box {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-gold);
+    border-radius: var(--radius);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .note-box :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .delay-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .delay-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    text-align: center;
+  }
+
+  .delay-value {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
+    color: var(--color-gold-text);
+    margin-bottom: 0.2rem;
+  }
+
+  .delay-label {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-muted) !important;
+  }
+
+  .doc-list {
+    margin: 0;
+    display: grid;
+    gap: 0.5rem;
+    max-width: 90ch;
+  }
+
+  .doc-list div {
+    display: grid;
+    grid-template-columns: 16rem 1fr;
+    gap: var(--space-sm);
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .doc-list dt {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+  }
+
+  .doc-list dd {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .faq-list {
+    display: grid;
+    gap: 0.5rem;
+    margin-bottom: var(--space-md);
+  }
+
+  .faq-item {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+  }
+
+  .faq-item summary {
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .faq-item p {
+    margin: 0.6rem 0 0;
+  }
+
+  .disclaimer {
+    font-size: 0.88rem;
+    border-left: 3px solid var(--color-border-ui);
+    padding-left: 1rem;
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 640px) {
+    .doc-list div {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+  }
+</style>

@@ -1,0 +1,378 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import RelatedArticles from '../components/RelatedArticles.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+
+const crumbs = [{ label: 'Accueil', href: '/' }, { label: 'Après un cambriolage' }];
+
+const description =
+  'Cambriolage à Meaux : les gestes de la première heure, le dépôt de plainte, les numéros utiles et le délai de deux jours pour déclarer à votre assurance.';
+
+// Numéros nationaux, gratuits et stables. Aucun numéro surtaxé ni aucune
+// coordonnée locale inventée : pour un commissariat, on renvoie vers l'annuaire
+// officiel plutôt que de publier une adresse qui peut changer.
+const numbers = [
+  {
+    number: '17',
+    name: 'Police secours',
+    note: 'Urgence immédiate. À composer depuis l’extérieur du logement si vous découvrez une effraction en rentrant.',
+  },
+  {
+    number: '112',
+    name: 'Urgences européennes',
+    note: 'Fonctionne depuis n’importe quel téléphone, même sans carte SIM ni forfait actif.',
+  },
+  {
+    number: '114',
+    name: 'Urgences par SMS',
+    note: 'Pour les personnes sourdes, malentendantes, aphasiques ou dysphasiques. Par SMS, chat ou visio.',
+  },
+  {
+    number: '116 006',
+    name: 'France Victimes',
+    note: 'Aide aux victimes : écoute, information sur vos droits et accompagnement dans les démarches. Gratuit.',
+  },
+];
+
+const steps = [
+  {
+    title: 'N’entrez pas',
+    body:
+      'Si vous découvrez une porte forcée en rentrant, restez dehors. La personne peut encore être à l’intérieur, et un cambriolage surpris devient une confrontation. Appelez le 17 depuis le palier, la rue ou chez un voisin.',
+  },
+  {
+    title: 'Ne touchez à rien',
+    body:
+      'C’est le réflexe le plus difficile à tenir et le plus utile. Ranger, nettoyer ou refermer efface les traces que les techniciens relèvent : empreintes, outils, points d’entrée. Attendez leur passage avant de remettre quoi que ce soit en place.',
+  },
+  {
+    title: 'Photographiez',
+    body:
+      'Dès que les forces de l’ordre vous y autorisent, photographiez la porte, la serrure, le bâti et chaque pièce touchée. Ces images serviront à votre assureur et à l’expert, longtemps après que tout aura été réparé.',
+  },
+  {
+    title: 'Faites opposition',
+    body:
+      'Cartes bancaires, chéquiers, clés de véhicule, téléphone. Utilisez l’application ou le numéro figurant au dos de votre carte plutôt qu’un numéro trouvé en ligne — c’est aussi le moment où circulent de faux services d’opposition.',
+  },
+];
+---
+
+<BaseLayout
+  title="Que faire après un cambriolage"
+  description={description}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <p class="urgent-line">
+        <Icon name="phone" size={18} />
+        <span>Danger immédiat ou effraction en cours : composez le <strong>17</strong>.</span>
+      </p>
+      <h1>Que faire après un cambriolage</h1>
+      <p>
+        Les premières heures comptent, et l’ordre des gestes aussi. Cette page suit la chronologie
+        réelle : se mettre en sécurité, préserver les traces, porter plainte, déclarer, puis
+        seulement sécuriser la porte.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container content-column">
+      <h2>Dans l’heure qui suit</h2>
+      <ol class="step-list">
+        {steps.map((step) => (
+          <li>
+            <h3>{step.title}</h3>
+            <p>{step.body}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2>Numéros utiles</h2>
+      <p class="section-lead">
+        Quatre numéros nationaux, gratuits, valables partout en France.
+      </p>
+      <div class="number-grid">
+        {numbers.map((item) => (
+          <article class="number-card">
+            <p class="number-value">{item.number}</p>
+            <p class="number-name">{item.name}</p>
+            <p class="number-note">{item.note}</p>
+          </article>
+        ))}
+      </div>
+      <p class="areas-note">
+        Pour joindre le commissariat dont dépend votre adresse, passez par l’annuaire officiel du
+        ministère de l’Intérieur :
+        {' '}<a href="https://www.masecurite.interieur.gouv.fr/" rel="noopener noreferrer" target="_blank">
+          masecurite.interieur.gouv.fr
+        </a>. Nous ne publions pas d’adresses de commissariats : elles changent, et une
+        information périmée dans un moment pareil ne rend service à personne.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container content-column">
+      <h2>Porter plainte</h2>
+      <p>
+        La plainte se dépose dans n’importe quel commissariat de police ou brigade de gendarmerie,
+        où que vous soyez en France : le service saisi ne peut pas vous renvoyer ailleurs. Vous
+        repartez avec un récépissé. Conservez-le, c’est la pièce que votre assureur réclamera en
+        premier.
+      </p>
+      <p>
+        Vous pouvez gagner du temps en remplissant une plainte en ligne à l’avance, pour une
+        atteinte aux biens dont l’auteur est inconnu. La démarche prépare le dossier ; le
+        rendez-vous en commissariat reste nécessaire pour signer.
+      </p>
+      <ul class="link-list">
+        <li>
+          <Icon name="shield" size={18} />
+          <a href="https://www.pre-plainte-en-ligne.gouv.fr/" rel="noopener noreferrer" target="_blank">
+            Déposer une plainte en ligne — service officiel
+          </a>
+        </li>
+        <li>
+          <Icon name="shield" size={18} />
+          <a href="https://www.service-public.fr/particuliers/vosdroits/F1435" rel="noopener noreferrer" target="_blank">
+            Porter plainte : la procédure expliquée par service-public.fr
+          </a>
+        </li>
+        <li>
+          <Icon name="shield" size={18} />
+          <a href="https://www.france-victimes.fr/" rel="noopener noreferrer" target="_blank">
+            France Victimes — accompagnement gratuit des victimes
+          </a>
+        </li>
+      </ul>
+
+      <h2>Déclarer à votre assurance : deux jours ouvrés</h2>
+      <p>
+        Le délai est court et il est légal : deux jours ouvrés en cas de vol, contre cinq pour les
+        autres sinistres. Il court à partir du moment où vous avez connaissance du cambriolage —
+        au retour de vacances, c’est le jour du retour.
+      </p>
+      <p>
+        Ce qui est couvert, ce qu’il faut fournir et le piège de l’assistance qui impose son
+        propre artisan : tout est détaillé sur la page
+        {' '}<a href="/assurance-habitation/">assurance habitation et serrurerie</a>.
+      </p>
+
+      <h2>Sécuriser la porte</h2>
+      <p>
+        Une serrure forcée ne se répare pas, elle se remplace. Et si des clés ont disparu pendant
+        le cambriolage, le cylindre doit changer même s’il n’a pas été touché : les clés d’un
+        logement dont l’adresse est connue valent une porte ouverte.
+      </p>
+      <p>
+        Nous intervenons {site.hours} sur {site.area} pour une
+        {' '}<a href="/services/depannage-serrurerie/">remise en état après effraction</a> :
+        condamnation provisoire si la porte doit rester telle quelle pour l’expertise, puis
+        remplacement une fois le constat fait. Le devis est établi avant l’intervention et la
+        facture sépare chaque ligne, ce qui vous évite de discuter avec votre assureur.
+      </p>
+      <p>
+        Si la porte a cédé au niveau du bâti plutôt qu’au niveau de la serrure, c’est le bâti
+        qu’il faut reprendre : voir <a href="/services/blindage-de-porte/">blindage de porte</a> et
+        les niveaux expliqués sur <a href="/marques-de-serrures/">marques et certification A2P</a>.
+      </p>
+
+      <p class="note-box">
+        <Icon name="key" size={18} />
+        <span>
+          Remplacer à l’identique une serrure qui vient de céder revient à réinstaller la faille.
+          Profitez du remplacement pour monter d’un cran — c’est souvent le moment où votre
+          assureur l’accepte le mieux, et parfois où il le demande.
+        </span>
+      </p>
+    </div>
+  </section>
+
+  <RelatedArticles slugs={['apres-un-cambriolage-demarches', 'cle-cassee-dans-la-serrure']} />
+
+  <CtaBanner
+    title="Porte forcée à sécuriser maintenant ?"
+    description="Intervention 24h/24 sur Meaux et le Pays de Meaux. Tarif annoncé avant déplacement, devis remis avant toute intervention."
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero p {
+    max-width: 70ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .urgent-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-gold);
+    border-radius: var(--radius);
+    padding: 0.5rem 0.9rem;
+    margin-bottom: var(--space-sm);
+    font-size: 0.95rem !important;
+  }
+
+  .urgent-line :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+  }
+
+  .urgent-line strong {
+    color: var(--color-gold-text);
+    font-size: 1.1rem;
+  }
+
+  .content-column {
+    max-width: 78ch;
+  }
+
+  .content-column p,
+  .content-column li {
+    color: var(--color-text-muted);
+  }
+
+  .section-lead {
+    max-width: 70ch;
+    color: var(--color-text-muted);
+  }
+
+  .step-list {
+    list-style: none;
+    counter-reset: etape;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .step-list li {
+    counter-increment: etape;
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md) var(--space-md) var(--space-md) 4rem;
+  }
+
+  .step-list li::before {
+    content: counter(etape);
+    position: absolute;
+    left: var(--space-md);
+    top: var(--space-md);
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-gold);
+    color: var(--color-black);
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+
+  .step-list h3 {
+    font-size: 1.05rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .step-list p {
+    margin-bottom: 0;
+  }
+
+  .number-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+  }
+
+  .number-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+  }
+
+  .number-value {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--color-gold-text);
+    margin-bottom: 0.1rem;
+  }
+
+  .number-name {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 0.3rem;
+  }
+
+  .number-note {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0;
+  }
+
+  .link-list {
+    list-style: none;
+    margin: 0 0 var(--space-lg);
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .link-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  .link-list :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .note-box {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-gold);
+    border-radius: var(--radius);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .note-box :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .areas-note {
+    color: var(--color-text-muted);
+    max-width: 75ch;
+    margin-bottom: 0;
+  }
+</style>

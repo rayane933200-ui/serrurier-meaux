@@ -1,0 +1,450 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Icon from '../../components/Icon.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
+import { articles } from '../../data/articles';
+import { services, getService } from '../../data/services';
+import { site } from '../../data/site';
+
+export function getStaticPaths() {
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}
+
+const { article } = Astro.props;
+
+const cibles = article.targetServices
+  .map((slug) => getService(slug))
+  .filter((service) => service !== undefined);
+
+// Lecture suivante : rotation circulaire, et non les trois plus récents.
+//
+// Le tri de `articles` étant antéchronologique, prendre les trois premiers
+// faisait perdre des liens aux anciens articles à chaque publication : le
+// sixième billet a fait tomber « clé cassée » de sept à quatre liens entrants.
+// La rotation en donne exactement trois à chacun, quel que soit le nombre
+// d'articles, et un article ancien ne se retrouve jamais sans lien.
+const index = articles.findIndex((item) => item.slug === article.slug);
+const autres = Array.from({ length: Math.min(3, articles.length - 1) }, (_, offset) =>
+  articles[(index + offset + 1) % articles.length],
+);
+
+const crumbs = [
+  { label: 'Accueil', href: '/' },
+  { label: 'Conseils', href: '/blog/' },
+  { label: article.title },
+];
+
+// Sommaire : un identifiant stable par section, dérivé du titre.
+//
+// Les articles font 1500 à 1900 mots sur sept ou huit sections, et rien ne
+// permettait d'y naviguer — les <h2> n'avaient même pas d'ancre. Un lecteur
+// qui cherche « faut-il changer la serrure » devait faire défiler.
+//
+// Effet de bord utile côté recherche : des sections ancrées permettent à Google
+// de proposer un lien direct vers le bon passage plutôt que vers le haut de page.
+const ancre = (texte: string) =>
+  texte
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+const sommaire = article.sections.map((section) => ({
+  id: ancre(section.heading),
+  heading: section.heading,
+}));
+
+const enClair = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
+
+const dateLisible = enClair(article.publishedOn);
+const dateMajLisible = article.updatedOn ? enClair(article.updatedOn) : null;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    description: article.metaDescription,
+    datePublished: article.publishedOn,
+    ...(article.updatedOn ? { dateModified: article.updatedOn } : {}),
+    inLanguage: 'fr-FR',
+    // Google demande une image pour afficher un résultat enrichi d'article.
+    // Le champ est facultatif côté données : un article sans illustration ne
+    // déclare rien plutôt qu'une URL vide.
+    ...(article.image ? { image: new URL(article.image.src.src, Astro.site).href } : {}),
+    author: { '@id': new URL('/#business', Astro.site).href },
+    publisher: { '@id': new URL('/#business', Astro.site).href },
+    mainEntityOfPage: new URL(`/blog/${article.slug}/`, Astro.site).href,
+  },
+];
+---
+
+<BaseLayout
+  title={article.metaTitle}
+  description={article.metaDescription}
+  jsonLd={jsonLd}
+  suffix={false}
+  ogType="article"
+  publishedTime={article.publishedOn}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <article>
+    <section class="section page-hero">
+      <div class="container article-column">
+        <p class="article-date">
+          <Icon name="clock" size={16} />
+          <span>Publié le {dateLisible}</span>
+          {dateMajLisible && <span class="article-maj">Mis à jour le {dateMajLisible}</span>}
+        </p>
+        <h1>{article.title}</h1>
+        <p class="article-excerpt">{article.excerpt}</p>
+      </div>
+    </section>
+
+    {article.image && (
+      <section class="article-illustration">
+        <div class="container article-column">
+          <figure>
+            {/* eager + fetchpriority : l'image est en haut de page, elle fait
+                partie du plus grand élément affiché au chargement. */}
+            <Image
+              src={article.image.src}
+              alt={article.image.alt}
+              widths={[600, 900, 1200]}
+              sizes="(max-width: 900px) 100vw, 900px"
+              loading="eager"
+              fetchpriority="high"
+            />
+            <figcaption>{article.image.credit}</figcaption>
+          </figure>
+        </div>
+      </section>
+    )}
+
+    <section class="section">
+      <div class="container article-column">
+        {sommaire.length > 2 && (
+          <nav class="sommaire" aria-labelledby="sommaire-titre">
+            <h2 id="sommaire-titre">Dans cet article</h2>
+            <ol>
+              {sommaire.map((entree) => (
+                <li><a href={`#${entree.id}`}>{entree.heading}</a></li>
+              ))}
+            </ol>
+          </nav>
+        )}
+
+        {article.sections.map((section) => (
+          <div class="article-section">
+            <h2 id={ancre(section.heading)}>{section.heading}</h2>
+            {/* set:html car les paragraphes contiennent les liens de maillage vers
+                les pages de prestation. Le contenu vient de src/data/, écrit par
+                nous et versionné — jamais d'une saisie visiteur. */}
+            {section.body.map((paragraphe) => <p set:html={paragraphe} />)}
+            {section.bullets && (
+              <ul class="article-bullets">
+                {section.bullets.map((point) => (
+                  <li>
+                    <Icon name="key" size={16} />
+                    <span set:html={point} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))}
+
+        <p class="article-takeaway">{article.takeaway}</p>
+
+        {article.sources && article.sources.length > 0 && (
+          <aside class="sources" aria-labelledby="sources-titre">
+            <h2 id="sources-titre">Sources</h2>
+            <ul>
+              {article.sources.map((source) => (
+                <li>
+                  <a href={source.url} target="_blank" rel="noopener noreferrer">
+                    {source.label}
+                  </a>
+                  <span class="sources-editeur"> — {source.publisher}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
+
+        <div class="article-cta">
+          <a class="btn btn-primary" href={site.phoneHref}>
+            <Icon name="phone" size={18} />
+            <span>Appeler le {site.phoneDisplay}</span>
+          </a>
+          <a class="btn btn-outline" href="/contact/">Demander un devis</a>
+        </div>
+
+        {cibles.length > 0 && (
+          <aside class="article-related">
+            <h2>La prestation correspondante</h2>
+            <ul>
+              {cibles.map((service) => (
+                <li>
+                  <a href={`/services/${service.slug}/`}>{service.title}</a>
+                  <span>{service.teaser}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
+
+        {autres.length > 0 && (
+          <aside class="article-related">
+            <h2>À lire aussi</h2>
+            <ul>
+              {autres.map((item) => (
+                <li>
+                  <a href={`/blog/${item.slug}/`}>{item.title}</a>
+                  <span>{item.excerpt}</span>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
+      </div>
+    </section>
+  </article>
+
+  <CtaBanner
+    title="Une urgence de serrurerie à Meaux ?"
+    description="Le diagnostic par téléphone est gratuit et le tarif vous est annoncé avant tout déplacement."
+  />
+</BaseLayout>
+
+<style>
+  /* Mention de mise a jour, en retrait visuel de la date de publication :
+     elle informe sans concurrencer l information principale. */
+  .article-maj {
+    color: var(--color-text-muted);
+  }
+
+  .article-maj::before {
+    content: "·";
+    margin: 0 0.4rem;
+  }
+
+  .sources {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .sources h2 {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin: 0 0 0.6rem;
+  }
+
+  .sources ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 0.45rem;
+    font-size: 0.92rem;
+  }
+
+  .sources-editeur {
+    color: var(--color-text-muted);
+  }
+
+  .sommaire {
+    background: var(--color-bg-alt);
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .sommaire h2 {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin: 0 0 0.75rem;
+  }
+
+  .sommaire ol {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.4rem;
+  }
+
+  .sommaire a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .sommaire a:hover,
+  .sommaire a:focus-visible {
+    color: var(--color-gold-text);
+    text-decoration: underline;
+  }
+
+  /* Le defilement par ancre doit degager la hauteur de l en-tete collant,
+     sinon le titre vise se retrouve masque dessous. */
+  .article-section h2 {
+    scroll-margin-top: 6rem;
+  }
+
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  /* Colonne de lecture : une longueur de ligne confortable prime sur la largeur
+     du conteneur pour un texte long. */
+  .article-column {
+    max-width: 74ch;
+  }
+
+  .article-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-xs);
+  }
+
+  .article-date :global(svg) {
+    color: var(--color-gold-dark);
+  }
+
+  .article-excerpt {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0;
+  }
+
+  .article-illustration {
+    padding-top: var(--space-lg);
+  }
+
+  .article-illustration figure {
+    margin: 0;
+  }
+
+  .article-illustration img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+  }
+
+  .article-illustration figcaption {
+    margin-top: 0.4rem;
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+    text-align: right;
+  }
+
+  .article-section {
+    margin-bottom: var(--space-lg);
+  }
+
+  .article-section h2 {
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+  }
+
+  .article-section p {
+    color: var(--color-text-muted);
+  }
+
+  .article-bullets {
+    list-style: none;
+    margin: var(--space-sm) 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .article-bullets li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 0.7rem 1rem;
+  }
+
+  .article-bullets :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  .article-takeaway {
+    border-left: 3px solid var(--color-gold);
+    padding: 0.75rem 0 0.75rem 1rem;
+    margin-bottom: var(--space-lg);
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+
+  .article-cta {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-lg);
+  }
+
+  .article-related {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .article-related h2 {
+    font-size: 1.05rem;
+  }
+
+  .article-related ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .article-related li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .article-related a {
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+
+  .article-related span {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+</style>

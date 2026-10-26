@@ -1,0 +1,85 @@
+---
+// Bandeau de réassurance placé juste sous le hero : format à 4 piliers repris
+// des serruriers les mieux référencés. N'utilise que des faits déjà annoncés
+// sur le site (délai, disponibilité, devis, tarif annoncé avant déplacement).
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+
+const pillars = [
+  {
+    icon: 'clock' as const,
+    title: `Chez vous en moins de ${site.responseTime}`,
+    description: `Sur ${site.area}.`,
+  },
+  {
+    icon: 'shield' as const,
+    title: 'Tarif annoncé avant déplacement',
+    description: 'Confirmé par téléphone, avant que nous partions.',
+  },
+  {
+    icon: 'van' as const,
+    title: `Disponible ${site.hours}`,
+    description: 'Nuit, week-end et jours fériés.',
+  },
+  {
+    icon: 'wrench' as const,
+    title: 'Devis gratuit',
+    description: `Interventions à partir de ${site.startingPrice}.`,
+  },
+];
+---
+
+<section class="reassurance" aria-label="Nos engagements">
+  <div class="container reassurance-grid">
+    {pillars.map((pillar) => (
+      <div class="pillar">
+        <Icon name={pillar.icon} size={26} />
+        <div>
+          <span class="pillar-title">{pillar.title}</span>
+          <span class="pillar-description">{pillar.description}</span>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .reassurance {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border-soft);
+    padding-block: var(--space-md);
+  }
+
+  .reassurance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .pillar {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+
+  .pillar :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  .pillar-title {
+    display: block;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-text);
+    line-height: 1.25;
+  }
+
+  .pillar-description {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+</style>

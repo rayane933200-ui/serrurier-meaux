@@ -1,0 +1,160 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Icon from '../../components/Icon.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
+import { articles } from '../../data/articles';
+
+const crumbs = [{ label: 'Accueil', href: '/' }, { label: 'Conseils' }];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Conseils de serrurerie',
+  itemListElement: articles.map((article, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: article.title,
+    url: new URL(`/blog/${article.slug}/`, Astro.site).href,
+  })),
+};
+
+const dateLisible = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString('fr-FR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
+---
+
+<BaseLayout
+  title="Conseils de serrurerie — porte claquée, serrure, sécurité"
+  description="Porte claquée, clé cassée, prix d'une ouverture, choix d'une serrure : nos conseils de serrurier pour comprendre et décider avant d'appeler."
+  jsonLd={jsonLd}
+  suffix={false}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>Conseils de serrurerie</h1>
+      <p>
+        Ce que nous expliquons le plus souvent au téléphone, écrit noir sur blanc : les bons
+        réflexes devant une porte fermée, ce qui fait varier un prix, et comment choisir un
+        équipement qui corresponde vraiment à votre situation.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <ul class="article-grid">
+        {articles.map((article) => (
+          <li class="article-card">
+            <p class="article-card-date">
+              <Icon name="clock" size={15} />
+              <span>{dateLisible(article.publishedOn)}</span>
+            </p>
+            <h2><a href={`/blog/${article.slug}/`}>{article.title}</a></h2>
+            <p class="article-card-excerpt">{article.excerpt}</p>
+            <span class="article-card-more" aria-hidden="true">Lire l’article →</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBanner
+    title="Votre situation n’attend pas ?"
+    description="Appelez-nous : le diagnostic par téléphone est gratuit, et le tarif est annoncé avant tout déplacement."
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero p {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .article-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-md);
+  }
+
+  /* Carte entièrement cliquable : le lien du titre couvre la carte. */
+  .article-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-card);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .article-card:hover,
+  .article-card:focus-within {
+    border-color: var(--color-gold-text);
+    transform: translateY(-2px);
+  }
+
+  .article-card-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.4rem;
+  }
+
+  .article-card-date :global(svg) {
+    color: var(--color-gold-dark);
+  }
+
+  .article-card h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .article-card h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .article-card h2 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .article-card-excerpt {
+    color: var(--color-text-muted);
+    font-size: 0.93rem;
+  }
+
+  .article-card-more {
+    margin-top: auto;
+    padding-top: var(--space-sm);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--color-silver);
+  }
+
+  .article-card:hover .article-card-more {
+    color: var(--color-gold-text);
+  }
+</style>

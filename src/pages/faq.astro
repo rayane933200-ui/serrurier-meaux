@@ -1,0 +1,66 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Faq from '../components/Faq.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import RelatedArticles from '../components/RelatedArticles.astro';
+import { faq } from '../data/faq';
+
+const crumbs = [
+  { label: 'Accueil', href: '/' },
+  { label: 'Questions fréquentes' },
+];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  },
+];
+---
+
+<BaseLayout
+  title="Questions fréquentes"
+  description="Prix d'une ouverture de porte, délai d'intervention, justificatifs, locataire ou propriétaire, certification A2P : les réponses de votre serrurier à Meaux."
+  jsonLd={jsonLd}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>Questions fréquentes</h1>
+      <p>
+        Tarifs, délais, justificatifs, prise en charge par l'assurance : les réponses aux
+        questions que l'on nous pose le plus souvent. Si la vôtre n'y figure pas, appelez-nous,
+        nous répondons directement.
+      </p>
+    </div>
+  </section>
+
+  <Faq items={faq} title="Toutes les questions" openFirst={false} />
+
+  <RelatedArticles slugs={['porte-claquee-que-faire', 'cle-perdue-changer-la-serrure', 'reconnaitre-serrurier-serieux']} />
+
+  <CtaBanner
+    title="Une autre question ?"
+    description="Appelez-nous : le diagnostic par téléphone est gratuit et sans engagement."
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero p {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+</style>

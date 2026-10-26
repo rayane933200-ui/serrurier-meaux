@@ -1,0 +1,164 @@
+# Construit le site de Meaux et l'envoie sur l'hébergement à chaque
+# `git push` sur main.
+#
+# ATTENTION — ce fichier est repris du dépôt de Lyon et n'est PAS prêt :
+#
+#   · Les secrets ci-dessous doivent être ceux du compte qui sert
+#     serrurier-meaux.fr. Reprendre ceux de Lyon publierait ce site par-dessus
+#     l'autre, sans le moindre avertissement.
+#   · `server-dir:` plus bas vaut `public_html/`, qui est la racine du domaine
+#     PRINCIPAL d'un compte o2switch. Si serrurier-meaux.fr est ajouté comme
+#     domaine additionnel, son dossier est différent — cPanel l'indique au
+#     moment de l'ajout. Voir DEPLOIEMENT.md.
+#
+# Les identifiants ne sont PAS dans ce fichier. Ils vivent dans les secrets du
+# dépôt (Settings → Secrets and variables → Actions), où ni le code, ni les
+# journaux d'exécution, ni personne d'autre que le propriétaire du dépôt ne
+# peut les lire. GitHub masque automatiquement leur valeur dans les journaux.
+#
+#   FTP_SERVEUR     à renseigner
+#   FTP_UTILISATEUR à renseigner
+#   FTP_MOTDEPASSE  à renseigner
+
+name: Déploiement serrurier-meaux.fr
+
+on:
+  push:
+    branches: [main]
+  # Permet aussi de relancer un déploiement à la main depuis l'onglet Actions,
+  # utile pour republier sans avoir à modifier quoi que ce soit.
+  workflow_dispatch:
+
+# Deux pushes rapprochés ne doivent pas téléverser en même temps : le second
+# annule le premier plutôt que d'entrelacer deux envois sur le même dossier.
+concurrency:
+  group: deploiement-meaux
+  cancel-in-progress: true
+
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v7
+
+      - name: Installer Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Construire le site
+        run: npm run build
+
+      # Garde-fou : si le domaine venait à disparaître de la configuration, le
+      # sitemap partirait sur localhost sans que rien ne le signale. On refuse
+      # de publier plutôt que de mettre en ligne un site inindexable.
+      - name: Vérifier les URL produites
+        run: |
+          if grep -q "localhost" dist/sitemap-0.xml; then
+            echo "::error::Le sitemap contient des URL localhost, publication annulée."
+            exit 1
+          fi
+          if [ ! -f dist/.htaccess ]; then
+            echo "::error::dist/.htaccess absent : le site perdrait HTTPS, en-têtes et page 404."
+            exit 1
+          fi
+          # Fichier de preuve IndexNow. Sans lui, les soumissions repartent en
+          # 403 alors qu'aucune page du site ne paraît cassée : la panne serait
+          # invisible jusqu'à ce qu'on aille lire les journaux.
+          if ! find dist -maxdepth 1 -regextype posix-extended \
+               -regex '.*/[0-9a-f]{8,128}\.txt' | grep -q .; then
+            echo "::error::Fichier de preuve IndexNow absent de dist/."
+            exit 1
+          fi
+          # URL internes sans slash final dans les données structurées.
+          #
+          # Le site est en trailingSlash: 'always' : une URL sans slash final
+          # part en 301. Deux balisages ItemList en déclaraient ainsi, et Google
+          # a passé des semaines à explorer 23 URL qui redirigent toutes — elles
+          # ressortaient en « Page avec redirection » dans Search Console, du
+          # budget d'exploration dépensé pour rien.
+          #
+          # Rien ne paraissait cassé : les pages s'affichaient, les liens
+          # visibles étaient corrects, seul le JSON-LD mentait. D'où ce contrôle.
+          #
+          # Le contrôle ne porte que sur NOTRE domaine : un lien externe n'a pas
+          # à suivre notre convention de slash. L'hôte est lu dans le sitemap
+          # plutôt qu'écrit en dur, pour suivre un éventuel changement de domaine.
+          #
+          # Les ancres #business et #website sont des identifiants d'entité, pas
+          # des adresses à explorer : elles sont exclues.
+          hote=$(grep -o '<loc>https://[^/]*' dist/sitemap-0.xml | head -1 | sed 's|<loc>https://||')
+          echo "Contrôle des URL internes pour l'hôte $hote"
+          mauvaises=$(grep -rhoE "\"https://${hote}/[a-z0-9/-]*[a-z0-9]\"" dist --include='*.html' \
+            | grep -vE '#|\.(png|webp|jpg|jpeg|xml|txt|ico|svg)"' | sort -u || true)
+          if [ -n "$mauvaises" ]; then
+            echo "::error::URL sans slash final dans les données structurées :"
+            echo "$mauvaises"
+            exit 1
+          fi
+          # grep -o puis wc -l : le sitemap tient sur une seule ligne, compter
+          # les lignes renverrait toujours 1.
+          pages=$(grep -o '<loc>' dist/sitemap-0.xml | wc -l)
+          echo "$pages pages, .htaccess et clé IndexNow présents."
+          if [ "$pages" -lt 40 ]; then
+            echo "::error::Seulement $pages pages dans le sitemap, construction incomplète."
+            exit 1
+          fi
+
+      - name: Envoyer sur l'hébergement
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVEUR }}
+          username: ${{ secrets.FTP_UTILISATEUR }}
+          password: ${{ secrets.FTP_MOTDEPASSE }}
+          # FTPS explicite : le FTP simple ferait circuler le mot de passe en
+          # clair sur le réseau à chaque déploiement.
+          protocol: ftps
+          port: 21
+          local-dir: ./dist/
+          server-dir: public_html/
+          # L'action garde un état sur le serveur et ne renvoie que les fichiers
+          # modifiés : un déploiement courant transfère quelques kilo-octets, pas
+          # les treize méga-octets du site.
+          state-name: .deploiement-etat.json
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+
+      # IndexNow prévient Bing, Yandex, Seznam et Naver qu'une page a changé, au
+      # lieu d'attendre leur prochain passage. Google n'en fait pas partie :
+      # c'est un complément à Search Console, pas un remplaçant.
+      #
+      # Ces trois étapes viennent APRÈS l'envoi : annoncer une page avant
+      # qu'elle soit en ligne enverrait les moteurs sur l'ancienne version.
+      - name: Récupérer les empreintes du déploiement précédent
+        uses: actions/cache/restore@v4
+        with:
+          path: empreintes-indexnow.json
+          key: indexnow-${{ github.run_id }}
+          restore-keys: indexnow-
+
+      - name: Signaler les pages modifiées à IndexNow
+        id: indexnow
+        # Un refus des moteurs ne doit pas faire échouer un déploiement qui,
+        # lui, a réussi : le site est en ligne. L'erreur reste visible dans le
+        # récapitulatif de l'exécution.
+        continue-on-error: true
+        # Pas de clé ici : le script la lit dans dist/<clé>.txt, généré depuis
+        # site.ts. Une seule source, donc aucune divergence possible.
+        run: node .github/scripts/indexnow.mjs
+
+      # Les empreintes ne sont conservées que si la soumission a abouti : sinon
+      # le prochain déploiement croirait ces pages déjà annoncées.
+      - name: Conserver les empreintes
+        if: steps.indexnow.outcome == 'success'
+        uses: actions/cache/save@v4
+        with:
+          path: empreintes-indexnow.json
+          key: indexnow-${{ github.run_id }}

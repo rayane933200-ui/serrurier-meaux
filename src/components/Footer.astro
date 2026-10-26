@@ -1,0 +1,251 @@
+﻿---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { services } from '../data/services';
+import { quartiers, communes } from '../data/zones';
+import { site } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <Logo />
+      <p>Serrurier à Meaux et dans le Pays de Meaux, disponible {site.hours}.</p>
+      <a class="btn btn-primary footer-cta" href={site.phoneHref}>
+        <Icon name="phone" size={18} />
+        <span>{site.phoneDisplay}</span>
+      </a>
+    </div>
+
+    <div class="footer-col">
+      <h3>Prestations</h3>
+      <ul>
+        {services.map((service) => (
+          <li><a href={`/services/${service.slug}/`}>{service.title}</a></li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>Navigation</h3>
+      <ul>
+        <li><a href="/">Accueil</a></li>
+        <li><a href="/services/">Services</a></li>
+        <li><a href="/tarifs/">Tarifs</a></li>
+        <li><a href="/zones-intervention/">Zones d'intervention</a></li>
+        <li><a href="/blog/">Conseils</a></li>
+        <li><a href="/faq/">Questions fréquentes</a></li>
+        <li><a href="/a-propos/">À propos</a></li>
+        <li><a href="/contact/">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>Guides pratiques</h3>
+      <ul>
+        <li><a href="/apres-un-cambriolage/">Après un cambriolage</a></li>
+        <li><a href="/assurance-habitation/">Assurance habitation</a></li>
+        <li><a href="/assureurs-habitation/">Assureurs et facture</a></li>
+        <li><a href="/marques-de-serrures/">Marques et certification A2P</a></li>
+        <li><a href="/blog/">Tous nos conseils</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3>Contact</h3>
+      <ul class="contact-list">
+        <li>
+          <a href={site.phoneHref}><Icon name="phone" size={18} /> {site.phoneDisplay}</a>
+        </li>
+        <li>
+          <a href={`mailto:${site.email}`}><Icon name="mail" size={18} /> {site.email}</a>
+        </li>
+        <li>
+          <span><Icon name="map-pin" size={18} /> {site.area}</span>
+        </li>
+        <li>
+          <span><Icon name="clock" size={18} /> Disponible {site.hours}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer-zones">
+    <h3>Nos zones d'intervention</h3>
+    <ul>
+      {[...quartiers, ...communes].map((zone) => (
+        <li><a href={`/zones/${zone.slug}/`}>{zone.name}</a></li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-inner">
+      <p>&copy; {year} {site.name} — Tous droits réservés.</p>
+      <ul>
+        <li><a href="/mentions-legales/">Mentions légales</a></li>
+        <li><a href="/politique-de-confidentialite/">Politique de confidentialité</a></li>
+        <li>
+          {/* Bouton et non lien : l’action rouvre le bandeau, elle ne mène pas
+              vers une page. Le retrait du consentement doit rester aussi simple
+              que son recueil (CNIL). */}
+          <button type="button" class="link-like" data-cookie-reopen>Cookies</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--band-surface);
+    color: var(--band-text);
+    border-top: 1px solid var(--band-border);
+  }
+
+  .footer-inner {
+    display: grid;
+    /* Cinq colonnes depuis l’ajout des guides pratiques : la marque garde plus
+       de place, les quatre listes se partagent le reste à parts égales. */
+    grid-template-columns: 1.6fr 1fr 1fr 1fr 1.2fr;
+    gap: var(--space-lg);
+    padding-block: var(--space-xl) var(--space-lg);
+  }
+
+  .footer-brand p {
+    margin-top: var(--space-sm);
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 32ch;
+  }
+
+  .footer-cta {
+    margin-top: var(--space-xs);
+  }
+
+  .footer-col h3 {
+    color: var(--color-white);
+    font-size: 1rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .footer-col a,
+  .footer-col span {
+    color: rgba(255, 255, 255, 0.85);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.93rem;
+  }
+
+  .footer-col a:hover,
+  .footer-col a:focus-visible {
+    color: var(--color-gold);
+  }
+
+  .contact-list :global(svg) {
+    flex-shrink: 0;
+    color: var(--color-gold);
+  }
+
+  /* Maillage interne vers les pages locales */
+  .footer-zones {
+    padding-bottom: var(--space-lg);
+  }
+
+  .footer-zones h3 {
+    color: var(--color-white);
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .footer-zones ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.9rem;
+  }
+
+  .footer-zones a {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+  }
+
+  .footer-zones a:hover,
+  .footer-zones a:focus-visible {
+    color: var(--color-gold);
+  }
+
+  .footer-bottom {
+    border-top: 1px solid var(--band-border);
+    padding-block: var(--space-sm);
+  }
+
+  .footer-bottom-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+
+  .footer-bottom p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .footer-bottom ul {
+    list-style: none;
+    display: flex;
+    gap: var(--space-md);
+    margin: 0;
+    padding: 0;
+    font-size: 0.85rem;
+  }
+
+  .footer-bottom a {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .footer-bottom a:hover,
+  .footer-bottom a:focus-visible,
+  .footer-bottom .link-like:hover,
+  .footer-bottom .link-like:focus-visible {
+    color: var(--color-gold);
+  }
+
+  .footer-bottom .link-like {
+    font: inherit;
+    color: rgba(255, 255, 255, 0.7);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  @media (max-width: 900px) {
+    .footer-inner {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .footer-inner {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

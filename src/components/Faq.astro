@@ -1,0 +1,111 @@
+---
+// FAQ en accordéon natif (<details>) : aucun JavaScript, et les réponses restent
+// dans le HTML pour être indexées. Le balisage FAQPage est injecté par la page
+// appelante via BaseLayout (prop jsonLd).
+import type { FaqItem } from '../data/faq';
+
+interface Props {
+  items: FaqItem[];
+  title?: string;
+  intro?: string;
+  /** Le premier élément est ouvert par défaut */
+  openFirst?: boolean;
+}
+
+const { items, title = 'Questions fréquentes', intro, openFirst = true } = Astro.props;
+---
+
+<section class="section faq-section">
+  <div class="container">
+    <h2>{title}</h2>
+    {intro && <p class="faq-intro">{intro}</p>}
+    <div class="faq-list">
+      {items.map((item, index) => (
+        <details class="faq-item" open={openFirst && index === 0}>
+          <summary>
+            <span>{item.question}</span>
+            <span class="faq-marker" aria-hidden="true"></span>
+          </summary>
+          <p>{item.answer}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-intro {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+  }
+
+  .faq-list {
+    margin-top: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .faq-item {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .faq-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    padding: 1rem var(--space-md);
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.02rem;
+    color: var(--color-text);
+    list-style: none;
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item summary:hover,
+  .faq-item summary:focus-visible {
+    color: var(--color-gold-text);
+  }
+
+  /* Chevron en CSS pur : deux traits pivotés à l'ouverture */
+  .faq-marker {
+    position: relative;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
+  .faq-marker::before,
+  .faq-marker::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 12px;
+    height: 2px;
+    background: var(--color-gold);
+    transition: transform 0.15s ease;
+  }
+
+  .faq-marker::after {
+    transform: rotate(90deg);
+  }
+
+  .faq-item[open] .faq-marker::after {
+    transform: rotate(0deg);
+  }
+
+  .faq-item p {
+    margin: 0;
+    padding: 0 var(--space-md) var(--space-md);
+    color: var(--color-text-muted);
+    max-width: 80ch;
+  }
+</style>

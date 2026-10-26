@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Icon from '../components/Icon.astro';
+import QuoteForm from '../components/QuoteForm.astro';
+import Faq from '../components/Faq.astro';
+import { featuredFaq } from '../data/faq';
+import { site } from '../data/site';
+
+const crumbs = [{ label: 'Accueil', href: '/' }, { label: 'Contact' }];
+---
+
+<BaseLayout
+  title="Contacter un serrurier à Meaux — devis gratuit"
+  description="Joignez notre serrurier à Meaux 24h/24 et 7j/7. Téléphone, email ou formulaire de devis gratuit, avec un tarif annoncé avant déplacement."
+  suffix={false}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>Contactez-nous</h1>
+      <p>
+        Pour une urgence, appelez-nous directement : c'est le moyen le plus rapide et le
+        diagnostic par téléphone est gratuit. Pour un devis ou une question, écrivez-nous.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container contact-grid">
+      <div class="contact-info">
+        <h2>Nos coordonnées</h2>
+        <ul>
+          <li>
+            <Icon name="phone" size={20} />
+            <div>
+              <strong>Téléphone</strong>
+              <a href={site.phoneHref}>{site.phoneDisplay}</a>
+            </div>
+          </li>
+          <li>
+            <Icon name="mail" size={20} />
+            <div>
+              <strong>Email</strong>
+              <a href={`mailto:${site.email}`}>{site.email}</a>
+            </div>
+          </li>
+          <li>
+            <Icon name="map-pin" size={20} />
+            <div>
+              <strong>Zone d'intervention</strong>
+              <span>{site.area}</span>
+            </div>
+          </li>
+          <li>
+            <Icon name="clock" size={20} />
+            <div>
+              <strong>Horaires</strong>
+              <span>Disponible {site.hours}</span>
+            </div>
+          </li>
+        </ul>
+
+        <a class="btn btn-primary contact-call" href={site.phoneHref}>
+          <Icon name="phone" size={18} />
+          <span>Appeler maintenant</span>
+        </a>
+
+        <div class="contact-note">
+          <h3>Ce qu'il faut nous préciser</h3>
+          <p>
+            Quatre informations suffisent à vous annoncer un tarif fiable : votre adresse exacte
+            avec l'étage et le code d'accès, le type de porte et de serrure, la façon dont la
+            porte est fermée (claquée ou verrouillée à clé), et si vous avez un justificatif de
+            domicile sur place.
+          </p>
+        </div>
+      </div>
+
+      <QuoteForm title="Écrivez-nous" />
+    </div>
+  </section>
+
+  <Faq items={featuredFaq} title="Questions fréquentes" />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero p {
+    max-width: 60ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: var(--space-lg);
+    align-items: start;
+  }
+
+  .contact-info ul {
+    list-style: none;
+    margin: var(--space-sm) 0 var(--space-md);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .contact-info li {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: flex-start;
+  }
+
+  .contact-info :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+  }
+
+  .contact-info strong {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+  }
+
+  /* Restreint aux <li> : sans le « li », ce selecteur attrapait aussi le
+     libelle du bouton dore .contact-call et le repeignait en gris sur or
+     (3,19:1). Le defaut existait deja en theme sombre, ou l'argent y tombait
+     a 1,9:1 -- il etait simplement invisible a l'oeil. */
+  .contact-info li a,
+  .contact-info li span {
+    color: var(--color-text-muted);
+  }
+
+  .contact-call {
+    margin-top: var(--space-sm);
+  }
+
+  .contact-note {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .contact-note h3 {
+    font-size: 1rem;
+  }
+
+  .contact-note p {
+    color: var(--color-text-muted);
+    font-size: 0.93rem;
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 780px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

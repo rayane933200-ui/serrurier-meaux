@@ -1,0 +1,191 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Icon from '../components/Icon.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import { quartiers, communes, zones } from '../data/zones';
+import { site } from '../data/site';
+
+const crumbs = [{ label: 'Accueil', href: '/' }, { label: "Zones d'intervention" }];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Zones d’intervention',
+  itemListElement: zones.map((zone, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: zone.name,
+    url: new URL(`/zones/${zone.slug}/`, Astro.site).href,
+  })),
+};
+---
+
+<BaseLayout
+  title="Serrurier à Meaux et Pays de Meaux : zones d'intervention"
+  description="Nous intervenons à Meaux et dans les communes du Pays de Meaux, 24h/24 et 7j/7. Une page par quartier et par commune, avec les secteurs desservis."
+  jsonLd={jsonLd}
+  suffix={false}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <h1>Nos zones d'intervention</h1>
+      <p>
+        Nous intervenons à <strong>Meaux</strong> et dans le <strong>Pays de Meaux</strong>,
+        {site.hours}. Chaque quartier et chaque commune a sa page : délais, secteurs desservis et
+        prestations disponibles. Un doute sur votre adresse ? Appelez-nous, nous vous confirmons
+        tout de suite si nous la couvrons.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Meaux, par quartier</h2>
+      <ul class="zones-list">
+        {quartiers.map((zone) => (
+          <li>
+            <a href={`/zones/${zone.slug}/`}>
+              <Icon name="map-pin" size={18} />
+              <span>
+                <strong>{zone.name}</strong>
+                <small>{zone.postalCode}</small>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <h2 class="zones-heading">Pays de Meaux, par commune</h2>
+      <ul class="zones-list">
+        {communes.map((zone) => (
+          <li>
+            <a href={`/zones/${zone.slug}/`}>
+              <Icon name="map-pin" size={18} />
+              <span>
+                <strong>{zone.name}</strong>
+                <small>{zone.postalCode}</small>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container zones-note">
+      <h2>Le plus proche n'est pas toujours le plus rapide</h2>
+      <p>
+        « Serrurier autour de moi », « serrurerie à proximité », « serrurier proche de moi » :
+        c'est la recherche réflexe quand on est devant une porte fermée, et elle est logique.
+        Elle a pourtant une limite — la distance à vol d'oiseau ne dit rien du temps réel pour
+        arriver chez vous.
+      </p>
+      <p>
+        À Meaux, trois choses pèsent davantage que les kilomètres : la circulation à l'heure où
+        vous appelez, le stationnement à votre adresse — les rues étroites du centre et ses
+        secteurs piétons en font une vraie contrainte — et le temps passé à trouver votre porte
+        une fois l'immeuble atteint. Dans les grands ensembles, c'est le nombre de bâtiments qui
+        coûte le plus cher en minutes. Donner le code de la rue, le bâtiment et l'étage dès
+        l'appel fait souvent gagner plus de temps qu'un atelier situé deux rues plus près.
+      </p>
+      <p>
+        C'est aussi pourquoi nous annonçons un objectif de {site.responseTime} sur une zone
+        resserrée plutôt que sur trois départements : un délai ne vaut que s'il est tenable
+        partout où on le promet.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container zones-note">
+      <h2>Vous cherchez une autre commune ?</h2>
+      <p>
+        Nous couvrons également d'autres communes du secteur. Contactez-nous par téléphone ou
+        par email avec votre adresse : nous vous indiquons rapidement si nous pouvons intervenir et
+        sous quel délai.
+      </p>
+      <a class="btn btn-primary" href={site.phoneHref}>
+        <Icon name="phone" size={18} />
+        <span>{site.phoneDisplay}</span>
+      </a>
+    </div>
+  </section>
+
+  <CtaBanner
+    title="Un serrurier proche de chez vous"
+    description="Où que vous soyez dans le Pays de Meaux, nous nous déplaçons rapidement."
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .page-hero p {
+    max-width: 68ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .zones-heading {
+    margin-top: var(--space-lg);
+  }
+
+  .zones-list {
+    list-style: none;
+    margin: var(--space-md) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-sm);
+  }
+
+  .zones-list a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: border-color 0.15s ease;
+  }
+
+  .zones-list a:hover,
+  .zones-list a:focus-visible {
+    border-color: var(--color-gold-text);
+    text-decoration: none;
+  }
+
+  .zones-list :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+  }
+
+  .zones-list strong {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 0.98rem;
+  }
+
+  .zones-list small {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+  }
+
+  .zones-note {
+    max-width: 70ch;
+  }
+
+  .zones-note p {
+    color: var(--color-text-muted);
+  }
+</style>

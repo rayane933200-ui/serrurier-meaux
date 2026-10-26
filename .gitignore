@@ -1,0 +1,27 @@
+# dépendances
+node_modules/
+
+# sorties de build
+dist/
+.astro/
+
+# variables d'environnement
+.env
+.env.production
+.env.local
+
+# journaux
+*.log
+npm-debug.log*
+
+# système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# éditeurs
+.vscode/
+.idea/
+
+# empreintes IndexNow : etat local du script, conserve par le cache GitHub Actions
+empreintes-indexnow.json

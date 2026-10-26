@@ -1,0 +1,232 @@
+---
+// Bandeau de consentement — exigé par l'article 82 de la loi Informatique et
+// Libertés depuis l'ajout de la balise Google Ads, qui est un traceur
+// publicitaire.
+//
+// Trois règles de la CNIL pilotent ce composant :
+//  1. Refuser doit être aussi simple qu'accepter : deux boutons de même forme,
+//     de même taille et de même poids visuel, côte à côte.
+//  2. Poursuivre la navigation ne vaut pas accord : aucune fermeture implicite
+//     au défilement ou au clic à côté.
+//  3. Le retrait doit rester aussi simple que l'accord : le lien « Cookies » du
+//     pied de page rouvre ce bandeau à tout moment.
+//
+// Il est volontairement non bloquant. Sur un site de dépannage d'urgence, une
+// fenêtre modale qui masque le numéro coûterait des appels ; le bandeau
+// s'installe en bas d'écran et laisse la page utilisable.
+import { site } from '../data/site';
+
+const { consentKey } = site.analytics;
+---
+
+<aside
+  class="cookie-banner"
+  id="cookie-banner"
+  role="region"
+  aria-label="Consentement aux cookies de mesure publicitaire"
+  hidden
+>
+  <div class="container cookie-inner">
+    <p class="cookie-text">
+      Ce site utilise un cookie de mesure publicitaire qui indique à Google Ads
+      si une visite provient d'une annonce. Il reste facultatif : le site
+      fonctionne à l'identique sans lui.
+      {' '}<a href="/politique-de-confidentialite/">En savoir plus</a>.
+    </p>
+    <div class="cookie-actions">
+      <button type="button" class="cookie-btn" data-cookie-choice="refuse">Refuser</button>
+      <button type="button" class="cookie-btn" data-cookie-choice="accepte">Accepter</button>
+    </div>
+  </div>
+</aside>
+
+{/* is:inline et placé juste après l'élément : le bandeau est écrit masqué dans
+    le HTML statique et révélé pendant l'analyse du document, donc sans
+    clignotement pour le visiteur qui a déjà répondu. */}
+<script is:inline define:vars={{ consentKey }}>
+  (function () {
+    var banniere = document.getElementById('cookie-banner');
+    if (!banniere) return;
+
+    function lireChoix() {
+      try {
+        return window.localStorage.getItem(consentKey);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function ecrireChoix(valeur) {
+      try {
+        window.localStorage.setItem(consentKey, valeur);
+      } catch (e) {
+        // Stockage indisponible : le choix vaut pour la session en cours.
+      }
+    }
+
+    // Le mode consentement de Google empêche d'écrire de nouveaux cookies, il
+    // ne supprime pas ceux déjà posés. Un visiteur qui accepte puis se ravise
+    // garderait donc _gcl_au sur son appareil pendant quatre-vingt-dix jours.
+    // Retirer son consentement doit produire un effet visible : on efface.
+    function effacerTraceurs() {
+      var hote = window.location.hostname;
+      // Le cookie peut être posé sur l'hôte exact, sur le domaine préfixé d'un
+      // point, ou sur le domaine parent. On expire les trois écritures possibles.
+      var domaines = ['', hote, '.' + hote];
+      var parent = hote.split('.').slice(-2).join('.');
+      if (parent !== hote) domaines.push('.' + parent);
+
+      document.cookie.split(';').forEach(function (brut) {
+        var nom = brut.split('=')[0].trim();
+        if (nom.indexOf('_gcl') !== 0 && nom.indexOf('_ga') !== 0) return;
+        domaines.forEach(function (d) {
+          document.cookie =
+            nom + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/' +
+            (d ? '; domain=' + d : '');
+        });
+      });
+    }
+
+    function appliquer(valeur) {
+      var etat = valeur === 'accepte' ? 'granted' : 'denied';
+      if (typeof window.gtag === 'function') {
+        window.gtag('consent', 'update', {
+          ad_storage: etat,
+          ad_user_data: etat,
+          ad_personalization: etat,
+          analytics_storage: etat,
+        });
+      }
+      if (etat === 'denied') effacerTraceurs();
+    }
+
+    function afficher() {
+      banniere.hidden = false;
+    }
+
+    var choixInitial = lireChoix();
+    if (!choixInitial) afficher();
+    else if (choixInitial === 'refuse') effacerTraceurs();
+
+    banniere.addEventListener('click', function (evenement) {
+      var bouton = evenement.target.closest('[data-cookie-choice]');
+      if (!bouton) return;
+      var valeur = bouton.getAttribute('data-cookie-choice');
+      ecrireChoix(valeur);
+      appliquer(valeur);
+      banniere.hidden = true;
+    });
+
+    // Retrait du consentement : le lien du pied de page rouvre le bandeau.
+    document.addEventListener('click', function (evenement) {
+      var lien = evenement.target.closest('[data-cookie-reopen]');
+      if (!lien) return;
+      evenement.preventDefault();
+      afficher();
+      banniere.scrollIntoView({ block: 'nearest' });
+      var premier = banniere.querySelector('[data-cookie-choice]');
+      if (premier) premier.focus();
+    });
+  })();
+</script>
+
+<style>
+  /* Panneau sombre pose sur une page claire : sans couleur explicite, le
+     texte heriterait du --color-text du corps et disparaitrait. */
+  /* Le corps de page donne aux liens --color-gold-text, assombri pour rester
+     lisible sur clair. Sur ce panneau sombre il tombe a 3,19:1 : on reprend
+     l'or pur, qui y vaut 8,98:1. */
+  .cookie-banner a {
+    color: var(--color-gold);
+  }
+
+  .cookie-banner {
+    color: var(--band-text);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Au-dessus du header (100) et de la barre d'appel fixe (200). */
+    z-index: 300;
+    background: var(--band-surface);
+    border-top: 1px solid var(--band-border-ui);
+    box-shadow: var(--shadow-card);
+  }
+
+  .cookie-banner[hidden] {
+    display: none;
+  }
+
+  /* .container donne la largeur maximale et les marges laterales communes au
+     reste du site ; on n’ajoute ici que le rythme vertical. */
+  .cookie-inner {
+    padding-block: var(--space-sm);
+    padding-bottom: max(var(--space-sm), env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .cookie-text {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--band-text-muted);
+    max-width: 78ch;
+  }
+
+  .cookie-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  /* Refuser et Accepter partagent exactement le même style : la CNIL demande
+     que le refus soit aussi accessible que l'accord, ce qui interdit de donner
+     plus de poids visuel à l'un des deux. */
+  .cookie-btn {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--color-white);
+    background: transparent;
+    border: 2px solid var(--color-border-ui);
+    border-radius: var(--radius);
+    padding: 0.55rem 1.4rem;
+    min-width: 8rem;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .cookie-btn:hover,
+  .cookie-btn:focus-visible {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+  }
+
+  /* Sous 1100px la barre d'appel fixe occupe déjà le bas de l'écran : le
+     bandeau se pose juste au-dessus pour laisser le numéro atteignable. */
+  @media (max-width: 1100px) {
+    .cookie-banner {
+      bottom: 4.75rem;
+      border-bottom: 1px solid var(--band-border-ui);
+    }
+
+    .cookie-inner {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-sm);
+      padding-bottom: var(--space-sm);
+    }
+
+    .cookie-actions {
+      margin-left: 0;
+    }
+
+    .cookie-btn {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+</style>
