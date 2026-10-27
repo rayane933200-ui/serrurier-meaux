@@ -80,7 +80,11 @@ c'est la promesse qu'il faut corriger, pas l'habillage.
   JavaScript, et le site s'affiche en texte brut — et `public/CNAME`, qui porte le domaine
   personnalisé et que chaque déploiement réécrirait sinon.
 
-  **GitHub Pages ne sert aucun en-tête HTTP personnalisé.** Ni `.htaccess`, ni `_headers` : les
+  **GitHub Pages ne sert aucun en-tête HTTP personnalisé.** Ni `.htaccess`, ni `_headers` — ce
+  dernier n'a vécu que le temps du passage par Cloudflare et a été retiré en arrivant ici.
+  Mesuré en production le 27/10/2026 : aucun en-tête de sécurité n'est envoyé. Ne pas en
+  réintroduire un : un fichier de configuration inerte fait croire à une protection inexistante.
+  Les
   deux seraient ignorés, et servis en clair. `X-Content-Type-Options`, `X-Frame-Options`,
   `Permissions-Policy` et la CSP sont perdus, sans équivalent en balise meta. Seule la politique
   de référent a été récupérée, par un `<meta name="referrer">` dans `BaseLayout.astro`. C'est le

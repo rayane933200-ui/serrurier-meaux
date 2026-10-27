@@ -17,8 +17,19 @@ recopié de l'un à l'autre.
 C'est le point à connaître avant tout le reste, parce que rien ne le signale.
 
 **GitHub Pages ne sert aucun en-tête HTTP personnalisé.** Il n'y a pas
-d'équivalent de `.htaccess` ni de `_headers`. Sont donc perdus, et c'est
-irrécupérable sur cette plateforme :
+d'équivalent de `.htaccess` ni de `_headers`.
+
+`public/_headers` n'a existé que le temps du passage par Cloudflare Pages :
+créé au commit `4e3acd5`, supprimé au commit suivant `24552d8`, celui qui
+amène sur GitHub Pages.
+
+C'était la bonne décision, et la mesure du 27 octobre 2026 le confirme : la
+plateforme ignore ce fichier intégralement. Le garder aurait été pire que son
+absence — il portait une ligne HSTS « à décommenter plus tard » qui n'aurait
+jamais rien produit, et on aurait cru le site protégé. Son contenu reste
+récupérable dans l'historique git si l'hébergement change à nouveau.
+
+Sont donc perdus, et c'est irrécupérable sur cette plateforme :
 
 | En-tête | État |
 |---|---|
@@ -27,7 +38,12 @@ irrécupérable sur cette plateforme :
 | `X-Frame-Options` | perdu — un `<meta http-equiv>` est ignoré par les navigateurs |
 | `Permissions-Policy` | perdu — aucun équivalent |
 | `Content-Security-Policy` | perdu en pratique. Une CSP en balise meta existe, mais seulement en mode bloquant : le mode `Report-Only` n'est pas supporté en meta. L'activer en bloquant risquerait de casser en silence le suivi de conversion Google Ads, ce que le projet refuse explicitement. |
-| `Cache-Control` | perdu — GitHub Pages impose le sien |
+| `Cache-Control` | perdu — GitHub Pages impose `max-age=600` à tout, y compris aux fichiers hachés de `/_astro/` qu'on gardait un an |
+| `Strict-Transport-Security` | **absent**, et GitHub ne l'envoie pas non plus de lui-même sur un domaine personnalisé |
+
+Relevé réel sur `https://serrurier-meaux.fr/` le 27 octobre 2026 : aucun des
+en-têtes ci-dessus n'est envoyé, à l'exception de `cache-control: max-age=600`.
+Ce n'est pas une déduction, c'est la réponse du serveur.
 
 Le site fonctionne parfaitement sans. Il est simplement moins protégé contre
 le détournement en iframe et la confusion de type MIME. C'est le prix de ce
@@ -135,6 +151,27 @@ Dans cet ordre :
 - `https://serrurier-meaux.fr/une-page-qui-nexiste-pas/` affiche **notre** 404
 - une page intérieure au hasard, par exemple
   `https://serrurier-meaux.fr/zones/serrurier-meaux-beauval/`
+
+## Vérifié en production le 27 octobre 2026
+
+Tout ce qui suit a été mesuré sur le site réel, pas sur une préversion :
+
+| Contrôle | Résultat |
+|---|---|
+| Les 4 enregistrements `A` | répondent, adresses correctes |
+| `CNAME` `www` | pointe vers `rayane933200-ui.github.io` |
+| HTTPS | certificat valide |
+| `http://` → `https://` | redirige, après activation d'*Enforce HTTPS* |
+| `www` → apex | redirige, y compris depuis `http://www` |
+| CSS et polices | servis, `/_astro/` intact — `.nojekyll` a fait son travail |
+| Page 404 | c'est la nôtre, avec le statut 404 |
+| `/_headers` | 404 — non exposé publiquement |
+| Audit de contraste | **zéro échec** sur les 59 pages, 8 796 éléments |
+
+**Piège de vérification** : le navigateur met en cache la réponse d'une URL
+testée avant l'activation d'*Enforce HTTPS*, et continue de l'afficher en
+clair. Tester la redirection sur une adresse jamais visitée, ou avec un
+paramètre d'URL quelconque.
 
 ## Après la mise en ligne
 
