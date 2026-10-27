@@ -154,21 +154,22 @@ jobs:
             exit 1
           fi
 
-      # enablement: true — l'action active GitHub Pages sur le dépôt elle-même,
-      # par l'API, au lieu de supposer que c'est déjà fait dans Settings.
+      # PRÉALABLE OBLIGATOIRE, et il n'est pas automatisable :
+      # GitHub Pages doit être activé sur le dépôt, par Settings → Pages →
+      # Build and deployment → Source = « GitHub Actions ».
       #
-      # Sans cette option, l'étape échoue en une seconde avec « Get Pages site
-      # failed » dès que Pages n'est pas déjà activé. C'est arrivé trois fois de
-      # suite le 26 octobre 2026, y compris APRÈS le réglage manuel de la source
-      # sur « GitHub Actions » — l'erreur est la même et ne dit pas laquelle des
-      # deux conditions manque, ce qui rend le diagnostic pénible.
+      # Sans ça, cette étape échoue en une seconde :
+      #   Get Pages site failed. Error: Not Found
       #
-      # Avec l'option, le workflow ne dépend plus d'un réglage d'interface : il
-      # est autonome, et reconstruisible à l'identique sur un dépôt neuf.
+      # L'option `enablement: true` a été essayée le 26 octobre 2026 pour s'en
+      # passer.
+      # Ça ne fonctionne pas : le jeton fourni au workflow peut publier sur un
+      # site Pages existant, pas en créer un. L'API répond
+      #   Create Pages site failed. Error: Resource not accessible by integration
+      # L'option a donc été retirée — elle ajoutait une seconde erreur sans
+      # régler la première, ce qui rendait le journal plus difficile à lire.
       - name: Préparer GitHub Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       # include-hidden-files : sans cette option, .nojekyll n'est PAS embarqué
       # dans l'archive, et on retombe exactement sur la panne qu'il évite.
