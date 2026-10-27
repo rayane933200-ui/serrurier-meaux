@@ -235,7 +235,7 @@ const jsonLd = [
           ))}
         </ul>
         <h2 class="nearby-title">
-          {zone.type === 'quartier' ? 'Communes du Pays de Meaux' : 'Quartiers de Meaux'}
+          {zone.type === 'quartier' ? 'Villes voisines' : 'Quartiers de Meaux'}
         </h2>
         <ul class="nearby-links">
           {(zone.type === 'quartier' ? communes : quartiers).slice(0, 9).map((item) => (

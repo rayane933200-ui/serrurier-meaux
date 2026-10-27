@@ -12,7 +12,7 @@ const year = new Date().getFullYear();
   <div class="container footer-inner">
     <div class="footer-brand">
       <Logo />
-      <p>Serrurier à Meaux et dans le Pays de Meaux, disponible {site.hours}.</p>
+      <p>Serrurier à Meaux et dans les villes voisines, disponible {site.hours}.</p>
       <a class="btn btn-primary footer-cta" href={site.phoneHref}>
         <Icon name="phone" size={18} />
         <span>{site.phoneDisplay}</span>
@@ -116,7 +116,7 @@ const year = new Date().getFullYear();
 
   .footer-brand p {
     margin-top: var(--space-sm);
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-text-muted);
     max-width: 32ch;
   }
 
@@ -125,7 +125,7 @@ const year = new Date().getFullYear();
   }
 
   .footer-col h3 {
-    color: var(--color-white);
+    color: var(--color-text);
     font-size: 1rem;
     margin-bottom: var(--space-sm);
   }
@@ -141,7 +141,7 @@ const year = new Date().getFullYear();
 
   .footer-col a,
   .footer-col span {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--color-text-muted);
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -150,12 +150,12 @@ const year = new Date().getFullYear();
 
   .footer-col a:hover,
   .footer-col a:focus-visible {
-    color: var(--color-gold);
+    color: var(--color-gold-text);
   }
 
   .contact-list :global(svg) {
     flex-shrink: 0;
-    color: var(--color-gold);
+    color: var(--color-gold-text);
   }
 
   /* Maillage interne vers les pages locales */
@@ -164,7 +164,7 @@ const year = new Date().getFullYear();
   }
 
   .footer-zones h3 {
-    color: var(--color-white);
+    color: var(--color-text);
     font-size: 0.9rem;
     margin-bottom: 0.6rem;
   }
@@ -179,13 +179,13 @@ const year = new Date().getFullYear();
   }
 
   .footer-zones a {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-text-muted);
     font-size: 0.85rem;
   }
 
   .footer-zones a:hover,
   .footer-zones a:focus-visible {
-    color: var(--color-gold);
+    color: var(--color-gold-text);
   }
 
   .footer-bottom {
@@ -204,7 +204,7 @@ const year = new Date().getFullYear();
   .footer-bottom p {
     margin: 0;
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-text-muted);
   }
 
   .footer-bottom ul {
@@ -217,19 +217,19 @@ const year = new Date().getFullYear();
   }
 
   .footer-bottom a {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-text-muted);
   }
 
   .footer-bottom a:hover,
   .footer-bottom a:focus-visible,
   .footer-bottom .link-like:hover,
   .footer-bottom .link-like:focus-visible {
-    color: var(--color-gold);
+    color: var(--color-gold-text);
   }
 
   .footer-bottom .link-like {
     font: inherit;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-text-muted);
     background: none;
     border: 0;
     padding: 0;

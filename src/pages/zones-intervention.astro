@@ -22,8 +22,8 @@ const jsonLd = {
 ---
 
 <BaseLayout
-  title="Serrurier à Meaux et Pays de Meaux : zones d'intervention"
-  description="Nous intervenons à Meaux et dans les communes du Pays de Meaux, 24h/24 et 7j/7. Une page par quartier et par commune, avec les secteurs desservis."
+  title="Serrurier à Meaux et villes voisines : zones d'intervention"
+  description="Nous intervenons à Meaux et dans les villes voisines, 24h/24 et 7j/7. Une page par quartier et par commune, avec les secteurs desservis."
   jsonLd={jsonLd}
   suffix={false}
 >
@@ -33,7 +33,7 @@ const jsonLd = {
     <div class="container">
       <h1>Nos zones d'intervention</h1>
       <p>
-        Nous intervenons à <strong>Meaux</strong> et dans le <strong>Pays de Meaux</strong>,
+        Nous intervenons à <strong>Meaux</strong> et dans les <strong>villes voisines</strong>,
         {site.hours}. Chaque quartier et chaque commune a sa page : délais, secteurs desservis et
         prestations disponibles. Un doute sur votre adresse ? Appelez-nous, nous vous confirmons
         tout de suite si nous la couvrons.
@@ -58,7 +58,7 @@ const jsonLd = {
         ))}
       </ul>
 
-      <h2 class="zones-heading">Pays de Meaux, par commune</h2>
+      <h2 class="zones-heading">Les villes voisines</h2>
       <ul class="zones-list">
         {communes.map((zone) => (
           <li>
@@ -117,7 +117,7 @@ const jsonLd = {
 
   <CtaBanner
     title="Un serrurier proche de chez vous"
-    description="Où que vous soyez dans le Pays de Meaux, nous nous déplaçons rapidement."
+    description="Où que vous soyez à Meaux ou dans une ville voisine, nous nous déplaçons rapidement."
   />
 </BaseLayout>
 

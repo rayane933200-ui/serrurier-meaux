@@ -69,7 +69,7 @@ const { iconOnly = false, class: className = '' } = Astro.props;
     /* Le logo ne vit que dans les bandeaux sombres (en-tête, pied de page) :
        son PNG a un fond noir incrusté, il serait un rectangle noir sur clair.
        L'argent reprend la clé du logo — ne pas basculer sur --color-text. */
-    color: var(--color-silver);
+    color: var(--color-text);
   }
 
   .logo-subtitle {
@@ -78,7 +78,7 @@ const { iconOnly = false, class: className = '' } = Astro.props;
     font-size: 0.65rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--color-gold);
+    color: var(--color-gold-text);
     white-space: nowrap;
   }
 </style>

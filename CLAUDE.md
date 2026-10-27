@@ -8,7 +8,7 @@ Site vitrine professionnel construit avec **Astro** pour une activité de serrur
 (77100, Seine-et-Marne)**. Objectif : présenter l'activité, les services/offres et permettre la
 prise de contact, avec un chargement rapide et un bon référencement (SEO).
 
-- **Logo et charte graphique** : fournis par l'utilisateur et **déjà intégrés**. Logo dans `src/assets/` (`logo-full.png` = lockup complet, `logo-icon.png` = icône recadrée utilisée dans le header/footer). Palette dans `src/styles/tokens.css` : **thème clair** (fond `#faf9f7`), avec des **bandeaux sombres** en en-tête, hero et pied de page. L'**or** reste l'unique couleur d'accent. Voir « Thème clair » plus bas pour la règle des trois ors, qui n'est pas négociable. Ne pas régénérer de logo ni réinterpréter la palette.
+- **Logo et charte graphique** : fournis par l'utilisateur et **déjà intégrés**. Logo dans `src/assets/` : `logo-full.png` (lockup complet, opaque, réservé aux données structurées et à l'image de partage), `logo-icon.png` (icône opaque, conservée comme source) et **`logo-icon-detoure.png`**, la version à canal alpha, seule employée à l'écran. Palette dans `src/styles/tokens.css` : **blanc épuré** (fond `#ffffff`) depuis le 27 octobre 2026, sans aucun bandeau sombre. L'**or** reste l'unique couleur d'accent. Voir « Blanc épuré » plus bas pour la règle des trois ors, qui n'est pas négociable. Ne pas régénérer de logo ni réinterpréter la palette.
 - **Contenu** : ne jamais inventer de coordonnées, de tarifs, de chiffres, de témoignages clients, de certifications, de marques travaillées ou de références sans confirmation explicite. Les champs encore inconnus sont marqués `À COMPLÉTER` dans `src/data/site.ts` et s'affichent comme `[À COMPLÉTER]` — les laisser tels quels plutôt que les remplir au jugé.
 
 ### Ce dépôt est le jumeau de celui de Lyon
@@ -157,7 +157,7 @@ balise n'est pas émise — le site fonctionne, il ne remonte simplement aucune 
 │   ├── data/              # contenu structuré en TypeScript — source unique des faits
 │   │   ├── site.ts          # coordonnées, disponibilité, infos légales, champs À COMPLÉTER
 │   │   ├── services.ts      # les 5 prestations → /services/<slug>
-│   │   ├── zones.ts         # 6 quartiers de Meaux + 14 communes → /zones/<slug>
+│   │   ├── zones.ts         # 6 quartiers de Meaux + 14 villes voisines → /zones/<slug>
 │   │   └── faq.ts           # questions/réponses, `featured` = affichées en accueil
 │   ├── layouts/           # BaseLayout.astro (SEO + JSON-LD + barre d'appel mobile)
 │   ├── pages/             # une page = une route ; [slug].astro = routes dynamiques
@@ -190,9 +190,21 @@ Meaux **n'a pas d'arrondissements**. Le découpage de `src/data/zones.ts` est do
 - **6 quartiers de Meaux** — Centre, Marché, Beauval, Pierre-Collinet, Dunant-Chenonceau,
   Foch-Roosevelt. Noms issus du découpage IRIS de l'INSEE et des périmètres des conventions de
   rénovation urbaine (ANRU) de la ville.
-- **14 communes du Pays de Meaux**, les plus peuplées après Meaux. Liste et populations relevées
-  le 26 octobre 2026 sur l'API Découpage administratif de l'État (`geo.api.gouv.fr`), EPCI
-  `200072130` « CA du Pays de Meaux ».
+- **14 villes voisines**, retenues sur la **distance réelle au centre de Meaux**, toutes à moins
+  de 7,2 km. Neuf d'entre elles sont limitrophes — Chambry, Chauconin-Neufmontiers,
+  Crégy-lès-Meaux, Fublaines, Mareuil-lès-Meaux, Nanteuil-lès-Meaux, Poincy, Trilport, Villenoy —
+  et à moins de 5,5 km. Les entrées de `zones.ts` sont ordonnées par distance croissante.
+  Populations et coordonnées relevées sur l'API Découpage administratif de l'État
+  (`geo.api.gouv.fr`) ; limitrophes vérifiées à part.
+
+  **Le critère a changé le 27 octobre 2026**, à la demande de Rayane : c'était auparavant
+  l'appartenance à la communauté d'agglomération du Pays de Meaux. Ce périmètre administratif
+  n'est employé par personne pour dire où il habite, et il mélangeait des communes limitrophes
+  avec d'autres bien plus loin. Saint-Soupplets (11,5 km) et Monthyon (7,7 km) sont sorties à ce
+  titre, Poincy (2,4 km) et Chambry (4,8 km) sont entrées.
+
+  **Ne pas réintroduire « Pays de Meaux » dans les textes du site.** Ajouter une commune suppose
+  de vérifier sa distance : « ville voisine » est une affirmation, et à 15 km elle est fausse.
 
 Le type d'une zone est `'quartier' | 'commune'` — **pas `'arrondissement'`**, qui était la valeur
 du site de Lyon. Les exports sont `quartiers` et `communes`.
@@ -291,35 +303,57 @@ Coller la balise brute fournie par Google, sans le mode consentement ni le
 bandeau, rendrait le site non conforme et ferait mentir les mentions légales et
 la politique de confidentialité, qui décrivent ce cookie nommément.
 
-### Thème clair : la règle des trois ors
+### Blanc épuré : la règle des trois ors
 
-Deux contraintes matérielles commandent toute la structure, et les ignorer casse
-le site en silence.
+Le site est en **blanc franc** (`#ffffff`) depuis le 27 octobre 2026, à la
+demande de Rayane. Il était auparavant en clair cassé avec des bandeaux sombres
+en en-tête, hero et pied de page.
 
-**1. Le logo est opaque, fond noir incrusté.** `logo-icon.png` et
-`logo-full.png` n'ont pas de canal alpha : leurs quatre coins valent `#010206`
-à 100 % d'opacité. Posés sur une page blanche, ils apparaîtraient comme un
-rectangle noir. C'est pour cela — et non par goût — que l'en-tête, le hero, la
-bannière d'appel et le pied de page restent des **bandeaux sombres**. Ils
-utilisent les variables `--band-*`. **Ne jamais employer `--band-*` dans le
-corps de page, ni `--color-text` dans un bandeau** : dans les deux cas le texte
-disparaît sur un fond de même valeur.
+**Ce qui a rendu le blanc possible.** Les bandeaux sombres n'étaient pas un
+choix esthétique : le logo fourni est opaque. `logo-icon.png` et
+`logo-full.png` n'ont pas de canal alpha, leurs quatre coins valent `#010206`
+à 100 %. Sur une page blanche ils formeraient un rectangle noir.
 
-**2. L'or n'est pas lisible en texte sur fond clair.** `#d4a937` sur `#faf9f7`
-ne donne que **2,09:1**, là où WCAG AA exige 4,5:1 pour du texte et 3:1 pour une
+Mais **`logo-icon-detoure.png`** existe — même image, plus un canal alpha, coins
+à alpha 0, vérifié le 27 octobre — et c'est lui que `Logo.astro` charge. Il
+passe sur n'importe quel fond. La contrainte est donc levée. `logo-full.png`
+reste opaque, sans conséquence : il ne sert qu'aux données structurées et à
+l'image de partage, jamais posé sur une page.
+
+**Les variables `--band-*` existent toujours**, mais elles sont désormais
+**claires**. Elles n'ont pas été supprimées parce qu'une cinquantaine de
+déclarations les utilisent dans six composants. Elles gardent un rôle : marquer
+l'en-tête et le pied de page, par un filet et une nuance de gris plutôt que par
+un aplat sombre. Il n'y a plus de « texte clair sur bandeau » : en-tête, hero,
+pied de page et bannière d'appel suivent les mêmes règles que le corps de page.
+
+**Une seule exception, et elle est volontaire** : `.availability-bar`, la fine
+barre d'annonce au-dessus de l'en-tête, garde `background: var(--color-black)`
+et son texte en `--color-white`. C'est le seul aplat sombre du site.
+
+**L'illustration du hero a sa propre palette, `--illu-*`, qui reste sombre.**
+`HeroIllustration.astro` dessine un ciel coupé jour / nuit : c'est un dessin
+dans un cadre, pas une zone de page. Il utilisait `--band-*` au temps des
+bandeaux sombres ; **ne pas les y remettre**, le ciel deviendrait blanc et le
+dessin disparaîtrait.
+
+**L'or n'est toujours pas lisible en texte sur fond clair.** `#d4a937` sur blanc
+ne donne que **2,18:1**, là où WCAG AA exige 4,5:1 pour du texte et 3:1 pour une
 icône. D'où trois ors, et un seul est correct dans chaque rôle :
 
-| Rôle | Variable | Valeur | Contraste sur `--color-bg` |
+| Rôle | Variable | Valeur | Contraste sur blanc |
 |---|---|---|---|
-| Remplissage (fond de bouton, pastille) | `--color-gold` | `#d4a937` | — (texte noir dessus : 8,98:1) |
-| Icône, filet, trait graphique | `--color-gold-dark` | `#a9821f` | **3,38:1** — passe WCAG 1.4.11 |
-| Texte, lien | `--color-gold-text` | `#846315` | **5,28:1** — passe WCAG AA |
+| Remplissage (fond de bouton, pastille) | `--color-gold` | `#d4a937` | — (texte noir dessus : 9,17:1) |
+| Icône, filet, trait graphique | `--color-gold-dark` | `#a9821f` | **3,45:1** — passe WCAG 1.4.11 |
+| Texte, lien | `--color-gold-text` | `#846315` | **5,56:1** — passe WCAG AA |
 
-Écrire `color: var(--color-gold)` dans le corps de page est donc une régression,
-même si à l'œil « ça se voit ». Dans un bandeau sombre, c'est l'inverse : l'or
-pur y vaut 8,98:1 et c'est lui qu'il faut.
+Écrire `color: var(--color-gold)` est donc une régression, même si à l'œil
+« ça se voit ». Cette règle compte **davantage** qu'avant : il n'existe plus un
+seul endroit sombre où l'or pur serait lisible en texte.
 
-De même, `--color-white` n'a sa place **que** dans un bandeau sombre. En corps de page, le texte
+De même, `--color-white` n'a sa place **que** sur un fond sombre — en pratique la seule barre
+d'annonce, et le survol du bouton secondaire dont le fond devient `--color-text`. Partout
+ailleurs, le texte
 est en `--color-text` (ou `--color-text-muted` pour le secondaire).
 
 **Les titres ne sont plus dorés.** Ils sont en `--color-text`. L'or n'a pas disparu pour autant,
@@ -407,7 +441,7 @@ Réglé :
 
 - [x] Nom de l'activité — **Serrurier** (enseigne légale : Rexpress)
 - [x] Nom de domaine — `serrurier-meaux.fr`, forme canonique sans `www`
-- [x] Zones — 6 quartiers de Meaux + 14 communes du Pays de Meaux
+- [x] Zones — 6 quartiers de Meaux + 14 villes voisines, retenues sur la distance réelle
 - [x] Tarifs — mêmes montants qu'à Lyon, décision de Rayane du 26/10/2026
 - [x] Formulaire de contact — pas de backend : `QuoteForm.astro` ouvre la messagerie du visiteur via `mailto:` (site 100 % statique)
 - [x] Informations légales de base — SIREN/SIRET/APE/adresse, depuis l'avis SIRENE

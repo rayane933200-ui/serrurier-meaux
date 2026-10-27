@@ -20,7 +20,7 @@ export const faq: FaqItem[] = [
   {
     question: 'En combien de temps intervenez-vous ?',
     answer:
-      "Nous visons une intervention en moins de 30 minutes sur Meaux et le Pays de Meaux. Le délai réel dépend de votre localisation exacte, de l'heure et des conditions de circulation : il vous est indiqué au téléphone, sans promesse que nous ne pourrions pas tenir.",
+      "Nous visons une intervention en moins de 30 minutes sur Meaux et les villes voisines. Le délai réel dépend de votre localisation exacte, de l'heure et des conditions de circulation : il vous est indiqué au téléphone, sans promesse que nous ne pourrions pas tenir.",
     featured: true,
   },
   {

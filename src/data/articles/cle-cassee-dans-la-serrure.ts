@@ -106,7 +106,7 @@ const article: Article = {
       heading: 'Ce qui évite la casse suivante',
       body: [
         'Trois habitudes suffisent. Choisissez un lubrifiant sec au graphite ou au PTFE, une à deux fois par an : les dégrippants gras captent la poussière et transforment le mécanisme en pâte abrasive. Faites régler la porte dès qu’elle frotte, plutôt que d’attendre la panne. Retirez du trousseau toute clé tordue ou amincie, car une clé déformée marque le cylindre à chaque passage avant de casser dedans.',
-        'Une extraction, un réglage de porte ou un remplacement de cylindre se traitent 24h/24 et 7j/7, avec un objectif d’intervention en moins de 30 minutes sur Meaux et le Pays de Meaux. Quand votre situation peut attendre le lendemain au tarif de journée, nous vous le disons au téléphone.',
+        'Une extraction, un réglage de porte ou un remplacement de cylindre se traitent 24h/24 et 7j/7, avec un objectif d’intervention en moins de 30 minutes sur Meaux et les villes voisines. Quand votre situation peut attendre le lendemain au tarif de journée, nous vous le disons au téléphone.',
       ],
     },
   ],

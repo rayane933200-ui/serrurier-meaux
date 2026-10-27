@@ -63,14 +63,14 @@ const values = [
   {
     icon: 'map-pin' as const,
     title: 'Proximité',
-    description: "Une connaissance du terrain à Meaux et dans le Pays de Meaux pour intervenir rapidement.",
+    description: "Une connaissance du terrain à Meaux et dans les villes voisines pour intervenir rapidement.",
   },
 ];
 ---
 
 <BaseLayout
   title="À propos de votre serrurier à Meaux"
-  description="Réactivité, transparence tarifaire et savoir-faire : nos engagements pour toutes vos urgences de serrurerie à Meaux et dans le Pays de Meaux."
+  description="Réactivité, transparence tarifaire et savoir-faire : nos engagements pour toutes vos urgences de serrurerie à Meaux et dans les villes voisines."
   suffix={false}
 >
   <Breadcrumbs items={crumbs} />
@@ -171,7 +171,7 @@ const values = [
       <h2>Où nous intervenons</h2>
       <p>
         Nous couvrons {quartiers.length} quartiers de Meaux et
-        {' '}{communes.length} communes du Pays de Meaux, {site.hours}. Chaque secteur a sa
+        {' '}{communes.length} villes voisines, {site.hours}. Chacune a sa
         page, avec les secteurs desservis : voir
         {' '}<a href="/zones-intervention/">nos zones d’intervention</a>.
       </p>

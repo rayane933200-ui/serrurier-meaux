@@ -62,7 +62,7 @@ const article: Article = {
       heading: 'Sécuriser l’ouverture le jour même',
       body: [
         'Une porte qui ne ferme plus laisse le logement ouvert, et votre contrat attend de vous des mesures conservatoires : des gestes qui empêchent le dommage de s’aggraver. La sécurisation de l’ouverture en fait partie, au même titre que la déclaration.',
-        'Nous intervenons à Meaux et dans le Pays de Meaux 24h/24 et 7j/7, avec un objectif d’intervention en moins de 30 minutes et un tarif annoncé au téléphone avant le déplacement : le détail figure sur notre page <a href="/services/serrurier-urgence/">serrurier d’urgence à Meaux</a>. Une ouverture de porte démarre à 69 €, déplacement compris, le montant exact dépendant de la porte, de la serrure et de l’horaire. Quand la remise en sécurité définitive suppose une pièce à commander, une sécurisation provisoire referme le logement en attendant.',
+        'Nous intervenons à Meaux et dans les villes voisines 24h/24 et 7j/7, avec un objectif d’intervention en moins de 30 minutes et un tarif annoncé au téléphone avant le déplacement : le détail figure sur notre page <a href="/services/serrurier-urgence/">serrurier d’urgence à Meaux</a>. Une ouverture de porte démarre à 69 €, déplacement compris, le montant exact dépendant de la porte, de la serrure et de l’horaire. Quand la remise en sécurité définitive suppose une pièce à commander, une sécurisation provisoire referme le logement en attendant.',
         'La sécurisation peut intervenir avant le passage des forces de l’ordre lorsque le logement n’est plus fermable : signalez-le lors de l’appel au 17, vos photos font foi. La serrure déposée reste chez vous : c’est une pièce du dossier, pas un déchet de chantier.',
       ],
     },

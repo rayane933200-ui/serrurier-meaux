@@ -29,7 +29,7 @@ const { title, description } = Astro.props;
 <style>
   .cta-banner {
     background: var(--band-surface);
-    color: var(--color-white);
+    color: var(--color-text);
     padding-block: var(--space-lg);
     border-block: 1px solid var(--band-border);
   }
@@ -43,12 +43,12 @@ const { title, description } = Astro.props;
   }
 
   .cta-banner h2 {
-    color: var(--color-gold);
+    color: var(--color-gold-text);
     margin-bottom: 0.25rem;
   }
 
   .cta-banner p {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--color-text-muted);
     margin-bottom: 0;
   }
 

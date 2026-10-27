@@ -185,11 +185,11 @@ export const services: Service[] = [
     h1: 'Serrurier d’urgence à Meaux, 24h/24 et 7j/7',
     metaTitle: 'Serrurier d’urgence 24h/24 à Meaux',
     metaDescription:
-      'Serrurier d’urgence à Meaux, 24h/24 et 7j/7, nuit, week-end et jours fériés. Intervention en moins de 30 minutes sur Meaux et le Pays de Meaux.',
-    teaser: 'Déplacement rapide sur Meaux et le Pays de Meaux, 24h/24 et 7j/7.',
+      'Serrurier d’urgence à Meaux, 24h/24 et 7j/7, nuit, week-end et jours fériés. Intervention en moins de 30 minutes sur Meaux et les villes voisines.',
+    teaser: 'Déplacement rapide sur Meaux et les villes voisines, 24h/24 et 7j/7.',
     price: 'Sur devis',
     intro:
-      "Une urgence de serrurerie survient à n'importe quelle heure : c'est précisément pour cela que nous restons joignables en permanence. Nous intervenons à Meaux et dans le Pays de Meaux 24h/24 et 7j/7, nuit, week-end et jours fériés compris, avec un objectif d'intervention en moins de 30 minutes et un tarif annoncé au téléphone avant tout déplacement.",
+      "Une urgence de serrurerie survient à n'importe quelle heure : c'est précisément pour cela que nous restons joignables en permanence. Nous intervenons à Meaux et dans les villes voisines 24h/24 et 7j/7, nuit, week-end et jours fériés compris, avec un objectif d'intervention en moins de 30 minutes et un tarif annoncé au téléphone avant tout déplacement.",
     situations: [
       'Blocage à l’extérieur du logement, de nuit ou en pleine journée',
       'Effraction ou tentative d’effraction à sécuriser immédiatement',

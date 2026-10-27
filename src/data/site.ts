@@ -21,7 +21,7 @@ export const site = {
   // et seule une équipe déjà sur place tient ce délai. Il l'a maintenu en
   // connaissance de cause. Ne pas durcir cette promesse davantage.
   city: 'Meaux',
-  area: 'Meaux et le Pays de Meaux',
+  area: 'Meaux et les villes voisines',
   hours: '24h/24, 7j/7',
   responseTime: '30 minutes',
   /**

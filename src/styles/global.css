@@ -137,25 +137,11 @@ img {
   border-color: var(--color-text);
 }
 
-/* Sur un bandeau sombre, le secondaire reste clair : meme composant, deux
-   contextes. Ajoute ici plutot que duplique dans chaque bandeau. */
-.band .btn-secondary,
-.cta-banner .btn-secondary,
-.hero .btn-secondary {
-  color: var(--color-white);
-  border-color: var(--color-white);
-}
-
-.band .btn-secondary:hover,
-.band .btn-secondary:focus-visible,
-.cta-banner .btn-secondary:hover,
-.cta-banner .btn-secondary:focus-visible,
-.hero .btn-secondary:hover,
-.hero .btn-secondary:focus-visible {
-  background: var(--color-white);
-  color: var(--color-black);
-  border-color: var(--color-white);
-}
+/* Il existait ici une variante claire du bouton secondaire, pour les bandeaux
+   sombres de l'en-tete, du hero et du pied de page. Les bandeaux sont clairs
+   depuis le 27 octobre 2026 : elle donnait du blanc sur blanc. Le style par
+   defaut du secondaire convient desormais partout, d'ou sa suppression plutot
+   qu'une reecriture. */
 
 .btn-outline {
   background: transparent;

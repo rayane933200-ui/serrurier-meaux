@@ -77,7 +77,7 @@ const article: Article = {
       ],
     },
     {
-      heading: 'À Meaux et dans le Pays de Meaux',
+      heading: 'À Meaux et dans les villes voisines',
       body: [
         'Le parc social est important à Meaux et inégalement réparti : Beauval, la Pierre-Collinet et Dunant-Chenonceau concentrent les grands ensembles de logements collectifs, tous trois profondément remaniés par les opérations de rénovation urbaine menées depuis le milieu des années 2000.',
         'Ce bâti a ses constantes : portes palières d’origine ou remplacées par lots entiers, serrures d’un même modèle sur des dizaines de logements, et organigrammes fréquents. Dire au téléphone le nom de la résidence, le bâtiment et l’étage permet souvent d’identifier le type de serrure avant même d’arriver — et donc d’embarquer la bonne pièce.',

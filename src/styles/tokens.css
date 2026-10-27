@@ -1,22 +1,29 @@
 /* Charte graphique SERRURIER — source unique des couleurs et typographies
  *
- * THÈME CLAIR, demandé par Rayane le 19 octobre 2026.
+ * BLANC ÉPURÉ, demandé par Rayane le 27 octobre 2026.
  *
- * Le site était en thème sombre. Le passage au clair s'est heurté à deux
- * contraintes matérielles, qui expliquent la structure ci-dessous :
+ * Histoire courte : thème sombre à l'origine, passé au clair cassé (#faf9f7)
+ * le 19 octobre, puis au blanc franc le 27. Les bandeaux sombres de l'en-tête,
+ * du hero et du pied de page ont disparu à cette dernière étape.
  *
- * 1. LE LOGO EST OPAQUE, FOND NOIR INCRUSTÉ. `logo-icon.png` et
- *    `logo-full.png` n'ont pas de canal alpha : leurs quatre coins valent
- *    #010206 à 100 % d'opacité. Posés sur une page blanche, ils apparaîtraient
- *    comme un rectangle noir. Plutôt que de retoucher le logo fourni — ce que
- *    CLAUDE.md interdit — l'en-tête et le pied de page restent des bandeaux
- *    sombres. Le logo y est chez lui, et l'or y garde sa pleine saturation.
+ * CE QUI A RENDU LE BLANC POSSIBLE. Le logo fourni est entièrement opaque :
+ * `logo-icon.png` et `logo-full.png` n'ont pas de canal alpha, leurs quatre
+ * coins valent #010206 à 100 %. Posés sur une page blanche, ils formeraient un
+ * rectangle noir — c'est ce qui imposait les bandeaux sombres.
  *
- * 2. L'OR N'EST PAS LISIBLE EN TEXTE SUR FOND CLAIR. #d4a937 sur #faf9f7 ne
- *    donne que 2,09:1, là où WCAG AA exige 4,5:1 pour du texte. L'or reste donc
- *    une couleur de REMPLISSAGE (fonds de boutons, pastilles, filets) et jamais
- *    une couleur de texte sur clair. Pour le texte, --color-gold-text descend
- *    la même teinte jusqu'à 5,28:1.
+ * Mais `logo-icon-detoure.png` existe : même image, plus un canal alpha calculé
+ * depuis l'histogramme de luminance, coins à alpha 0. Vérifié le 27 octobre.
+ * C'est LUI que `Logo.astro` charge, et il passe sur n'importe quel fond. La
+ * contrainte est donc levée pour tout ce qui affiche l'icône.
+ *
+ * `logo-full.png` reste opaque, et c'est très bien : il ne sert qu'aux données
+ * structurées et à l'image de partage, jamais posé sur une page.
+ *
+ * CE QUI N'A PAS CHANGÉ. L'or n'est toujours pas lisible en texte sur fond
+ * clair : #d4a937 sur blanc ne donne que 2,18:1, là où WCAG AA exige 4,5:1.
+ * La règle des trois ors tient donc intégralement, et elle compte davantage
+ * qu'avant puisqu'il n'y a plus un seul endroit sombre où l'or pur soit lisible
+ * en texte.
  *
  * Tous les rapports ci-dessous sont calculés, pas estimés.
  */
@@ -39,34 +46,58 @@
   /* ------------------------------------------------------------------
    * Corps de page — thème clair.
    * ------------------------------------------------------------------ */
-  --color-bg: #faf9f7;        /* blanc cassé chaud, écho discret à l'or */
-  --color-bg-alt: #f2efe9;    /* sections alternées */
-  --color-surface: #ffffff;   /* cartes et panneaux posés sur le fond */
-  --color-surface-alt: #f6f4f0;
+  --color-bg: #ffffff;        /* blanc franc */
+  --color-bg-alt: #f6f7f8;    /* sections alternées, gris neutre très clair */
+  --color-surface: #ffffff;   /* cartes et panneaux */
+  --color-surface-alt: #fafbfc;
 
-  --color-text: #17181c;      /* 16,86:1 sur --color-bg */
-  --color-text-muted: #56595f; /* 6,68:1 sur --color-bg */
+  --color-text: #17181c;       /* 17,56:1 sur blanc */
+  --color-text-muted: #55585e; /* 7,06:1 sur blanc */
 
-  --color-border: #e4e0d8;      /* séparateurs décoratifs, sans exigence */
-  --color-border-soft: #ece9e2;
+  --color-border: #e6e8ea;      /* séparateurs décoratifs, sans exigence */
+  --color-border-soft: #f0f1f3;
   /* Bordure des composants d'interface (champs, boutons secondaires).
      WCAG 1.4.11 exige 3:1 pour délimiter un contrôle : ce palier donne
-     3,51:1 sur --color-bg. Ne pas l'éclaircir. */
-  --color-border-ui: #82858c;
+     3,66:1 sur blanc. Ne pas l'éclaircir. */
+  --color-border-ui: #808488;
 
   /* ------------------------------------------------------------------
-   * Bandeaux sombres — en-tête, hero, pied de page, barre d'appel.
-   * Y vivent le logo et l'or à pleine saturation. Ne jamais employer ces
-   * variables dans le corps de page : le texte y deviendrait invisible.
+   * Bandeaux — en-tête, hero, pied de page, barre d'appel.
+   *
+   * Ils étaient sombres jusqu'au 27 octobre 2026, par nécessité et non par
+   * goût : le logo opaque y était posé. Avec la version détourée, ils passent
+   * en clair, et ces variables suivent plutôt que de disparaître — une
+   * cinquantaine de déclarations les utilisent dans six composants, et les
+   * garder évite de toucher à chacune.
+   *
+   * Elles restent distinctes de --color-* parce que les bandeaux gardent un
+   * rôle : délimiter l'en-tête et le pied de page du corps de la page. Ici
+   * c'est un filet et une nuance de gris qui s'en chargent, plus un aplat noir.
    * ------------------------------------------------------------------ */
-  --band-bg: #0a0a0b;
-  --band-bg-top: #000000;        /* barre d'annonce, au-dessus de l'en-tête */
-  --band-surface: #17181c;
-  --band-surface-alt: #232429;
-  --band-border: #2b2d33;
-  --band-text: #e7e7ea;          /* 16,04:1 sur --band-bg */
-  --band-text-muted: #9a9ea6;
-  --band-border-ui: #646872;     /* 3,18:1 sur --band-surface */
+  --band-bg: #ffffff;
+  --band-bg-top: #17181c;        /* barre d'annonce : le seul aplat sombre restant */
+  --band-surface: #ffffff;
+  --band-surface-alt: #f6f7f8;
+  --band-border: #e6e8ea;
+  --band-text: #17181c;          /* 17,56:1 sur --band-bg */
+  --band-text-muted: #55585e;    /* 7,06:1 sur --band-bg */
+  --band-border-ui: #808488;     /* 3,66:1 sur --band-surface */
+
+  /* ------------------------------------------------------------------
+   * Palette de l'illustration du hero — SOMBRE, et elle doit le rester.
+   *
+   * HeroIllustration.astro dessine un ciel coupé jour / nuit. C'est un dessin
+   * posé dans un cadre, pas un bandeau de page : il garde son fond sombre sur
+   * la page blanche, où il se lit comme un visuel et non comme une zone.
+   *
+   * Il utilisait --band-* quand ceux-ci étaient sombres. Il lui faut donc ses
+   * propres variables, sinon le ciel devient blanc et le dessin disparaît.
+   * ------------------------------------------------------------------ */
+  --illu-bg: #0a0a0b;
+  --illu-surface: #17181c;
+  --illu-surface-alt: #232429;
+  --illu-border: #2b2d33;
+  --illu-border-ui: #646872;
 
   /* Typographies de la charte */
   --font-heading: 'Montserrat', sans-serif;
@@ -86,5 +117,5 @@
   --radius: 10px;
   --shadow-card: 0 1px 2px rgba(23, 24, 28, 0.05), 0 8px 24px rgba(23, 24, 28, 0.07);
   --shadow-card-hover: 0 2px 4px rgba(23, 24, 28, 0.07), 0 16px 36px rgba(23, 24, 28, 0.11);
-  --shadow-band: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --shadow-band: 0 1px 0 rgba(23, 24, 28, 0.06);
 }

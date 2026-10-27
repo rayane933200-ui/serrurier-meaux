@@ -26,7 +26,7 @@ const jsonLd = {
 
 <BaseLayout
   title="Serrurier à Meaux 24h/24 — intervention en 30 minutes"
-  description="Serrurier à Meaux et Pays de Meaux, 24h/24 et 7j/7. Ouverture de porte, changement de serrure, blindage, dépannage dès 69 €. Tarif annoncé avant déplacement."
+  description="Serrurier à Meaux et villes voisines, 24h/24 et 7j/7. Ouverture de porte, changement de serrure, blindage, dépannage dès 69 €. Tarif annoncé avant déplacement."
   jsonLd={jsonLd}
   suffix={false}
 >
@@ -36,7 +36,7 @@ const jsonLd = {
         <h1>Serrurier à Meaux, intervention garantie en moins de 30 minutes</h1>
         <p>
           Ouverture de porte, changement de serrure, blindage, dépannage : une équipe réactive
-          se déplace chez vous à Meaux et dans tout le Pays de Meaux, 24h/24 et 7j/7.
+          se déplace chez vous à Meaux et dans les villes voisines, 24h/24 et 7j/7.
         </p>
         <div class="hero-stats">
           <div class="hero-stat">
@@ -63,7 +63,7 @@ const jsonLd = {
         </div>
         <ul class="hero-badges">
           <li><Icon name="clock" size={18} /> Disponible 24h/24, 7j/7</li>
-          <li><Icon name="map-pin" size={18} /> Meaux et Pays de Meaux</li>
+          <li><Icon name="map-pin" size={18} /> Meaux et villes voisines</li>
         </ul>
       </div>
 
@@ -116,7 +116,7 @@ const jsonLd = {
             <Icon name="map-pin" size={22} />
             <div>
               <h3>Intervention locale à Meaux</h3>
-              <p>Une équipe qui connaît Meaux et le Pays de Meaux pour se déplacer rapidement.</p>
+              <p>Une équipe qui connaît Meaux et les villes voisines pour se déplacer rapidement.</p>
             </div>
           </li>
           <li>
@@ -135,7 +135,7 @@ const jsonLd = {
     <div class="container">
       <h2>Où nous intervenons</h2>
       <p class="section-intro">
-        Les quartiers de Meaux et les communes du Pays de Meaux. Chaque secteur a sa page, avec
+        Les quartiers de Meaux et les villes voisines. Chaque secteur a sa page, avec
         les délais et les secteurs desservis.
       </p>
       <div class="zones-columns">
@@ -148,7 +148,7 @@ const jsonLd = {
           </ul>
         </div>
         <div>
-          <h3>Pays de Meaux</h3>
+          <h3>Villes voisines</h3>
           <ul class="zones-inline">
             {communes.map((zone) => (
               <li><a href={`/zones/${zone.slug}/`}>{zone.name}</a></li>
@@ -206,8 +206,8 @@ const jsonLd = {
      incruste du logo -- et le corps de page clair. Les variables --band-*
      sont faites pour ce contexte ; n'y jamais employer --color-text. */
   .hero {
-    background: linear-gradient(135deg, var(--band-surface) 0%, var(--band-bg) 100%);
-    color: var(--color-white);
+    background: var(--band-bg);
+    color: var(--color-text);
     padding-block: var(--space-xl);
     border-bottom: 1px solid var(--band-border);
   }
@@ -216,7 +216,7 @@ const jsonLd = {
   .hero h1,
   .hero h2,
   .hero h3 {
-    color: var(--color-white);
+    color: var(--color-text);
   }
 
   .hero-inner {
@@ -243,11 +243,11 @@ const jsonLd = {
   }
 
   .hero h1 {
-    color: var(--color-white);
+    color: var(--color-text);
   }
 
   .hero-text p {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--color-text-muted);
     font-size: 1.1rem;
   }
 
@@ -270,7 +270,7 @@ const jsonLd = {
 
   /* Le hero est un bandeau sombre : l'or pur y est a 8,98:1. */
   .hero-stat :global(svg) {
-    color: var(--color-gold);
+    color: var(--color-gold-text);
     flex-shrink: 0;
   }
 
@@ -285,7 +285,7 @@ const jsonLd = {
   .hero-stat-label {
     display: block;
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-text-muted);
   }
 
   .hero-actions {
@@ -302,7 +302,7 @@ const jsonLd = {
     flex-wrap: wrap;
     padding: 0;
     margin: var(--space-sm) 0 0;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--color-text-muted);
     font-weight: 500;
   }
 
