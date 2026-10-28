@@ -122,7 +122,8 @@ dossier synchronisé.
 ### IndexNow : prévenir les moteurs au lieu de les attendre
 
 Le site soumet ses pages modifiées à IndexNow à chaque déploiement
-(`.github/scripts/indexnow.mjs`, appelé par le workflow après l'envoi FTP).
+(`.github/scripts/indexnow.mjs`, appelé par le workflow une fois la
+publication GitHub Pages terminée).
 Couvre **Bing, Yandex, Seznam et Naver — pas Google**, qui a testé le protocole
 puis y a renoncé. C'est donc un complément à Search Console, jamais un
 remplacement : ne pas laisser croire l'inverse.
@@ -144,11 +145,36 @@ aucun accès : au pire, un tiers signale que nos pages ont changé.
 Pour vérifier le calcul sans rien annoncer aux moteurs :
 `INDEXNOW_SIMULATION=1 node .github/scripts/indexnow.mjs`.
 
-### Search Console : la propriété reste à créer
+### Validation auprès des moteurs : ne jamais supprimer ces fichiers
+
+Un moteur revérifie périodiquement qu'on contrôle bien le domaine. Une propriété qui perd sa
+validation **cesse de remonter ses données en silence** : aucune alerte, aucune page cassée,
+juste des rapports qui se vident. C'est pour ça que ces fichiers n'ont l'air de rien.
+
+**Bing — validé le 28 octobre 2026, par deux voies redondantes :**
+
+- `public/BingSiteAuth.xml`, servi à la racine du site. Son contenu est imposé par Bing au
+  caractère près : ne pas le reformater, ne pas y ajouter de retour à la ligne final — le
+  fichier n'en a pas.
+- `site.analytics.bingSiteVerification`, qui émet la balise `msvalidate.01` sur toutes les pages.
+
+Les deux portent le même jeton et coexistent volontairement : si l'une disparaît, l'autre tient.
+C'est le montage déjà retenu sur le site de Lyon pour Google. Le workflow refuse de publier si le
+fichier manque de `dist/`.
+
+Bing alimente aussi Copilot et ChatGPT : ce n'est pas un moteur secondaire pour qui vend du
+dépannage, c'est l'autre moitié des réponses assistées.
+
+**Google — la propriété reste à créer.**
 
 `site.analytics.googleSiteVerification` est **vide**, volontairement. Un jeton vaut pour UNE
 propriété : celui de Lyon ne valide pas `serrurier-meaux.fr`. Tant que le champ est vide, la
 balise n'est pas émise — le site fonctionne, il ne remonte simplement aucune donnée de recherche.
+
+Si la propriété est créée en type **« Domaine »** plutôt qu'en « Préfixe d'URL », la validation
+passe par un enregistrement TXT chez Internet.bs et **ce champ restera vide pour toujours** :
+ce ne sera pas un oubli. Le type « Domaine » couvre d'un coup les quatre formes d'adresse du
+site (avec et sans `www`, en `http` et en `https`), là où « Préfixe d'URL » n'en suit qu'une.
 
 ## Structure du projet
 

@@ -106,18 +106,24 @@ export const site = {
     /**
      * Jeton de validation Bing Webmaster Tools, méthode « balise meta ».
      *
-     * Laissé vide volontairement : la balise n'est émise que s'il porte une
-     * valeur, pour ne pas servir un attribut `content` creux sur 47 pages.
+     * Renseigné le 28 octobre 2026, jeton obtenu dans Bing Webmaster Tools.
      *
-     * Dans la plupart des cas il restera vide, et c'est normal : Bing sait
-     * importer une propriété depuis Google Search Console, et cette voie valide
-     * le site sans aucune balise à poser. Ce champ ne sert qu'à la validation
-     * manuelle, si l'import venait à échouer.
+     * DEUXIÈME méthode de validation, volontairement redondante avec le
+     * fichier public/BingSiteAuth.xml, qui porte exactement le même jeton.
+     * Bing n'en exige qu'une seule, mais une propriété qui perd sa validation
+     * cesse de remonter ses données en silence, sans alerte : la seconde
+     * méthode tient si la première disparaît. C'est le montage déjà retenu
+     * sur le site de Lyon pour Google, et pour la même raison.
+     *
+     * Public par nature : ce jeton est lu dans le code source de la page. Il
+     * n'ouvre aucun accès au compte Bing.
      *
      * Bing alimente aussi Copilot et ChatGPT, d'où l'intérêt de ne pas s'en
-     * tenir à Google.
+     * tenir à Google. C'est le moteur qu'IndexNow prévient déjà à chaque
+     * déploiement (voir indexNowKey plus bas) : les deux se complètent, la
+     * validation donne les données, IndexNow accélère la découverte.
      */
-    bingSiteVerification: '',
+    bingSiteVerification: '411AD47D5794F5BF5F5723C206A1734A',
     /**
      * Clé IndexNow, propre au domaine serrurier-meaux.fr, générée le
      * 26 octobre 2026.

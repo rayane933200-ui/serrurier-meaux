@@ -119,6 +119,14 @@ jobs:
             echo "::error::Fichier de preuve IndexNow absent de dist/."
             exit 1
           fi
+          # Fichier de validation Bing Webmaster Tools. Même logique que
+          # ci-dessus : Bing revérifie la propriété périodiquement, et une
+          # propriété qui perd sa validation cesse de remonter ses données
+          # sans qu'aucune page du site ne paraisse cassée.
+          if [ ! -f dist/BingSiteAuth.xml ]; then
+            echo "::error::dist/BingSiteAuth.xml absent : la propriété Bing perdrait sa validation."
+            exit 1
+          fi
           # URL internes sans slash final dans les données structurées.
           #
           # Le site est en trailingSlash: 'always' : une URL sans slash final
@@ -148,7 +156,7 @@ jobs:
           # grep -o puis wc -l : le sitemap tient sur une seule ligne, compter
           # les lignes renverrait toujours 1.
           pages=$(grep -o '<loc>' dist/sitemap-0.xml | wc -l)
-          echo "$pages pages, .nojekyll, CNAME et clé IndexNow présents."
+          echo "$pages pages, .nojekyll, CNAME, clé IndexNow et validation Bing présents."
           if [ "$pages" -lt 40 ]; then
             echo "::error::Seulement $pages pages dans le sitemap, construction incomplète."
             exit 1
