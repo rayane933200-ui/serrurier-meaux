@@ -496,9 +496,19 @@ En attente — **ne rien inventer pour combler ces trous** :
       porter dans les mentions légales. Il n'a pas pu être vérifié à une source officielle pour
       GitHub, Inc. À relever à la main plutôt qu'à recopier d'un annuaire : publier un numéro
       faux sur une page opposable est pire que de ne pas en publier.
-- [ ] **Mot de passe o2switch à changer** — l'identifiant du compte figure dans l'historique
-      public de ce dépôt. Penser à reporter le nouveau mot de passe dans les secrets du dépôt de
-      Lyon, sinon son déploiement automatique cassera au prochain push.
+- [ ] **Mot de passe o2switch à changer** — hygiène, pas incident. L'historique public de ce
+      dépôt ne contient **aucun mot de passe** : le workflow n'a jamais écrit autre chose que
+      `${{ secrets.FTP_MOTDEPASSE }}`. Vérifié commit par commit le 30/10/2026. Ce qui est
+      lisible, c'est l'identifiant du compte, le nom du serveur et l'URL du panneau — de quoi
+      viser une attaque, pas de quoi entrer. Ne pas en faire une alerte à la fuite.
+      Au changement, reporter le nouveau mot de passe dans le secret `FTP_MOTDEPASSE` du dépôt
+      de Lyon : c'est le même mot de passe, et son déploiement cassera sinon au prochain push.
+      La vraie correction serait un **compte FTP dédié** cantonné au dossier du site, plutôt que
+      le compte maître — qui donne aujourd'hui à GitHub Actions les fichiers, les bases, les
+      emails et le panneau, pour publier des pages statiques. Écarté par Rayane le 30/10/2026,
+      à reproposer. Piège s'il est fait un jour : un compte FTP cantonné arrive **déjà** dans
+      son dossier, donc le `server-dir: public_html/` du workflow de Lyon écrirait dans
+      `public_html/public_html/`.
 - [ ] **Assurance décennale** — souscription confirmée par Rayane le 05/10/2026 et annoncée sur le
       site (`credentials.decennale`). Manquent **l'assureur, le n° de contrat et la couverture
       géographique** : la loi impose déjà de les porter sur chaque devis et chaque facture, il

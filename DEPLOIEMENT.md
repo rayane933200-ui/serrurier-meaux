@@ -181,10 +181,16 @@ paramètre d'URL quelconque.
   la règle de non-suppression sont dans CLAUDE.md. Le site est passé
   d'invisible à indexé en trois jours : pages générales, les six pages de
   prestation et les pages de commune.
-- **Mot de passe o2switch** : à changer. L'identifiant du compte figure dans
-  l'historique public de ce dépôt (commits `63df0ad` à `6f55bb8`). Penser à
-  reporter le nouveau mot de passe dans les secrets du dépôt de Lyon, sinon son
-  déploiement automatique cassera.
+- **Mot de passe o2switch** : à changer, par hygiène. L'historique public de ce
+  dépôt ne contient **aucun mot de passe** — vérifié commit par commit le
+  30 octobre 2026 — mais l'identifiant du compte, le nom du serveur et l'URL du
+  panneau y sont lisibles : commits `d0e569a`, `873d67f`, `6f55bb8`, `4e3acd5`
+  et `fc0daf7`, tous du 26 octobre. La fourchette « `63df0ad` à `6f55bb8` »
+  écrite ici auparavant était fausse aux deux bouts.
+  Reporter le nouveau mot de passe dans le secret `FTP_MOTDEPASSE` du dépôt de
+  Lyon, sinon son déploiement cassera au prochain push. La double
+  authentification de cPanel, si l'offre la propose, protège davantage que la
+  rotation elle-même : un identifiant connu reste connu.
 - **Téléphone de l'hébergeur** : la LCEN impose de le porter dans les mentions
   légales. `site.legal.host.phone` est vide, faute de source officielle
   vérifiable. À relever à la main.
