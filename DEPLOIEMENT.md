@@ -175,10 +175,12 @@ paramètre d'URL quelconque.
 
 ## Après la mise en ligne
 
-- **Search Console** : créer la propriété `serrurier-meaux.fr`, validation par
-  *balise HTML*, coller le jeton dans `site.analytics.googleSiteVerification`,
-  pousser. Tant que ce champ est vide, la balise n'est pas émise du tout.
-  Soumettre ensuite `https://serrurier-meaux.fr/sitemap-index.xml`.
+- **Moteurs de recherche** : fait. Bing validé le 28 octobre 2026
+  (`public/BingSiteAuth.xml` + balise `msvalidate.01`), Google le 30 octobre
+  en propriété « Domaine », validée par un TXT chez Internet.bs. Le détail et
+  la règle de non-suppression sont dans CLAUDE.md. Le site est passé
+  d'invisible à indexé en trois jours : pages générales, les six pages de
+  prestation et les pages de commune.
 - **Mot de passe o2switch** : à changer. L'identifiant du compte figure dans
   l'historique public de ce dépôt (commits `63df0ad` à `6f55bb8`). Penser à
   reporter le nouveau mot de passe dans les secrets du dépôt de Lyon, sinon son

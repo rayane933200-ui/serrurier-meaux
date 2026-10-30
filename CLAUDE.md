@@ -165,16 +165,28 @@ fichier manque de `dist/`.
 Bing alimente aussi Copilot et ChatGPT : ce n'est pas un moteur secondaire pour qui vend du
 dépannage, c'est l'autre moitié des réponses assistées.
 
-**Google — la propriété reste à créer.**
+**Google — validé le 30 octobre 2026, par enregistrement DNS.**
 
-`site.analytics.googleSiteVerification` est **vide**, volontairement. Un jeton vaut pour UNE
-propriété : celui de Lyon ne valide pas `serrurier-meaux.fr`. Tant que le champ est vide, la
-balise n'est pas émise — le site fonctionne, il ne remonte simplement aucune donnée de recherche.
+La propriété est de type **« Domaine »**, pas « Préfixe d'URL » : elle couvre d'un coup les
+quatre formes d'adresse du site — avec et sans `www`, en `http` et en `https` — là où un
+préfixe d'URL n'en suivrait qu'une, et laisserait croire à une chute de trafic chaque fois que
+les visiteurs arrivent par une autre forme.
 
-Si la propriété est créée en type **« Domaine »** plutôt qu'en « Préfixe d'URL », la validation
-passe par un enregistrement TXT chez Internet.bs et **ce champ restera vide pour toujours** :
-ce ne sera pas un oubli. Le type « Domaine » couvre d'un coup les quatre formes d'adresse du
-site (avec et sans `www`, en `http` et en `https`), là où « Préfixe d'URL » n'en suit qu'une.
+La preuve est un enregistrement TXT à l'apex du domaine, chez Internet.bs :
+
+```
+serrurier-meaux.fr  TXT  google-site-verification=_6-gb1nCryObBAjP_QU9nM4320kVZNw0vMNlLFre1eI
+```
+
+**Ne jamais le supprimer**, et ne jamais écraser les autres TXT du domaine en l'éditant : un
+domaine porte plusieurs TXT côte à côte, et les interfaces de registrar proposent volontiers de
+« remplacer » au lieu d'ajouter.
+
+`site.analytics.googleSiteVerification` reste **vide, et c'est définitif** : une validation par
+DNS ne passe pas par le site. Ce champ ne sert qu'à la méthode « balise HTML », qui n'a pas été
+retenue. Ce n'est donc pas un oubli — et surtout, **ne pas y recopier le jeton ci-dessus** : un
+jeton DNS et un jeton de balise sont deux valeurs différentes, et le premier ne vaut rien dans
+le `<head>`.
 
 ## Structure du projet
 
@@ -475,10 +487,11 @@ Réglé :
 - [x] Tarifs — mêmes montants qu'à Lyon, décision de Rayane du 26/10/2026
 - [x] Formulaire de contact — pas de backend : `QuoteForm.astro` ouvre la messagerie du visiteur via `mailto:` (site 100 % statique)
 - [x] Informations légales de base — SIREN/SIRET/APE/adresse, depuis l'avis SIRENE
+- [x] Validation Bing Webmaster Tools — 28/10/2026, fichier + balise (voir plus haut)
+- [x] Validation Google Search Console — 30/10/2026, propriété « Domaine » validée par DNS
 
 En attente — **ne rien inventer pour combler ces trous** :
 
-- [ ] **Jeton Search Console** — la propriété `serrurier-meaux.fr` reste à créer.
 - [ ] **Téléphone de l'hébergeur** — `site.legal.host.phone` est vide. La LCEN impose de le
       porter dans les mentions légales. Il n'a pas pu être vérifié à une source officielle pour
       GitHub, Inc. À relever à la main plutôt qu'à recopier d'un annuaire : publier un numéro
