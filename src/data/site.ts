@@ -126,7 +126,8 @@ export const site = {
     bingSiteVerification: '411AD47D5794F5BF5F5723C206A1734A',
     /**
      * Clé IndexNow, propre au domaine serrurier-meaux.fr, générée le
-     * 26 octobre 2026.
+     * 2 novembre 2026. Remplace la clé du 26 octobre, refusée par Bing en 403
+     * (UserForbiddedToAccessSite) alors que son fichier de preuve était en ligne.
      *
      * Elle DOIT être différente de celle du site de Lyon : le fichier de preuve
      * est servi par le domaine qui soumet, et une clé partagée ferait rejeter
@@ -149,7 +150,7 @@ export const site = {
      * public/ : si le nom du fichier et son contenu divergent d'un caractère,
      * les moteurs répondent 403 et les soumissions sont rejetées en silence.
      */
-    indexNowKey: 'fcbc5d1d92c988dcfcc31118a4ccf765',
+    indexNowKey: '98bd57fb6dd22faa60890c6c73e584bc',
     googleAdsId: 'AW-17731891576',
     /**
      * Action de conversion « appels depuis le site web », fournie par Rayane le
