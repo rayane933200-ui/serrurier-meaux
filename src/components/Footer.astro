@@ -25,6 +25,10 @@ const year = new Date().getFullYear();
         {services.map((service) => (
           <li><a href={`/services/${service.slug}/`}>{service.title}</a></li>
         ))}
+        {/* Hors src/data/services.ts : seule page du site dont la zone soit
+            Paris et l’Île-de-France. Elle est listée ici pour ne pas rester
+            orpheline — une page sans lien entrant n’est pas explorée. */}
+        <li><a href="/installation-serrure-porte-paris/">Installation à Paris / Île-de-France</a></li>
       </ul>
     </div>
 

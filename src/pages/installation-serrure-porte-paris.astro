@@ -1,0 +1,831 @@
+---
+// Page d'atterrissage « installation » — Paris et Île-de-France.
+//
+// POURQUOI ELLE EXISTE, ET POURQUOI ELLE N'EST PAS UNE PRESTATION DE PLUS.
+// Demandée par Rayane le 7 novembre 2026 : les enchères Google Ads sur la pose
+// planifiée sont très inférieures à celles de l'urgence, où tout le marché se
+// bat sur « serrurier ouverture de porte ». La page sert donc de cible d'annonce
+// sur un autre mot-clé, avec une autre géographie.
+//
+// Elle reste volontairement HORS de src/data/services.ts. L'y faire entrer
+// l'aurait propagée aux cartes de prestation, au tableau de /tarifs/ et au pied
+// de page avec un H1 « à Meaux » — alors que c'est précisément la seule page du
+// site dont la zone est Paris et l'Île-de-France. Les prestations gardent leur
+// géographie, celle-ci a la sienne.
+//
+// LES DEUX ZONES NE SE CONFONDENT PAS, et la page le dit explicitement :
+//   - urgence 24h/24, objectif 30 minutes → Meaux et les communes voisines ;
+//   - pose planifiée, sur rendez-vous      → Paris et l'Île-de-France.
+// Un déplacement de quarante kilomètres se planifie, il ne se promet pas en
+// trente minutes. Ne pas étendre la promesse d'urgence à cette page.
+//
+// LE PRIX. « À partir de 200 € » vient de Rayane. Il est présenté comme le
+// plancher de la POSE, déplacement compris, fourniture en sus — jamais comme le
+// prix d'une porte. Deux raisons :
+//   1. la grille du site est opposable (voir CLAUDE.md) : un visiteur peut
+//      exiger le montant affiché, et « porte à partir de 200 € » serait
+//      intenable là où le marché parisien annonce plusieurs milliers d'euros ;
+//   2. /tarifs/ publie déjà « serrure 3 points dès 349 € », fournie et posée.
+//      Sans la distinction pose / fourniture, les deux chiffres se
+//      contrediraient sur le même site.
+// Le déplacement est annoncé compris : c'est la lecture favorable au client, et
+// c'est la logique de forfait déjà retenue pour les 69 € de l'ouverture.
+//
+// AUCUNE MENTION DE TVA. Franchise en base, art. 293 B du CGI. Les pages
+// concurrentes relevées affichent « TTC, TVA 20 % » : ne pas les imiter là-dessus.
+//
+// LES PHOTOS sont les clichés de chantier de Rayane, déjà utilisés sur les pages
+// de zone. Les légendes décrivent l'ouvrage et jamais le lieu — la commune de
+// chacune n'est pas établie (voir src/assets/photos/CREDITS.md). C'est aussi le
+// différenciant : les pages concurrentes analysées n'illustrent leurs types de
+// porte qu'avec des pictogrammes.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import RelatedArticles from '../components/RelatedArticles.astro';
+import Faq from '../components/Faq.astro';
+import Icon from '../components/Icon.astro';
+import { Image } from 'astro:assets';
+import { brands, lockGrades, doorGrades } from '../data/brands';
+import { site } from '../data/site';
+
+import pBlindee from '../assets/photos/interventions/porte-blindee-posee.jpg';
+import pPalliere from '../assets/photos/interventions/porte-palliere-vue-interieure.jpg';
+import pBois from '../assets/photos/interventions/judas-et-serrure-porte-bois.jpg';
+import pService from '../assets/photos/interventions/cremone-porte-de-service.jpg';
+import pCoupeFeu from '../assets/photos/interventions/double-porte-coupe-feu.jpg';
+import pPalier from '../assets/photos/interventions/porte-de-palier-haut-escalier.jpg';
+import pApplique from '../assets/photos/interventions/serrure-multipoints-en-applique.jpg';
+import pCylindre from '../assets/photos/interventions/cylindre-remplace-plaque-de-proprete.jpg';
+import pMultipoints from '../assets/photos/interventions/cle-engagee-serrure-multipoints.jpg';
+import pGache from '../assets/photos/interventions/chant-de-porte-et-gache.jpg';
+
+const crumbs = [
+  { label: 'Accueil', href: '/' },
+  { label: 'Installation de serrure et de porte' },
+];
+
+const description =
+  'Installation de serrure et de porte à Paris et en Île-de-France : pose à partir de 200 €, déplacement compris, fourniture au devis gratuit. Serrures certifiées A2P, portes blindées.';
+
+// Les légendes reprennent mot pour mot celles de src/data/zones.ts : ce sont les
+// mêmes clichés, et une même photo ne doit pas être décrite de deux façons.
+const doorTypes = [
+  {
+    photo: pPalliere,
+    alt: 'Porte palière vue de l’intérieur, serrure et paumelles',
+    title: 'Porte palière d’appartement',
+    body:
+      'Le cas le plus fréquent en immeuble. La porte est rarement changée : on remplace la serrure, on passe en multipoints, on reprend la gâche et on règle les paumelles. L’accord du syndic n’est nécessaire que si l’aspect côté palier change.',
+  },
+  {
+    photo: pBlindee,
+    alt: 'Porte blindée posée, vue depuis le palier',
+    title: 'Porte blindée, bloc-porte complet',
+    body:
+      'Porte, bâti, serrure et paumelles forment un ensemble testé comme un tout. C’est la solution la plus résistante, et la seule qui se juge en grade BP. Elle suppose de déposer l’ancien dormant : le relevé se fait sur place, jamais au téléphone.',
+  },
+  {
+    photo: pBois,
+    alt: 'Judas optique et serrure encastrée sur une porte palière en bois',
+    title: 'Porte en bois existante',
+    body:
+      'Une porte ancienne se renforce souvent au lieu de se remplacer : serrure encastrée ou en applique, cornière anti-pince, judas, entrebâilleur. L’épaisseur du battant et l’état du chant décident de ce qui est possible.',
+  },
+  {
+    photo: pService,
+    alt: 'Crémone verticale sur une porte de service repeinte',
+    title: 'Porte de service, cave, local',
+    body:
+      'Crémone, verrou, serrure en applique : l’équipement est plus simple, mais c’est souvent le point faible d’un immeuble. Une cave mal fermée donne accès aux parties communes.',
+  },
+  {
+    photo: pCoupeFeu,
+    alt: 'Double porte coupe-feu et sa serrure, vue depuis le couloir',
+    title: 'Double porte et porte coupe-feu',
+    body:
+      'Deux vantaux, un vantail semi-fixe, et une contrainte de plus sur les portes coupe-feu : la quincaillerie posée ne doit pas annuler le classement au feu de l’ouvrage. Le matériel se choisit en conséquence.',
+  },
+  {
+    photo: pPalier,
+    alt: 'Porte de palier en haut d’une cage d’escalier',
+    title: 'Parties communes d’immeuble',
+    body:
+      'Porte de hall, d’escalier, de local technique. Pour un syndic ou un bailleur, l’organigramme compte autant que la serrure : une clé qui ouvre les communs sans ouvrir les logements, cela se conçoit avant d’acheter.',
+  },
+];
+
+const lockTypes = [
+  {
+    photo: pCylindre,
+    alt: 'Cylindre remplacé et plaque de propreté remise en place',
+    title: 'Cylindre seul',
+    body:
+      'Le barillet, la partie où entre la clé. On le change après une perte de clés ou un emménagement, sans toucher au mécanisme. C’est la pose la plus courte, et la moins chère.',
+  },
+  {
+    photo: pApplique,
+    alt: 'Serrure multipoints en applique sur une porte ancienne, tringles verticales apparentes',
+    title: 'Multipoints en applique',
+    body:
+      'Le coffre se fixe sur la face intérieure de la porte, les tringles verrouillent en haut et en bas. C’est la solution pour renforcer une porte ancienne qu’on ne peut pas entailler.',
+  },
+  {
+    photo: pMultipoints,
+    alt: 'Clé engagée dans une serrure multipoints',
+    title: 'Multipoints à larder',
+    body:
+      'Le coffre est encastré dans l’épaisseur du battant, trois, cinq ou sept points répartis sur la hauteur du dormant. L’effort d’une tentative d’effraction se répartit au lieu de se concentrer sur un point.',
+  },
+  {
+    photo: pGache,
+    alt: 'Chant de porte et gâche après intervention',
+    title: 'Gâches, chant et bâti',
+    body:
+      'La pièce qu’on oublie. Une serrure certifiée vissée dans une gâche d’origine tenue par deux vis courtes ne vaut pas ce qu’annonce son certificat : on reprend le dormant en même temps, ou le niveau de protection reste théorique.',
+  },
+];
+
+const steps = [
+  {
+    number: '1',
+    title: 'Vous décrivez la porte',
+    body: 'Par téléphone ou depuis le formulaire. Type de porte, immeuble ou maison, ce que vous cherchez à obtenir.',
+  },
+  {
+    number: '2',
+    title: 'Visite et devis gratuits',
+    body: 'Le relevé se fait sur place : une pose se chiffre sur la porte réelle. Le devis est détaillé, et sans frais si vous ne donnez pas suite.',
+  },
+  {
+    number: '3',
+    title: 'Pose sur rendez-vous',
+    body: 'À la date convenue, avec le matériel annoncé au devis. Une pose planifiée n’est pas une urgence : elle se prépare.',
+  },
+  {
+    number: '4',
+    title: 'Remise des clés et des papiers',
+    body: 'Clés, carte de propriété du cylindre quand le modèle en comporte une, facture détaillée et ancienne pièce déposée.',
+  },
+];
+
+// Zone de la pose planifiée. Paris intra-muros plus les sept autres
+// départements franciliens — la Seine-et-Marne, où se trouve Meaux, en fait
+// partie. Ne pas y lire une extension de la promesse d'urgence.
+const departements = [
+  'Paris (75) — les 20 arrondissements',
+  'Seine-et-Marne (77)',
+  'Yvelines (78)',
+  'Essonne (91)',
+  'Hauts-de-Seine (92)',
+  'Seine-Saint-Denis (93)',
+  'Val-de-Marne (94)',
+  'Val-d’Oise (95)',
+];
+
+const installFaq = [
+  {
+    question: 'Que couvrent exactement les 200 € ?',
+    answer:
+      'La pose, déplacement compris : le serrurier se déplace, dépose l’ancien équipement, installe le nouveau et le règle. La fourniture — la serrure, le cylindre ou la porte — est facturée en plus, au prix du modèle retenu. Les deux lignes sont séparées sur le devis comme sur la facture : c’est une obligation, et c’est ce qui vous permet de comparer deux propositions.',
+  },
+  {
+    question: 'Pourquoi le prix d’une porte blindée n’est-il pas affiché ?',
+    answer:
+      'Parce qu’il dépend du modèle, du grade visé et de l’état du bâti existant. Un chiffre annoncé sans avoir vu la porte serait soit faux, soit un prix d’appel destiné à faire décrocher le téléphone. Le relevé sur place est gratuit et le devis qui en sort est ferme.',
+  },
+  {
+    question: 'Faut-il l’accord du syndic ou du propriétaire ?',
+    answer:
+      'Changer une serrure ou un cylindre à l’identique ne demande aucune autorisation : c’est de l’entretien courant. En revanche, poser une porte blindée ou modifier l’aspect extérieur de la porte palière touche à l’harmonie des parties communes et demande l’accord de la copropriété, et celui du propriétaire si vous êtes locataire. Nous le signalons avant de chiffrer plutôt qu’après la pose.',
+  },
+  {
+    question: 'Intervenez-vous aussi en urgence à Paris ?',
+    answer:
+      'La pose planifiée couvre Paris et toute l’Île-de-France, sur rendez-vous. Le dépannage d’urgence 24h/24 avec un objectif de 30 minutes vaut pour Meaux et les communes voisines : annoncer le même délai à quarante kilomètres de là serait une promesse que personne ne tient.',
+  },
+  {
+    question: 'Quel niveau de certification choisir ?',
+    answer:
+      'A2P mesure un temps de résistance, pas une qualité déclarée : une étoile vaut cinq minutes, deux étoiles dix, trois étoiles quinze. Pour un appartement en étage, une ou deux étoiles suffisent le plus souvent. Un rez-de-chaussée, un accès sur cour ou un contrat d’assurance exigeant un niveau minimum orientent vers davantage. Vérifiez votre contrat avant de choisir : certains assureurs imposent un grade.',
+  },
+  {
+    question: 'Travaillez-vous pour les syndics et les bailleurs ?',
+    answer:
+      'Oui, sur devis, y compris pour des séries de portes et des organigrammes de clés. Une facture détaillée et une attestation d’assurance décennale vous sont remises : ce sont les deux pièces qu’un gestionnaire demande avant de référencer un artisan.',
+  },
+];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: 'Installation de serrure et de porte',
+    serviceType: 'Installation de serrure et de porte',
+    provider: { '@id': new URL('/#business', Astro.site).href },
+    // Pose planifiée : la zone est l'Île-de-France entière, Paris compris.
+    // C'est la seule page du site dont areaServed sorte du Pays de Meaux.
+    areaServed: [
+      { '@type': 'City', name: 'Paris' },
+      { '@type': 'AdministrativeArea', name: 'Île-de-France' },
+    ],
+    url: new URL('/installation-serrure-porte-paris/', Astro.site).href,
+    // minPrice plutôt que price : le montant est un plancher de pose, pas un
+    // tarif unique. Aucun champ de TVA n'est déclaré — l'entreprise est en
+    // franchise en base, et poser valueAddedTaxIncluded laisserait croire
+    // qu'une taxe s'ajoute ou se déduit.
+    offers: {
+      '@type': 'Offer',
+      priceSpecification: {
+        '@type': 'PriceSpecification',
+        priceCurrency: 'EUR',
+        minPrice: 200,
+      },
+      description:
+        'Pose à partir de 200 €, déplacement compris. Fourniture de la serrure ou de la porte chiffrée au devis, gratuit.',
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: installFaq.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  },
+];
+---
+
+<BaseLayout
+  title="Installation de serrure et de porte à Paris et en Île-de-France"
+  description={description}
+  jsonLd={jsonLd}
+  suffix={false}
+>
+  <Breadcrumbs items={crumbs} />
+
+  <section class="section page-hero">
+    <div class="container">
+      <p class="eyebrow">Paris et Île-de-France · pose sur rendez-vous</p>
+      <h1>Installation de serrure et de porte</h1>
+      <p class="hero-lead">
+        Serrure, cylindre, multipoints, porte blindée : la pose démarre à
+        <strong>200 €, déplacement compris</strong>. La fourniture est chiffrée au devis, après
+        avoir vu la porte — et le devis est gratuit, y compris si vous ne donnez pas suite.
+      </p>
+      <div class="page-hero-actions">
+        <a class="btn btn-primary" href={site.phoneHref}>
+          <Icon name="phone" size={18} />
+          <span>Appeler le {site.phoneDisplay}</span>
+        </a>
+        <a class="btn btn-outline" href="/contact/">Demander un devis gratuit</a>
+      </div>
+      <ul class="hero-points">
+        <li>
+          <Icon name="map-pin" size={18} />
+          <span>Les 20 arrondissements et les 8 départements franciliens</span>
+        </li>
+        <li>
+          <Icon name="shield" size={18} />
+          <span>Serrures certifiées A2P — Picard, Fichet, Bricard, Vachette</span>
+        </li>
+        <li>
+          <Icon name="clock" size={18} />
+          <span>Relevé sur place et devis détaillé avant tout engagement</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container content-column">
+      <h2>Ce que recouvrent les 200 €</h2>
+      <p>
+        C’est le plancher de la <strong>pose</strong> : le déplacement, la dépose de l’ancien
+        équipement, l’installation du nouveau et son réglage. La <strong>fourniture</strong> —
+        cylindre, serrure ou porte — s’ajoute, au prix du modèle que vous choisissez.
+      </p>
+      <p>
+        Les deux lignes sont séparées sur le devis comme sur la facture. Ce n’est pas une
+        présentation commerciale, c’est une obligation, et c’est surtout ce qui vous permet de
+        comparer deux propositions : un serrurier qui annonce un prix global sans détailler la
+        fourniture vous empêche de savoir ce que vous payez.
+      </p>
+      <p class="note-box">
+        <Icon name="shield" size={18} />
+        <span>
+          Un point à garder en tête : une serrure A2P trois étoiles posée sur un bâti d’origine ne
+          vaut pas quinze minutes de résistance. On entre à côté de la serrure. C’est pour cette
+          raison que le relevé se fait sur place, et que le devis mentionne la reprise du dormant
+          quand elle est nécessaire.
+        </span>
+      </p>
+      <p>
+        Nos <a href="/tarifs/">tarifs</a> sont publiés ligne par ligne, et le prix annoncé est
+        celui de la facture. Pour une intervention non planifiée — porte claquée, clé cassée —
+        c’est la grille d’<a href="/services/ouverture-de-porte/">urgence</a> qui s’applique, pas
+        celle-ci.
+      </p>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2>Les portes que nous équipons</h2>
+      <p class="section-lead">
+        Chaque type de porte impose ses contraintes, et ce sont elles qui décident du matériel,
+        pas le catalogue. Les photos ci-dessous sont les nôtres : des portes et des serrures que
+        nous avons réellement posées ou remplacées.
+      </p>
+      <div class="type-grid">
+        {doorTypes.map((item) => (
+          <article class="type-card">
+            <Image
+              src={item.photo}
+              alt={item.alt}
+              widths={[320, 480, 720]}
+              sizes="(max-width: 560px) 100vw, (max-width: 980px) 46vw, 30vw"
+              quality={72}
+              loading="lazy"
+            />
+            <div class="type-body">
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+      {/* La légende ne nomme aucun lieu : ces clichés viennent bien de nos
+          chantiers, mais la commune de chacun n'est pas établie. */}
+      <p class="photo-note">
+        Photos prises lors de nos interventions. Aucune image de banque d’images : cela se
+        vérifie d’un coup d’œil, et c’est le premier test de sérieux d’un site de serrurerie.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Les serrures que nous posons</h2>
+      <p class="section-lead">
+        Du simple cylindre au multipoints encastré. Le choix se fait sur la porte et sur l’usage,
+        et il se discute avant le devis.
+      </p>
+      <div class="lock-grid">
+        {lockTypes.map((item) => (
+          <article class="lock-card">
+            <Image
+              src={item.photo}
+              alt={item.alt}
+              widths={[280, 420, 600]}
+              sizes="(max-width: 560px) 100vw, (max-width: 980px) 46vw, 23vw"
+              quality={72}
+              loading="lazy"
+            />
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container content-column">
+      <h2>Les niveaux de protection, en minutes</h2>
+      <p>
+        La certification A2P est délivrée par le CNPP. Un laboratoire attaque le produit avec des
+        outils définis à l’avance, et chronomètre. Les étoiles ne sont donc pas un niveau de
+        qualité annoncé par le fabricant : c’est un nombre de minutes tenues face à quelqu’un qui
+        sait s’y prendre.
+      </p>
+
+      <h3>Les étoiles concernent la serrure</h3>
+      <div class="table-wrap">
+        <table class="grade-table">
+          <thead>
+            <tr>
+              <th scope="col">Grade</th>
+              <th scope="col">Résistance</th>
+              <th scope="col">Ce que ça vaut en pratique</th>
+            </tr>
+          </thead>
+          <tbody>
+            {lockGrades.map((grade) => (
+              <tr>
+                <th scope="row">{grade.label}</th>
+                <td class="grade-time">{grade.resistance}</td>
+                <td>{grade.comment}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Les grades BP concernent le bloc-porte entier</h3>
+      <div class="table-wrap">
+        <table class="grade-table">
+          <thead>
+            <tr>
+              <th scope="col">Grade</th>
+              <th scope="col">Résistance</th>
+              <th scope="col">Portée du test</th>
+            </tr>
+          </thead>
+          <tbody>
+            {doorGrades.map((grade) => (
+              <tr>
+                <th scope="row">{grade.label}</th>
+                <td class="grade-time">{grade.resistance}</td>
+                <td>{grade.comment}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Les marques que nous posons et le détail de leurs gammes sont sur la page
+        {' '}<a href="/marques-de-serrures/">marques de serrures et certification A2P</a>.
+      </p>
+      <ul class="brand-chips">
+        {brands.map((brand) => (
+          <li>{brand.name}</li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Comment se passe une pose</h2>
+      <ol class="steps">
+        {steps.map((step) => (
+          <li>
+            <span class="step-number">{step.number}</span>
+            <div>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container content-column">
+      <h2>Où nous intervenons</h2>
+      <p>
+        <strong>Pour une pose planifiée</strong>, le déplacement couvre Paris intra-muros et les
+        huit départements d’Île-de-France. La date se fixe ensemble, et le déplacement est compris
+        dans le prix de la pose.
+      </p>
+      <ul class="area-list">
+        {departements.map((dep) => (
+          <li>
+            <Icon name="map-pin" size={16} />
+            <span>{dep}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="note-box">
+        <Icon name="clock" size={18} />
+        <span>
+          <strong>À ne pas confondre avec l’urgence.</strong> Le dépannage 24h/24 avec un objectif
+          de 30 minutes vaut pour Meaux et les communes voisines — voir nos
+          {' '}<a href="/zones-intervention/">zones d’intervention</a>. Promettre le même délai à
+          l’autre bout de la région serait une promesse que personne ne tient, et nous préférons
+          l’écrire que de la laisser croire.
+        </span>
+      </p>
+    </div>
+  </section>
+
+  <Faq
+    items={installFaq}
+    title="Questions fréquentes sur l’installation"
+    intro="Les questions qui reviennent avant un devis de pose."
+  />
+
+  <RelatedArticles
+    slugs={[
+      'serrure-multipoints-combien-de-points',
+      'serrure-applique-encastree-carenee',
+      'securiser-son-logement-par-ou-commencer',
+    ]}
+  />
+
+  <CtaBanner
+    title="Décrivez-nous votre porte"
+    description="Le relevé sur place et le devis sont gratuits, et sans frais si vous ne donnez pas suite. Vous saurez ce que coûte la pose et ce que coûte le matériel, séparément."
+  />
+</BaseLayout>
+
+<style>
+  .page-hero {
+    background: var(--color-bg-alt);
+    padding-block: var(--space-lg);
+  }
+
+  .eyebrow {
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-gold-text);
+    margin-bottom: var(--space-xs);
+  }
+
+  .hero-lead {
+    max-width: 70ch;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .hero-lead strong {
+    color: var(--color-text);
+  }
+
+  .page-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+
+  .hero-points {
+    list-style: none;
+    margin: var(--space-md) 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs) var(--space-md);
+  }
+
+  .hero-points li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  .hero-points :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+  }
+
+  .content-column {
+    max-width: 78ch;
+  }
+
+  .content-column p,
+  .content-column li {
+    color: var(--color-text-muted);
+  }
+
+  .content-column strong {
+    color: var(--color-text);
+  }
+
+  .section-lead {
+    max-width: 70ch;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-md);
+  }
+
+  .note-box {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-gold);
+    border-radius: var(--radius);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .note-box :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+  }
+
+  /* Cartes illustrées — le point sur lequel les pages concurrentes relevées
+     n'alignent que des pictogrammes. La photo garde le ratio 4/3 des fichiers
+     sources, recadrés une fois pour toutes dans src/assets. */
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: var(--space-md);
+  }
+
+  .type-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .type-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* `height: auto` n'est pas décoratif, il est indispensable. <Image> écrit
+     width="1200" height="900" sur la balise, et global.css ne neutralise pas
+     cette hauteur : sans cette ligne, l'attribut l'emporte, aspect-ratio est
+     ignoré et chaque vignette est rendue en 303 × 900 px. Mesuré, pas supposé. */
+  .type-card :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: var(--color-bg-alt);
+  }
+
+  .type-body {
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+  }
+
+  .type-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .type-card p {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 0;
+  }
+
+  .photo-note {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    max-width: 70ch;
+    margin: var(--space-md) 0 0;
+  }
+
+  .lock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--space-md);
+  }
+
+  .lock-card :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-alt);
+    margin-bottom: var(--space-sm);
+  }
+
+  .lock-card h3 {
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .lock-card p {
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+    margin-bottom: 0;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    margin-bottom: var(--space-md);
+  }
+
+  .grade-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 34rem;
+  }
+
+  .grade-table th,
+  .grade-table td {
+    text-align: left;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--color-border-soft);
+    vertical-align: top;
+  }
+
+  .grade-table thead th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  .grade-table tbody th {
+    font-family: var(--font-heading);
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+
+  .grade-table td {
+    color: var(--color-text-muted);
+  }
+
+  .grade-time {
+    color: var(--color-gold-text);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .brand-chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .brand-chips li {
+    font-size: 0.85rem;
+    color: var(--color-gold-text);
+    border: 1px solid var(--color-border-ui);
+    border-radius: 999px;
+    padding: 0.2rem 0.75rem;
+  }
+
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: var(--space-md);
+  }
+
+  .steps li {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+  }
+
+  /* Pastille dorée : l'or est ici un REMPLISSAGE, pas du texte — le chiffre
+     posé dessus est noir et donne 8,98:1. Écrire color: var(--color-gold) sur
+     fond clair tomberait à 2,18:1 (voir la règle des trois ors, CLAUDE.md). */
+  .step-number {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--color-gold);
+    color: var(--color-black);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+  }
+
+  .steps h3 {
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .steps p {
+    color: var(--color-text-muted);
+    font-size: 0.93rem;
+    margin-bottom: 0;
+  }
+
+  .area-list {
+    list-style: none;
+    margin: 0 0 var(--space-md);
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 0.45rem;
+  }
+
+  .area-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  .area-list :global(svg) {
+    color: var(--color-gold-dark);
+    flex-shrink: 0;
+  }
+</style>

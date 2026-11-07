@@ -212,9 +212,33 @@ ajouter une entrée dans le fichier de données correspondant ; la page, le site
 interne du footer et les données structurées suivent automatiquement. Ne pas recréer de tableaux
 de contenu en dur dans une page.
 
-Le site compte **60 pages** générées : 14 pages fixes (dont tarifs, assurance habitation,
-après un cambriolage, marques de serrures, politique de confidentialité, blog et 404),
-5 pages prestation, 20 pages locales, 20 articles de blog.
+Le site compte **61 pages** générées : 15 pages fixes (dont tarifs, assurance habitation,
+après un cambriolage, marques de serrures, installation Paris / Île-de-France, politique de
+confidentialité, blog et 404), 5 pages prestation, 20 pages locales, 20 articles de blog.
+
+### `/installation-serrure-porte-paris/` : la seule page qui sorte de Meaux
+
+Ajoutée le 7 novembre 2026, à la demande de Rayane : les enchères Google Ads sur la pose
+planifiée sont très inférieures à celles de l'urgence. C'est une cible d'annonce, pas une
+prestation de plus — d'où trois règles qui ne se devinent pas en lisant le fichier.
+
+**Elle n'est pas dans `src/data/services.ts`, et ne doit pas y entrer.** L'y mettre la
+propagerait aux cartes de prestation, au tableau de `/tarifs/` et au pied de page avec un H1
+« à Meaux », alors que c'est la seule page du site dont la zone soit Paris et l'Île-de-France.
+Elle est rattachée à la main dans `Footer.astro` pour ne pas rester orpheline.
+
+**Les deux zones ne se confondent pas**, et la page le dit en toutes lettres :
+pose planifiée sur rendez-vous → Paris et l'Île-de-France ; urgence 24h/24 avec objectif de
+30 minutes → Meaux et les communes voisines. Un déplacement de quarante kilomètres se
+planifie, il ne se promet pas en trente minutes. Ne pas étendre la promesse d'urgence ici, ni
+l'inverse.
+
+**Les 200 € sont un plancher de POSE, déplacement compris, fourniture en sus.** Le montant
+vient de Rayane et il est opposable comme le reste de la grille. Présenté comme le prix d'une
+porte, il serait intenable — le marché parisien publie des blocs-portes à plusieurs milliers
+d'euros — et il contredirait le « serrure 3 points dès 349 €, fournie et posée » de
+`/tarifs/`. La distinction pose / fourniture est ce qui rend les deux chiffres compatibles :
+ne pas la gommer pour « simplifier le message ».
 
 Le blog suit le même principe : `src/data/articles/<slug>.ts` par article, agrégés par
 `src/data/articles.ts`. Les paragraphes sont rendus avec `set:html` pour que les liens de
