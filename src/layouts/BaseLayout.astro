@@ -3,6 +3,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import StickyCallBar from '../components/StickyCallBar.astro';
 import GoogleTag from '../components/GoogleTag.astro';
+import BingUetTag from '../components/BingUetTag.astro';
 import CookieBanner from '../components/CookieBanner.astro';
 import { getImage } from 'astro:assets';
 import { site } from '../data/site';
@@ -189,6 +190,12 @@ const schemas = [localBusiness, ...(estAccueil ? [webSite] : []), ...extraSchema
         la bibliothèque Google ne s'exécute, et rien de ce qui précède n'en
         dépend. Aucun cookie n'est écrit tant que le visiteur n'a pas accepté. */}
     <GoogleTag />
+
+    {/* Même principe pour la régie de Microsoft. Les deux balises sont
+        indépendantes — ordre indifférent entre elles — mais toutes deux lisent
+        le choix du visiteur avant de charger quoi que ce soit, et le bandeau
+        met les deux à jour d'un seul geste. */}
+    <BingUetTag />
   </head>
   <body>
     <a href="#main" class="skip-link">Aller au contenu principal</a>

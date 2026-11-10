@@ -28,9 +28,9 @@ const { consentKey } = site.analytics;
 >
   <div class="container cookie-inner">
     <p class="cookie-text">
-      Ce site utilise un cookie de mesure publicitaire qui indique à Google Ads
-      si une visite provient d'une annonce. Il reste facultatif : le site
-      fonctionne à l'identique sans lui.
+      Ce site utilise des cookies de mesure publicitaire qui indiquent à Google
+      Ads et à Microsoft Advertising si une visite provient d'une annonce. Ils
+      restent facultatifs : le site fonctionne à l'identique sans eux.
       {' '}<a href="/politique-de-confidentialite/">En savoir plus</a>.
     </p>
     <div class="cookie-actions">
@@ -64,10 +64,11 @@ const { consentKey } = site.analytics;
       }
     }
 
-    // Le mode consentement de Google empêche d'écrire de nouveaux cookies, il
-    // ne supprime pas ceux déjà posés. Un visiteur qui accepte puis se ravise
-    // garderait donc _gcl_au sur son appareil pendant quatre-vingt-dix jours.
-    // Retirer son consentement doit produire un effet visible : on efface.
+    // Les modes consentement de Google et de Microsoft empêchent d'écrire de
+    // nouveaux cookies, ils ne suppriment pas ceux déjà posés. Un visiteur qui
+    // accepte puis se ravise garderait donc _gcl_au sur son appareil pendant
+    // quatre-vingt-dix jours, et _uetvid pendant treize mois. Retirer son
+    // consentement doit produire un effet visible : on efface.
     function effacerTraceurs() {
       var hote = window.location.hostname;
       // Le cookie peut être posé sur l'hôte exact, sur le domaine préfixé d'un
@@ -78,7 +79,12 @@ const { consentKey } = site.analytics;
 
       document.cookie.split(';').forEach(function (brut) {
         var nom = brut.split('=')[0].trim();
-        if (nom.indexOf('_gcl') !== 0 && nom.indexOf('_ga') !== 0) return;
+        // _uet* : cookies de premier niveau de la balise UET de Microsoft
+        // (_uetsid, _uetvid, _uetmsclkid). Les cookies posés par Microsoft sur
+        // son propre domaine (MUID) ne sont pas accessibles depuis cette page
+        // et ne peuvent pas être effacés ici — c'est au navigateur de les
+        // gérer, et la politique de confidentialité le dit.
+        if (nom.indexOf('_gcl') !== 0 && nom.indexOf('_ga') !== 0 && nom.indexOf('_uet') !== 0) return;
         domaines.forEach(function (d) {
           document.cookie =
             nom + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/' +
@@ -96,6 +102,12 @@ const { consentKey } = site.analytics;
           ad_personalization: etat,
           analytics_storage: etat,
         });
+      }
+      // Microsoft n'expose qu'ad_storage. Le push fonctionne avant comme après
+      // le chargement de bat.js : tant que la bibliothèque n'est pas là, uetq
+      // est une simple file qu'elle rejouera.
+      if (window.uetq && typeof window.uetq.push === 'function') {
+        window.uetq.push('consent', 'update', { ad_storage: etat });
       }
       if (etat === 'denied') effacerTraceurs();
     }

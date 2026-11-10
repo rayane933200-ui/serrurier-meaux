@@ -1,0 +1,95 @@
+---
+// Balise UET (Universal Event Tracking) du compte Microsoft Advertising —
+// suivi des conversions des campagnes payantes sur Bing.
+//
+// C'est le pendant exact de GoogleTag.astro pour l'autre régie. Microsoft Ads
+// sert Bing, Yahoo, DuckDuckGo et Ecosia ; les enchères y sont nettement moins
+// disputées que sur Google, d'où l'intérêt d'y mesurer les conversions.
+//
+// Conformité : UET est un traceur publicitaire. L'article 82 de la loi
+// Informatique et Libertés impose le consentement PRÉALABLE du visiteur. Le
+// mode consentement de Microsoft est donc posé à « denied » AVANT le
+// chargement de bat.js : tant que le visiteur n'a pas accepté, la balise ne lit
+// ni n'écrit aucun cookie de premier niveau (_uetsid, _uetvid). Le bandeau
+// (CookieBanner.astro) envoie ensuite la mise à jour, dans le même geste que
+// pour Google — un seul choix pilote les deux régies.
+//
+// Coller la balise brute fournie par Microsoft, sans ce préambule, rendrait le
+// site non conforme et ferait mentir la politique de confidentialité, qui
+// décrit ces cookies nommément.
+import { site } from '../data/site';
+
+const { bingUetTagId, bingCallEventName, consentKey } = site.analytics;
+---
+
+{
+  bingUetTagId && (
+    <>
+      {/* is:inline : ce script doit s'exécuter pendant l'analyse du document,
+          avant que la file uetq ne soit rejouée par la bibliothèque. Astro le
+          laisserait sinon en module différé, donc après. */}
+      <script is:inline define:vars={{ bingUetTagId, consentKey }}>
+        window.uetq = window.uetq || [];
+
+        var choixEnregistre = null;
+        try {
+          choixEnregistre = window.localStorage.getItem(consentKey);
+        } catch (e) {
+          // Navigation privée ou stockage bloqué : on reste sur le refus.
+        }
+
+        // Microsoft n'expose qu'un seul paramètre, ad_storage, là où Google en
+        // compte quatre. Refusé, UET ne lit ni n'écrit de cookie de premier
+        // niveau et n'en dépose aucun de tiers.
+        window.uetq.push('consent', 'default', {
+          ad_storage: choixEnregistre === 'accepte' ? 'granted' : 'denied',
+        });
+
+        // Snippet officiel de Microsoft Advertising, laissé tel qu'il est
+        // généré par l'interface : il crée la file, charge bat.js, puis rejoue
+        // la file — dont l'appel de consentement ci-dessus — dans l'instance
+        // UET. Ne pas le reformater : c'est la forme que le support Microsoft
+        // reconnaît.
+        (function (w, d, t, u, o) {
+          (w[u] = w[u] || []), (o.ts = new Date().getTime());
+          var n = d.createElement(t);
+          n.src = 'https://bat.bing.net/bat.js?ti=' + o.ti + ('uetq' != u ? '&q=' + u : '');
+          n.async = 1;
+          n.onload = n.onreadystatechange = function () {
+            var s = this.readyState;
+            (s && 'loaded' !== s && 'complete' !== s) ||
+              ((o.q = w[u]), (w[u] = new UET(o)), w[u].push('pageLoad'), (n.onload = n.onreadystatechange = null));
+          };
+          var i = d.getElementsByTagName(t)[0];
+          i.parentNode.insertBefore(n, i);
+        })(window, document, 'script', 'uetq', { ti: bingUetTagId, enableAutoSpaTracking: true });
+      </script>
+
+      {/* Conversion « clic sur le numéro ». Un seul écouteur délégué sur le
+          document couvre tous les liens d'appel du site — en-tête, barre fixe,
+          bandeaux, pied de page, articles — y compris ceux qui apparaîtraient
+          plus tard. C'est pour cela qu'on ne pose pas de onclick sur chaque
+          lien comme le suggère la documentation de Microsoft : il faudrait
+          penser à le répéter dans chaque nouveau composant, et un oubli ne
+          produit aucune erreur visible.
+
+          Volontairement sans attente d'accusé de réception : sur un site de
+          dépannage d'urgence, retarder le déclenchement du téléphone pour
+          attendre la confirmation de Microsoft serait payer une statistique
+          avec un appel.
+
+          Le consentement est géré en amont : refusé, UET n'attribue rien. */}
+      <script is:inline define:vars={{ bingCallEventName }}>
+        document.addEventListener('click', function (evenement) {
+          var cible = evenement.target;
+          if (!cible || typeof cible.closest !== 'function') return;
+
+          var lien = cible.closest('a[href^="tel:"]');
+          if (!lien || !window.uetq || typeof window.uetq.push !== 'function') return;
+
+          window.uetq.push('event', bingCallEventName, {});
+        });
+      </script>
+    </>
+  )
+}

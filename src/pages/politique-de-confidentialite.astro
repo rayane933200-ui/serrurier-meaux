@@ -66,13 +66,13 @@ const processings: Processing[] = [
   {
     name: 'Mesure des conversions publicitaires',
     purpose:
-      'Savoir si une visite provient d’une annonce Google Ads et laquelle a donné lieu à un appel ou à une demande de devis, afin de régler les campagnes.',
+      'Savoir si une visite provient d’une annonce Google Ads ou Microsoft Advertising (Bing) et laquelle a donné lieu à un appel ou à une demande de devis, afin de régler les campagnes.',
     data:
-      'Identifiant de clic publicitaire déposé dans un cookie, page consultée, adresse IP et informations techniques du navigateur transmises à Google. Si vous appelez depuis une visite issue d’une annonce : date, heure et durée de l’appel, ainsi que les premiers chiffres de votre numéro, relevés par le service de transfert de Google.',
+      'Identifiant de clic publicitaire déposé dans un cookie, page consultée, adresse IP et informations techniques du navigateur transmises à Google et à Microsoft. Si vous appelez depuis une visite issue d’une annonce : date, heure et durée de l’appel, ainsi que les premiers chiffres de votre numéro, relevés par le service de transfert de Google.',
     basis:
       'Article 6.1.a du RGPD et article 82 de la loi Informatique et Libertés — votre consentement, recueilli par le bandeau affiché à votre première visite. Les données partent une fois que vous avez accepté, et votre choix reste modifiable à tout moment.',
     retention:
-      'Quatre-vingt-dix jours pour le cookie déposé sur votre appareil. Les statistiques agrégées sont conservées par Google selon ses propres durées.',
+      'Quatre-vingt-dix jours pour le cookie de Google, treize mois au plus pour ceux de Microsoft. Les statistiques agrégées sont conservées par chaque régie selon ses propres durées.',
   },
   {
     name: 'Journaux techniques du serveur d’hébergement',
@@ -225,7 +225,7 @@ const rights: { name: string; text: string }[] = [
         l’écart de toute cession, location ou revente à des tiers.
       </p>
       <p>
-        Deux prestataires techniques interviennent nécessairement dans la chaîne :
+        Trois prestataires techniques interviennent dans la chaîne :
       </p>
       <ul>
         <li>
@@ -236,9 +236,15 @@ const rights: { name: string; text: string }[] = [
           l’information qu’une visite issue d’une annonce a eu lieu.
         </li>
         <li>
+          <strong>Microsoft Corporation</strong>, comme régie publicitaire, si et seulement si
+          vous avez accepté la mesure des conversions : Microsoft reçoit alors l’information
+          qu’une visite issue d’une annonce Bing a eu lieu.
+        </li>
+        <li>
           <strong>{legal.host.name}</strong>, hébergeur du site, établi à
           {' '}{legal.host.address.replace(', France', '')}. Ses journaux serveur enregistrent
-          les adresses IP des visiteurs. Les données restent en France.
+          les adresses IP des visiteurs. Voir la section suivante sur les transferts hors de
+          l’Union européenne.
         </li>
       </ul>
 
@@ -251,10 +257,11 @@ const rights: { name: string; text: string }[] = [
         au droit des États-Unis.
       </p>
       <p>
-        Deux autres flux sont susceptibles d’être traités aux États-Unis, tous deux liés à Google
-        LLC : les messages reçus à l’adresse de contact, hébergés sur sa messagerie, et, si vous
-        l’avez accepté, les données de mesure publicitaire. Refuser la mesure publicitaire
-        supprime le second.
+        D’autres flux sont susceptibles d’être traités aux États-Unis : les messages reçus à
+        l’adresse de contact, hébergés sur la messagerie de Google LLC, et, si vous l’avez
+        accepté, les données de mesure publicitaire adressées à Google LLC et à Microsoft
+        Corporation, toutes deux sociétés de droit américain. Refuser la mesure publicitaire
+        supprime ces derniers.
       </p>
       <p>
         L’encadrement précis de ces transferts relève des garanties publiées par chacun de ces
@@ -275,17 +282,23 @@ const rights: { name: string; text: string }[] = [
         devis et le numéro d’appel restent pleinement utilisables si vous refusez tout dépôt.
       </p>
       <p>
-        Un seul traceur peut être déposé, celui de la régie <strong>Google Ads</strong>. Il
-        indique si votre visite fait suite à une annonce, ce qui permet de savoir quelles
-        annonces amènent réellement des demandes. Il est soumis à votre consentement : à votre
-        première visite, un bandeau vous propose de l’accepter ou de le refuser, et les deux
-        réponses demandent le même effort. La balise reste en mode refus, sans rien écrire sur
-        votre appareil, aussi longtemps que vous n’avez pas accepté.
+        Les seuls traceurs susceptibles d’être déposés sont ceux des deux régies publicitaires
+        sur lesquelles le site est diffusé : <strong>Google Ads</strong> et
+        <strong>Microsoft Advertising</strong>, la régie de Bing. Ils indiquent si votre visite
+        fait suite à une annonce, ce qui permet de savoir quelles annonces amènent réellement des
+        demandes. Ils sont soumis à votre consentement : à votre première visite, un bandeau vous
+        propose de les accepter ou de les refuser, et les deux réponses demandent le même effort.
+        Les deux balises restent en mode refus, sans rien écrire sur votre appareil, aussi
+        longtemps que vous n’avez pas accepté. Votre choix vaut pour les deux à la fois.
       </p>
       <dl>
         <div>
-          <dt>Nom du cookie</dt>
-          <dd><code>_gcl_au</code>, déposé par ce site pour le compte de Google Ads.</dd>
+          <dt>Nom des cookies</dt>
+          <dd>
+            <code>_gcl_au</code>, déposé par ce site pour le compte de Google Ads.
+            {' '}<code>_uetsid</code> et <code>_uetvid</code>, déposés par ce site pour le compte
+            de Microsoft Advertising.
+          </dd>
         </div>
         <div>
           <dt>Finalité</dt>
@@ -293,7 +306,19 @@ const rights: { name: string; text: string }[] = [
         </div>
         <div>
           <dt>Durée</dt>
-          <dd>Quatre-vingt-dix jours.</dd>
+          <dd>
+            Quatre-vingt-dix jours pour le cookie de Google. Une session pour
+            <code>_uetsid</code>, treize mois au plus pour <code>_uetvid</code>.
+          </dd>
+        </div>
+        <div>
+          <dt>Cookies déposés par Microsoft lui-même</dt>
+          <dd>
+            Si vous acceptez, Microsoft peut également déposer un identifiant sur son propre
+            domaine (<code>MUID</code>). Celui-là n’est pas accessible depuis ce site et ne peut
+            donc pas être effacé par le bandeau : il se supprime depuis les paramètres de votre
+            navigateur, en vidant les données des sites Microsoft.
+          </dd>
         </div>
         <div>
           <dt>Votre choix</dt>

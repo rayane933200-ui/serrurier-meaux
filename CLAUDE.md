@@ -341,11 +341,34 @@ effacées en transit. Leur répartition sur les pages suit l'ordre des pages :
 c'est éditorial, pas géographique. Ne jamais y ajouter de localisation sans
 confirmation explicite.
 
-### Balise Google Ads et consentement
+### Balises publicitaires et consentement
 
-Le site charge la balise Google (gtag.js) du compte Google Ads pour le suivi des
-conversions. L'identifiant vit dans `site.analytics` ; le supprimer désactive
-l'ensemble.
+Le site charge **deux** balises de suivi des conversions, une par régie :
+
+| Régie | Composant | Identifiant |
+|---|---|---|
+| Google Ads | `GoogleTag.astro` (gtag.js) | `site.analytics.googleAdsId` |
+| Microsoft Advertising (Bing) | `BingUetTag.astro` (UET) | `site.analytics.bingUetTagId` |
+
+Vider l'identifiant désactive la balise correspondante, bandeau compris — le
+composant n'émet alors plus rien.
+
+La balise Bing a été ajoutée le 10 novembre 2026, les enchères Microsoft Ads
+étant nettement moins disputées que celles de Google. Elle couvre Bing, Yahoo,
+DuckDuckGo et Ecosia.
+
+**Google identifie ses conversions par une étiquette opaque, Microsoft par un nom
+d'événement** (`site.analytics.bingCallEventName`, aujourd'hui `appel`). Ce nom
+doit correspondre au caractère près à celui déclaré dans l'interface Microsoft
+Advertising : s'il diverge, les clics partent dans le vide **sans qu'aucune
+erreur ne paraisse**, ni dans la console ni sur le site.
+
+Les deux balises suivent les clics sur les liens d'appel par un **écouteur
+délégué sur le document**, et non par un `onclick` posé sur chaque lien comme le
+suggère la documentation de Microsoft. Un seul écouteur couvre l'en-tête, la
+barre fixe, les bandeaux, le pied de page et les articles, y compris les liens
+ajoutés plus tard — alors qu'un `onclick` oublié dans un nouveau composant ne
+produit, là encore, aucune erreur visible.
 
 **Le compte Google Ads est celui de l'entreprise, pas celui d'une ville** : les identifiants sont
 donc les mêmes que sur le site de Lyon, et c'est voulu. En revanche les conversions des deux
@@ -353,21 +376,37 @@ sites se mélangeront dans les mêmes colonnes. Pour les distinguer, c'est au ni
 que ça se règle — une campagne par ville, avec son ciblage géographique et ses URL finales — pas
 dans le code.
 
-C'est un traceur publicitaire au sens de l'article 82 de la loi Informatique et
-Libertés : il exige le consentement **préalable** du visiteur. Le montage tient en
-deux composants et ne doit pas être simplifié :
+Ce sont des traceurs publicitaires au sens de l'article 82 de la loi
+Informatique et Libertés : ils exigent le consentement **préalable** du
+visiteur. Le montage tient en trois composants et ne doit pas être simplifié :
 
 - `GoogleTag.astro` pose le mode consentement de Google sur `denied` avant de
   charger la bibliothèque. Tant que le visiteur n'a pas accepté, aucun cookie
   n'est écrit.
-- `CookieBanner.astro` recueille le choix et envoie la mise à jour. Refuser et
-  accepter sont deux boutons de taille et de style identiques, comme la CNIL
-  l'exige, et le lien « Cookies » du pied de page rouvre le bandeau pour revenir
-  sur sa décision.
+- `BingUetTag.astro` fait de même pour Microsoft, qui n'expose qu'un seul
+  paramètre, `ad_storage`, là où Google en compte quatre. L'appel `consent`
+  `default` doit rester **avant** le chargement de `bat.js` dans le même script :
+  déplacé après, il arrive trop tard et des cookies sont déposés sans accord.
+- `CookieBanner.astro` recueille le choix **une seule fois** et met les deux
+  régies à jour du même geste. Refuser et accepter sont deux boutons de taille
+  et de style identiques, comme la CNIL l'exige, et le lien « Cookies » du pied
+  de page rouvre le bandeau pour revenir sur sa décision.
 
-Coller la balise brute fournie par Google, sans le mode consentement ni le
-bandeau, rendrait le site non conforme et ferait mentir les mentions légales et
-la politique de confidentialité, qui décrivent ce cookie nommément.
+Le bandeau efface aussi les cookies déjà posés quand le visiteur se ravise
+(`_gcl*`, `_ga*`, `_uet*`) : un mode consentement empêche d'écrire, il ne
+supprime pas. Le `MUID` que Microsoft pose sur **son propre domaine** échappe à
+ce nettoyage — il n'est pas accessible depuis la page, et la politique de
+confidentialité le dit plutôt que de laisser croire le contraire.
+
+Coller les balises brutes fournies par Google et Microsoft, sans le mode
+consentement ni le bandeau, rendrait le site non conforme et ferait mentir les
+mentions légales et la politique de confidentialité, qui décrivent ces cookies
+nommément.
+
+Vérification du montage, à refaire après toute modification : page chargée sans
+choix enregistré → `document.cookie` **vide** ; après « Accepter » → `_gcl_au`,
+`_uetsid` et `_uetvid` ; après « Refuser » → vide à nouveau. Mesuré le
+10 novembre 2026, les trois états conformes.
 
 ### Blanc épuré : la règle des trois ors
 

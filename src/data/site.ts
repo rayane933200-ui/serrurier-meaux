@@ -170,6 +170,29 @@ export const site = {
      * faute de quoi la colonne Conversions compte deux fois le même appel.
      */
     callClickLabel: 'AW-17731891576/VABTCKXq4IMdEPjinIdC',
+    /**
+     * Identifiant de la balise UET (Universal Event Tracking) du compte
+     * Microsoft Advertising, fourni par Rayane le 10 novembre 2026. C'est
+     * l'équivalent Bing de googleAdsId : il mesure les conversions des
+     * campagnes Microsoft Ads, qui servent Bing, Yahoo, DuckDuckGo et Ecosia.
+     *
+     * Microsoft vérifie de son côté que la balise est bien présente sur le
+     * site avant de déclarer le suivi actif. La vérification peut demander
+     * jusqu'à vingt-quatre heures.
+     *
+     * Vider ce champ désactive entièrement la balise, bandeau compris : le
+     * composant n'émet rien si l'identifiant est absent.
+     */
+    bingUetTagId: '187287276',
+    /**
+     * Nom de l'événement de conversion « appel » déclaré dans Microsoft
+     * Advertising. Contrairement à Google, Microsoft n'identifie pas la
+     * conversion par une étiquette opaque mais par un nom d'événement choisi
+     * dans l'interface : il doit correspondre AU CARACTÈRE PRÈS à celui
+     * configuré côté compte, sinon les clics partent dans le vide sans qu'aucune
+     * erreur ne paraisse.
+     */
+    bingCallEventName: 'appel',
     /** Clé de stockage du choix du visiteur (localStorage). */
     consentKey: 'consentement-mesure',
   },
