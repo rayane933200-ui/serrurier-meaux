@@ -60,6 +60,20 @@ export interface Zone {
   postalCode: string;
   type: 'quartier' | 'commune';
   /**
+   * Centre de la commune, [longitude, latitude]. Source : API Découpage
+   * administratif de l'État (geo.api.gouv.fr), relevé le 10 novembre 2026.
+   *
+   * Sert à classer les « communes les plus proches » de chaque page par
+   * distance réelle. Jusque-là, les quatorze pages de commune affichaient
+   * toutes la même liste — les huit premières par distance à Meaux — sous le
+   * titre « Communes voisines » : à Isles-lès-Villenoy, on y lisait Poincy et
+   * Trilport, qui sont de l'autre côté de Meaux.
+   *
+   * Absent sur les quartiers : ils sont tous dans Meaux, et un centre de
+   * quartier n'est publié par aucune source officielle.
+   */
+  centre?: [number, number];
+  /**
    * Quartiers ou secteurs desservis, facultatif.
    *
    * Volontairement absent sur les villes voisines : ce sont des
@@ -215,6 +229,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Poincy — 24h/24',
     postalCode: '77470',
     type: 'commune',
+    centre: [2.9239, 48.9739],
     intro:
       "Poincy est la commune la plus proche de Meaux, à peine à deux kilomètres et demi du centre, sur la rive droite de la Marne. Village de taille modeste, habitat individuel. La proximité joue en votre faveur sur le délai : donnez l'adresse avec un repère visible depuis la rue, le reste du temps se perd rarement sur la route mais sur les derniers mètres.",
   },
@@ -229,6 +244,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Nanteuil-lès-Meaux — 24h/24',
     postalCode: '77100',
     type: 'commune',
+    centre: [2.9019, 48.9317],
     intro:
       "Nanteuil-lès-Meaux jouxte Meaux au sud et partage son code postal. C'est la plus peuplée des communes voisines, très majoritairement pavillonnaire. Sur une maison, la sécurisation ne s'arrête pas à la porte d'entrée : porte de garage, porte de service et baies arrière comptent autant, et c'est souvent par là qu'on entre. Nous regardons l'ensemble avant de chiffrer.",
   },
@@ -243,6 +259,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Crégy-lès-Meaux — 24h/24',
     postalCode: '77124',
     type: 'commune',
+    centre: [2.874, 48.9759],
     intro:
       "Crégy-lès-Meaux touche Meaux au nord-ouest et mêle pavillons et petits collectifs. Dites-nous au téléphone s'il s'agit d'une maison ou d'un immeuble, et si un hall est à franchir : cela détermine à la fois le matériel embarqué et le temps réel pour arriver devant votre porte.",
   },
@@ -257,6 +274,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Fublaines — 24h/24',
     postalCode: '77470',
     type: 'commune',
+    centre: [2.9433, 48.9385],
     intro:
       "Fublaines borde Meaux à l'est. Pour un remplacement de serrure, la marque et le modèle posés chez vous orientent le choix : nous posons Picard, Fichet, Bricard et Vachette. Si vous pouvez photographier la serrure et la tranche de la porte avant notre venue, le devis est plus précis dès le premier passage.",
   },
@@ -271,6 +289,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Mareuil-lès-Meaux — 24h/24',
     postalCode: '77100',
     type: 'commune',
+    centre: [2.8769, 48.9252],
     intro:
       "Mareuil-lès-Meaux borde Meaux au sud et partage son code postal. Habitat principalement individuel. Après un déménagement ou l'achat d'une maison, le changement de cylindre est la première chose à faire : vous ne savez pas combien de clés circulent, et c'est une opération courte qui ne touche pas à la porte.",
   },
@@ -285,6 +304,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Villenoy — 24h/24',
     postalCode: '77124',
     type: 'commune',
+    centre: [2.8516, 48.9406],
     intro:
       "Villenoy touche Meaux à l'ouest. Si votre clé tourne dans le vide ou si elle s'est cassée dans le canon, ne forcez pas et n'essayez pas de l'extraire avec une pince : un bout de clé enfoncé plus loin transforme une extraction de dix minutes en remplacement de cylindre. Laissez la serrure en l'état, nous arrivons.",
   },
@@ -295,6 +315,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Trilport — 24h/24',
     postalCode: '77470',
     type: 'commune',
+    centre: [2.9661, 48.9583],
     intro:
       "Trilport borde Meaux à l'est, sur la Marne. Un point qui revient souvent ici : la porte qui ferme mal se règle, elle ne se remplace pas forcément. Nous commençons toujours par regarder si un réglage des paumelles ou de la gâche suffit — c'est moins cher, et ça tient.",
   },
@@ -305,6 +326,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Chambry — 24h/24',
     postalCode: '77910',
     type: 'commune',
+    centre: [2.886, 48.9991],
     intro:
       "Chambry borde Meaux au nord. Petit village, bâti surtout individuel. Pour une urgence, deux informations nous font gagner le plus de temps : l'adresse exacte avec un repère visible depuis la rue, et la nature du problème — porte claquée, clé perdue, serrure bloquée. Le tarif vous est annoncé au téléphone avant que nous partions.",
   },
@@ -315,6 +337,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Penchard — 24h/24',
     postalCode: '77124',
     type: 'commune',
+    centre: [2.8576, 48.9908],
     intro:
       "Penchard occupe les hauteurs au nord de Meaux. Commune pavillonnaire de petite taille. Si vous vous êtes enfermé dehors et qu'une fenêtre est restée ouverte, ne tentez pas d'escalade : l'ouverture par la porte reste la voie la plus sûre, et dans la grande majorité des cas elle se fait sans abîmer la serrure.",
   },
@@ -325,6 +348,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Germigny-l’Évêque — 24h/24',
     postalCode: '77910',
     type: 'commune',
+    centre: [2.9577, 48.9888],
     intro:
       "Germigny-l'Évêque borde la Marne au nord-est de Meaux. Dans les logements qui ne sont pas occupés toute l'année, les serrures se grippent faute d'usage : si la clé devient dure à tourner, un dégrippage et un entretien suffisent le plus souvent, à condition de ne pas avoir mis d'huile dedans — elle encrasse le mécanisme au lieu de le libérer.",
   },
@@ -335,6 +359,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Chauconin-Neufmontiers — 24h/24',
     postalCode: '77124',
     type: 'commune',
+    centre: [2.8323, 48.97],
     intro:
       "Née de la réunion de deux villages, Chauconin-Neufmontiers borde Meaux à l'ouest et se compose de secteurs bâtis distincts, séparés par des espaces agricoles. Précisez lequel : à l'échelle de la commune, l'écart d'itinéraire entre les deux n'est pas négligeable, et nous préférons vous annoncer un délai juste.",
   },
@@ -345,6 +370,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Varreddes — 24h/24',
     postalCode: '77910',
     type: 'commune',
+    centre: [2.9284, 49.0055],
     intro:
       "Varreddes se trouve au nord-est de Meaux, sur la Marne. Village de taille modeste, bâti ancien par endroits : sur une porte en bois massif d'origine, un blindage se pose, mais il demande d'abord d'examiner l'encadrement. Nous le regardons sur place, et le devis est remis avant tout travaux.",
   },
@@ -355,6 +381,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Quincy-Voisins — 24h/24',
     postalCode: '77860',
     type: 'commune',
+    centre: [2.8765, 48.8982],
     intro:
       "Quincy-Voisins est une commune résidentielle au sud-est de Meaux. L'habitat individuel y domine, avec des portes d'entrée qui donnent directement sur l'extérieur : l'exposition aux intempéries fatigue les serrures plus vite qu'en cage d'escalier. Une clé qui force depuis quelques semaines se traite mieux avant la panne qu'après.",
   },
@@ -365,6 +392,7 @@ export const zones: Zone[] = [
     metaTitle: 'Serrurier & serrurerie Isles-lès-Villenoy — 24h/24',
     postalCode: '77450',
     type: 'commune',
+    centre: [2.8285, 48.9167],
     intro:
       "Isles-lès-Villenoy est une petite commune à l'ouest, au-delà de Villenoy. Nous y intervenons comme ailleurs, 24h/24 : le tarif est annoncé au téléphone, le devis remis et signé avant l'intervention, y compris en urgence. Aucun supplément n'apparaît sur la facture qui n'ait été annoncé avant.",
   }
@@ -373,3 +401,29 @@ export const zones: Zone[] = [
 export const quartiers = zones.filter((zone) => zone.type === 'quartier');
 export const communes = zones.filter((zone) => zone.type === 'commune');
 export const getZone = (slug: string) => zones.find((zone) => zone.slug === slug);
+
+/**
+ * Distance à vol d'oiseau entre deux points [longitude, latitude], en
+ * kilomètres (formule de haversine). C'est une distance de centre à centre,
+ * pas un trajet routier : la page le dit, pour ne pas laisser croire à un
+ * temps de route.
+ */
+export function distanceKm(a: [number, number], b: [number, number]): number {
+  const rad = (degres: number) => (degres * Math.PI) / 180;
+  const dLat = rad(b[1] - a[1]);
+  const dLon = rad(b[0] - a[0]);
+  const h =
+    Math.sin(dLat / 2) ** 2 + Math.cos(rad(a[1])) * Math.cos(rad(b[1])) * Math.sin(dLon / 2) ** 2;
+  return 2 * 6371 * Math.asin(Math.sqrt(h));
+}
+
+/** Les communes les plus proches d'une commune donnée, la plus proche d'abord. */
+export function communesProches(zone: Zone, nombre = 8): { zone: Zone; km: number }[] {
+  const centre = zone.centre;
+  if (!centre) return [];
+  return communes
+    .filter((autre) => autre.slug !== zone.slug && autre.centre)
+    .map((autre) => ({ zone: autre, km: distanceKm(centre, autre.centre!) }))
+    .sort((a, b) => a.km - b.km)
+    .slice(0, nombre);
+}

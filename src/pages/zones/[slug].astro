@@ -7,7 +7,7 @@ import ServiceCard from '../../components/ServiceCard.astro';
 import QuoteForm from '../../components/QuoteForm.astro';
 import Faq from '../../components/Faq.astro';
 import VerifierUnSerrurier from '../../components/VerifierUnSerrurier.astro';
-import { zones, quartiers, communes } from '../../data/zones';
+import { zones, quartiers, communes, communesProches } from '../../data/zones';
 import { services } from '../../data/services';
 import { site } from '../../data/site';
 
@@ -19,7 +19,16 @@ export function getStaticPaths() {
 }
 
 const { zone } = Astro.props;
+// Quartiers : les autres quartiers de Meaux, ils tiennent tous dans la liste.
 const nearby = zones.filter((item) => item.slug !== zone.slug && item.type === zone.type).slice(0, 8);
+
+// Communes : les plus proches de CETTE commune, par distance réelle. La liste
+// diffère donc d'une page à l'autre, et elle est vraie — voir `Zone.centre`.
+const proches = communesProches(zone);
+// « d’Isles-lès-Villenoy », pas « de Isles-lès-Villenoy ».
+const deLaZone = /^[aeiouyhàâéèêîôû]/i.test(zone.name) ? `d’${zone.name}` : `de ${zone.name}`;
+const km = (valeur: number) =>
+  `${valeur.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} km`;
 
 const crumbs = [
   { label: 'Accueil', href: '/' },
@@ -228,12 +237,31 @@ const jsonLd = [
       </div>
 
       <div class="nearby">
-        <h2>{zone.type === 'quartier' ? 'Autres quartiers de Meaux' : 'Communes voisines'}</h2>
-        <ul class="nearby-links">
-          {nearby.map((item) => (
-            <li><a href={`/zones/${item.slug}/`}>{item.name}</a></li>
-          ))}
-        </ul>
+        {zone.type === 'quartier' ? (
+          <>
+            <h2>Autres quartiers de Meaux</h2>
+            <ul class="nearby-links">
+              {nearby.map((item) => (
+                <li><a href={`/zones/${item.slug}/`}>{item.name}</a></li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <>
+            <h2>Communes les plus proches {deLaZone}</h2>
+            <ul class="nearby-links">
+              {proches.map((proche) => (
+                <li>
+                  <a href={`/zones/${proche.zone.slug}/`}>{proche.zone.name}</a>
+                  <span class="nearby-km">{km(proche.km)}</span>
+                </li>
+              ))}
+            </ul>
+            {/* Dit ce que mesure le chiffre : sans cette ligne, « 3,2 km » se lit
+                comme un trajet, et un trajet se lit comme un délai. */}
+            <p class="nearby-note">Distances à vol d'oiseau, de centre à centre.</p>
+          </>
+        )}
         <h2 class="nearby-title">
           {zone.type === 'quartier' ? 'Villes voisines' : 'Quartiers de Meaux'}
         </h2>
@@ -416,6 +444,21 @@ const jsonLd = [
     flex-wrap: wrap;
     gap: 0.4rem 0.9rem;
     font-size: 0.92rem;
+  }
+
+  .nearby-km,
+  .nearby-note {
+    color: var(--color-text-muted);
+  }
+
+  .nearby-km {
+    margin-left: 0.25rem;
+    font-size: 0.85rem;
+  }
+
+  .nearby-note {
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
   }
 
   @media (max-width: 900px) {

@@ -285,6 +285,34 @@ Règle pour toute zone ajoutée : une `intro` n'affirme que ce qui est établi. 
 vrai partout (préciser l'étage, le code d'accès) vaut mieux qu'une description de bâti inventée
 pour faire couleur locale.
 
+Chaque commune porte son `centre` ([longitude, latitude], relevé sur `geo.api.gouv.fr` le
+10 novembre 2026). Il sert à afficher, sur chaque page de commune, **les communes réellement les
+plus proches de celle-ci**, avec la distance. Jusque-là les quatorze pages affichaient la même
+liste sous le titre « Communes voisines » : à Isles-lès-Villenoy on y lisait Poincy et Trilport,
+de l'autre côté de Meaux. Les distances sont à vol d'oiseau, de centre à centre, et la page le
+dit — ne pas les présenter comme un trajet ni en déduire un délai.
+
+#### Ressemblance entre pages de zone : mesurée, pas réglée
+
+Relevé du 10 novembre 2026 (`node .github/scripts/ressemblance-zones.mjs`) : une page de zone
+ne contient en moyenne que **18 % de texte qui lui soit propre**, et partage **70 %** de son
+texte avec la page la plus proche. Le site de Lyon donne les mêmes chiffres. Le texte propre,
+c'est l'`intro` ; tout le reste — prestations, bloc de vérification, questions fréquentes,
+formulaire — vient du gabarit.
+
+C'est le profil que les moteurs rangent dans les pages satellites. Aucune sanction n'est
+constatée, mais le risque est réel et il ne se règle pas par la rédaction :
+
+- **Ne pas gonfler les pages de phrases à trous** (« X compte N habitants »). Le chiffre
+  monterait, la page n'apprendrait rien de plus à un habitant, et c'est précisément le procédé
+  visé.
+- **Ne pas retirer le bloc de vérification ou les prestations pour faire baisser le taux** : ce
+  sont eux qui font décrocher le téléphone.
+- Ce qui rend une page réellement locale ne peut venir que de Rayane : les interventions faites
+  dans la commune, le type de portes et de serrures qu'il y rencontre, les avis de clients qui y
+  habitent, la commune de chaque photo de chantier. Tant qu'il ne les a pas fournis, la décision
+  qui reste ouverte est de **garder vingt pages ou d'en regrouper** — elle lui appartient.
+
 ### Tarifs publiés — attention, ils sont opposables
 
 La grille vit dans `site.pricing` et `services[].price` (src/data/). Elle a été établie en
