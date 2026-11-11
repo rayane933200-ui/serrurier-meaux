@@ -1,0 +1,115 @@
+---
+// Trois photos d'interventions réelles, sur l'accueil.
+//
+// Ce sont les clichés de Rayane, déjà publiés sur les pages de zone et sur la
+// page d'installation. L'accueil n'en montrait aucun : c'est pourtant le seul
+// élément du site qu'un concurrent ne peut pas copier, et celui qui distingue
+// un artisan d'une plateforme.
+//
+// Trois règles, toutes reprises de CLAUDE.md :
+//
+//   - la légende décrit l'ouvrage, JAMAIS un lieu. La commune de chaque cliché
+//     n'est pas établie ; le titre du bloc ne dit donc pas « à Meaux » non plus ;
+//   - une même photo ne se décrit pas de deux façons : les légendes sont lues
+//     dans src/data/zones.ts, pas réécrites ici ;
+//   - objets et détails uniquement, aucune mise en scène de technicien.
+import { Image } from 'astro:assets';
+import { zones } from '../data/zones';
+import porteBlindee from '../assets/photos/interventions/porte-blindee-posee.jpg';
+import cylindre from '../assets/photos/interventions/cylindre-remplace-plaque-de-proprete.jpg';
+import multipoints from '../assets/photos/interventions/serrure-multipoints-en-applique.jpg';
+
+// Le même module importé deux fois donne le même objet : la comparaison par
+// référence retrouve la légende établie dans zones.ts. Une photo dont la
+// légende a disparu là-bas disparaît ici, plutôt que de paraître sans légende.
+const photos = [porteBlindee, cylindre, multipoints].flatMap((src) => {
+  const work = zones.find((zone) => zone.work?.src === src)?.work;
+  return work ? [work] : [];
+});
+---
+
+{photos.length > 0 && (
+  <section class="chantiers section" aria-labelledby="chantiers-titre">
+    <div class="container">
+      <h2 id="chantiers-titre">Nos interventions, en photos</h2>
+      <p class="chantiers-intro">
+        Les photos de ce site sont les nôtres. Pas de serrurier souriant acheté en banque
+        d’images : des portes, des serrures et des cylindres que nous avons réellement
+        ouverts, remplacés ou renforcés.
+      </p>
+
+      <div class="chantiers-grid">
+        {photos.map((photo) => (
+          <figure>
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              widths={[320, 480, 720]}
+              sizes="(max-width: 700px) 100vw, 360px"
+              quality={72}
+              loading="lazy"
+            />
+            <figcaption>{photo.alt}</figcaption>
+          </figure>
+        ))}
+      </div>
+
+      <p class="chantiers-note">
+        Photos prises lors de nos interventions. Cela se vérifie d’un coup d’œil, et c’est le
+        premier test de sérieux d’un site de serrurerie.
+      </p>
+    </div>
+  </section>
+)}
+
+<style>
+  /* Fond blanc et filet bas : le bloc suit « Pourquoi choisir », en
+     --color-bg-alt, et précède « Où nous intervenons », blanc lui aussi. */
+  .chantiers {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .chantiers-intro {
+    max-width: 62ch;
+    color: var(--color-text-muted);
+  }
+
+  .chantiers-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  @media (min-width: 700px) {
+    .chantiers-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .chantiers-grid figure {
+    margin: 0;
+  }
+
+  .chantiers-grid img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+  }
+
+  .chantiers-grid figcaption {
+    margin-top: 0.45rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+
+  .chantiers-note {
+    margin: var(--space-md) 0 0;
+    font-size: 0.92rem;
+    color: var(--color-text-muted);
+  }
+</style>

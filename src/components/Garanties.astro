@@ -1,0 +1,180 @@
+---
+// Bloc « assurance et garanties » de l'accueil. Repris du dépôt de Lyon le
+// 11 novembre 2026 : mêmes quatre lignes, mêmes formulations.
+//
+// Il ne contient AUCUNE promesse nouvelle : chaque ligne est déjà publiée
+// ailleurs sur ce site (bloc « Comment vérifier à qui vous avez affaire »,
+// page tarifs, page à propos). L'accueil était la seule page d'arrivée à n'en
+// porter aucune.
+//
+// Ce qu'on NE dit pas, et pourquoi — à relire avant d'ajouter une ligne :
+//
+//   - aucun nom d'assureur, aucun numéro de contrat. La décennale est bien
+//     souscrite (confirmé par Rayane le 5 octobre 2026), mais `legal.insurer`,
+//     `legal.insurancePolicy` et `legal.insuranceCoverage` sont vides. On
+//     annonce donc la couverture et on promet l'attestation, sans détailler ce
+//     qu'on ne peut pas prouver ;
+//   - jamais « agréé par les assurances » ni le logo d'un assureur : aucun
+//     partenariat n'existe, et c'est la formule la plus répandue du secteur
+//     chez ceux qui n'ont rien ;
+//   - aucune note, aucune étoile, aucun nombre d'avis tant qu'il n'y a pas
+//     d'avis réels publiés sur ce site.
+//
+// Les lignes se construisent à partir des données : si `credentials.decennale`
+// repasse à false, la ligne disparaît au lieu de mentir.
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+
+interface Garantie {
+  icon: 'shield' | 'lock' | 'wrench' | 'clock';
+  titre: string;
+  texte: string;
+}
+
+const garanties: Garantie[] = [];
+
+if (site.credentials.decennale) {
+  garanties.push({
+    icon: 'shield',
+    titre: 'Assurance décennale souscrite',
+    texte:
+      'L’attestation est remise sur simple demande, avant l’intervention si vous le souhaitez.',
+  });
+}
+
+if (site.credentials.diploma) {
+  garanties.push({
+    icon: 'wrench',
+    titre: site.credentials.diplomaExact || site.credentials.diploma,
+    texte:
+      'La serrurerie s’apprend : l’ouverture fine évite de détruire une serrure qui pouvait être conservée.',
+  });
+}
+
+garanties.push(
+  {
+    icon: 'lock',
+    titre: 'Devis signé avant de commencer',
+    texte:
+      'Gratuit, détaillé, remis et signé avant toute intervention — y compris la nuit et en urgence.',
+  },
+  {
+    icon: 'clock',
+    titre: 'Le prix annoncé est celui payé',
+    texte: `Le tarif est confirmé par téléphone avant que nous prenions la route. ${site.legal.vatNumber} : aucun montant ne s’ajoute à l’arrivée.`,
+  },
+);
+---
+
+<section class="garanties section" aria-labelledby="garanties-titre">
+  <div class="container">
+    <h2 id="garanties-titre">Assurance et garanties</h2>
+    <p class="garanties-intro">
+      Ce qu’un serrurier sérieux doit pouvoir montrer, et que vous êtes en droit d’exiger
+      avant qu’il touche à votre porte.
+    </p>
+
+    <div class="garanties-grid">
+      {garanties.map((g) => (
+        <article class="garantie">
+          <span class="garantie-pastille"><Icon name={g.icon} size={22} /></span>
+          <h3>{g.titre}</h3>
+          <p>{g.texte}</p>
+        </article>
+      ))}
+    </div>
+
+    <p class="garanties-note">
+      Un professionnel qui refuse de vous montrer son attestation d’assurance ou de vous
+      laisser un devis écrit n’a pas à entrer chez vous.
+      <a href="/blog/reconnaitre-serrurier-serieux/">Reconnaître un serrurier sérieux</a>.
+    </p>
+  </div>
+</section>
+
+<style>
+  /* Un filet plutôt qu'un fond alterné : la section des prestations qui précède
+     est sur fond blanc, et « Pourquoi choisir », qui suit, est déjà en
+     --color-bg-alt. Le filet sépare sans décaler l'alternance du reste de la
+     page. */
+  .garanties {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .garanties-intro {
+    max-width: 60ch;
+    color: var(--color-text-muted);
+  }
+
+  /* Paliers explicites plutôt qu'un auto-fit. Avec quatre cartes, `auto-fit`
+     donne trois colonnes et une quatrième seule sur la ligne suivante dès que
+     la fenêtre tombe sous ~1100 px. Des paliers 4 / 2 / 1 ne laissent jamais
+     d'orpheline. À revoir si le nombre de garanties change. */
+  .garanties-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
+  }
+
+  @media (min-width: 600px) {
+    .garanties-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .garanties-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .garantie {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-md);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Pastille : l'or en REMPLISSAGE, avec l'icône en sombre par-dessus. L'or en
+     trait sur fond blanc ne passerait pas le contraste (2,18:1) — voir la
+     règle des trois ors dans CLAUDE.md. */
+  .garantie-pastille {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--color-gold);
+    margin-bottom: 0.7rem;
+  }
+
+  .garantie-pastille :global(svg) {
+    color: var(--color-black);
+  }
+
+  .garantie h3 {
+    font-size: 1.02rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .garantie p {
+    font-size: 0.92rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .garanties-note {
+    margin-top: var(--space-md);
+    font-size: 0.92rem;
+    color: var(--color-text-muted);
+    border-left: 3px solid var(--color-gold-dark);
+    padding-left: 0.9rem;
+  }
+
+  .garanties-note a {
+    color: var(--color-gold-text);
+  }
+</style>

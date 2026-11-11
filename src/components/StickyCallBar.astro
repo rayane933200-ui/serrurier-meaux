@@ -75,6 +75,10 @@ import { site } from '../data/site';
     /* Filet de sécurité pour les écrans de 320px : le numéro ne se coupe
        jamais, c'est « Devis gratuit » qui passe sur deux lignes. */
     .sticky-call .sticky-call-secondary {
+      /* Le contour est redit ici : posé sur .sticky-call-secondary seul, il
+         perdait contre le « border: 2px solid transparent » de .sticky-call a,
+         plus spécifique, et le bouton paraissait sans bord. */
+      border-color: var(--band-border-ui);
       min-width: 0;
       white-space: normal;
       text-align: center;

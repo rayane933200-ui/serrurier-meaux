@@ -128,7 +128,10 @@ const crumbs = [{ label: 'Accueil', href: '/' }, { label: 'Contact' }];
     align-items: flex-start;
   }
 
-  .contact-info :global(svg) {
+  /* Restreint aux <li> comme la règle du dessous : sans cela le sélecteur
+     attrapait aussi l'icône du bouton doré .contact-call et la peignait en or
+     sombre sur or, à 1,62:1. Elle reprend maintenant le noir du libellé. */
+  .contact-info li :global(svg) {
     color: var(--color-gold-dark);
     flex-shrink: 0;
     margin-top: 0.15rem;

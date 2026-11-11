@@ -8,6 +8,8 @@ import HeroIllustration from '../components/HeroIllustration.astro';
 import ReassuranceBar from '../components/ReassuranceBar.astro';
 import Faq from '../components/Faq.astro';
 import QuoteForm from '../components/QuoteForm.astro';
+import Garanties from '../components/Garanties.astro';
+import Chantiers from '../components/Chantiers.astro';
 import { services } from '../data/services';
 import { quartiers, communes } from '../data/zones';
 import { featuredFaq } from '../data/faq';
@@ -100,6 +102,8 @@ const jsonLd = {
     </div>
   </section>
 
+  <Garanties />
+
   <section class="section section-alt">
     <div class="container why-grid">
       <div>
@@ -130,6 +134,8 @@ const jsonLd = {
       </div>
     </div>
   </section>
+
+  <Chantiers />
 
   <section class="section">
     <div class="container">
@@ -200,11 +206,9 @@ const jsonLd = {
 </BaseLayout>
 
 <style>
-  /* Le hero reste un bandeau sombre dans un site clair, et ce n'est pas un
-     reste du theme precedent : l'illustration est une scene de nuit, et le
-     bloc fait la transition entre l'en-tete sombre -- impose par le fond noir
-     incruste du logo -- et le corps de page clair. Les variables --band-*
-     sont faites pour ce contexte ; n'y jamais employer --color-text. */
+  /* Le hero est blanc depuis le 27 octobre 2026, comme le reste de la page :
+     --band-bg vaut #ffffff. Seule l'illustration garde son fond sombre, avec
+     sa propre palette --illu-*. */
   .hero {
     background: var(--band-bg);
     color: var(--color-text);
@@ -212,7 +216,6 @@ const jsonLd = {
     border-bottom: 1px solid var(--band-border);
   }
 
-  /* Les titres du corps sont sombres : ici il faut les reclaircir. */
   .hero h1,
   .hero h2,
   .hero h3 {
@@ -262,13 +265,16 @@ const jsonLd = {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    /* Reste du hero sombre : le cadre etait en blanc translucide, donc blanc
+       sur blanc depuis le 27 octobre, et les deux chiffres flottaient sans
+       contour. Meme cadre que les cartes du site. */
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius);
     padding: 0.75rem 1.1rem;
   }
 
-  /* Le hero est un bandeau sombre : l'or pur y est a 8,98:1. */
+  /* Icone sur fond clair : --color-gold-text (5,56:1), jamais l'or pur. */
   .hero-stat :global(svg) {
     color: var(--color-gold-text);
     flex-shrink: 0;

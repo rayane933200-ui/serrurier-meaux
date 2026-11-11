@@ -54,6 +54,40 @@ volontairement **pas** dans les données structurées, l'activité étant une ac
 De même, l'enseigne SIRENE est **Rexpress**, mais le nom affiché sur le site est **Serrurier**
 (choix de l'utilisateur) ; Rexpress n'apparaît que dans les mentions légales.
 
+### Le registre SIRENE ne concorde plus avec le site — laissé en l'état sur décision de Rayane
+
+Relevé le 11 novembre 2026 sur l'API publique de l'État
+(`recherche-entreprises.api.gouv.fr`, données à jour du 10 novembre) :
+
+| | Ce que publie le site | Ce que porte le registre |
+|---|---|---|
+| SIRET | 945 246 874 **00016** | **00016 fermé le 1er mai 2026** ; siège actif : 945 246 874 **00024** |
+| Siège | 23B allée du Général Joubert, 93320 Les Pavillons-sous-Bois | 2 rue Léon Blum, 69100 Villeurbanne, depuis le 1er mai 2026 |
+| Enseigne | Rexpress | aucune sur l'établissement actif ; l'ancien portait « A VOS CLES » |
+
+La source du site est l'avis de situation SIRENE du 9 novembre 2025, antérieur au transfert.
+
+**Rayane a été prévenu le jour même et a répondu de laisser en l'état pour le moment.** Ne pas
+corriger ces champs de sa propre initiative : ce sont des mentions légales opposables, et lui
+seul sait ce que portent ses devis et ce qu'il a déclaré.
+
+Ce que cela implique tant que ce n'est pas réglé :
+
+- **Ne pas afficher le SIRET à de nouveaux endroits, et ne pas ajouter de lien vers l'annuaire
+  des entreprises.** Le site invite déjà le visiteur à vérifier (bloc « Comment vérifier à qui
+  vous avez affaire », sur 26 pages, et page À propos) : celui qui le fait trouve un
+  établissement fermé et un siège à Villeurbanne. Un lien direct rendrait la discordance
+  visible en un clic. L'idée d'une ligne SIRET dans le pied de page a été écartée pour cette
+  raison le 11 novembre 2026.
+- Le site de Lyon publie les mêmes valeurs, et son `CLAUDE.md` donne « 2 rue Léon Piat » pour
+  l'établissement de Villeurbanne là où le registre écrit « 2 rue Léon Blum ». À signaler au
+  moment où Lyon sera rouvert — une adresse qui ne concorde pas rompt le rapprochement avec les
+  fiches d'annuaire.
+- Si Rayane confirme le registre, quatre champs de `site.legal` changent ensemble (`siret`,
+  `address`, `postalCode`, `addressCity`), et la phrase « la ville ciblée est
+  géographiquement cohérente avec l'implantation réelle », ci-dessus, devient fausse : le siège
+  serait à 430 km de Meaux.
+
 ### La promesse de délai, et pourquoi elle est à surveiller
 
 Le site annonce **30 minutes, 24h/24 et 7j/7**, comme celui de Lyon. Rayane l'a décidé le
@@ -215,6 +249,33 @@ de contenu en dur dans une page.
 Le site compte **61 pages** générées : 15 pages fixes (dont tarifs, assurance habitation,
 après un cambriolage, marques de serrures, installation Paris / Île-de-France, politique de
 confidentialité, blog et 404), 5 pages prestation, 20 pages locales, 20 articles de blog.
+
+### Accueil : deux blocs de confiance, aucune promesse nouvelle
+
+Ajoutés le 11 novembre 2026, à la demande de Rayane (« fais en sorte que les gens aient
+confiance »). L'accueil était la seule page d'arrivée qui ne portait ni garantie ni photo réelle.
+
+- `Garanties.astro` — décennale souscrite, diplôme, devis signé avant de commencer, prix annoncé
+  égal au prix payé. Repris du dépôt de Lyon, mêmes formulations. **Chaque ligne était déjà
+  publiée ailleurs sur ce site** : le bloc ne crée aucun engagement.
+- `Chantiers.astro` — trois photos d'interventions réelles. Les légendes sont **lues dans
+  `zones.ts`**, pas réécrites, et le titre ne nomme aucun lieu.
+
+Ce qui a été volontairement laissé de côté, parce que cela demande une décision de Rayane et
+non une mise en page :
+
+- **Les trois avis clients publiés à Lyon.** Ce sont des avis sur l'entreprise, mais l'un dit
+  « à Lyon » en toutes lettres, et `src/data/` ne se recopie pas d'un dépôt à l'autre. Des avis
+  de clients de Meaux ou d'Île-de-France vaudraient mieux ; à défaut, c'est à lui de dire s'il
+  veut ceux de Lyon ici.
+- **« Vous ne payez rien si vous refusez le devis, déplacement compris. »** Engagement opposable
+  confirmé le 3 novembre 2026 pour Lyon. Il coûte un aller-retour à chaque refus : ne pas le
+  publier ici sans qu'il l'ait redit pour Meaux.
+- **Le mot « garantie » du hero.** L'accueil écrit « intervention garantie en moins de
+  30 minutes » ; la FAQ, sur la même page, écrit « nous visons […] sans promesse que nous ne
+  pourrions pas tenir ». Les deux ne disent pas la même chose, et « garantie » est le terme
+  qui engage. Signalé le 11 novembre 2026 ; la promesse de délai ne se touche pas sans lui
+  (voir plus haut).
 
 ### `/installation-serrure-porte-paris/` : la seule page qui sorte de Meaux
 
@@ -539,6 +600,15 @@ pas à l'œil, et l'objectif est **zéro échec sur chaque page**. Deux pièges 
    qui donne de faux négatifs. Il faut un chargement réel : une visite, ou une **iframe de même
    origine** — l'iframe charge le document avec ses propres `<style>`.
 
+Un second audit est passé le 11 novembre 2026 sur les 61 pages, cette fois en huit largeurs
+(1280, 1200, 1101, 768, 561, 375, 360 et 320 px) pour les débordements, et en 1280 et 375 px
+pour le contraste. Il a relevé et fait corriger : une icône en or sombre sur bouton doré, à
+1,62:1, sur `/contact/` ; trois débordements d'en-tête (4 px vers 1101 px, 6 px vers 561 px
+dans une fenêtre à barre de défilement, 19 px à 320 px) ; le contour invisible de « Devis
+gratuit » dans la barre d'appel ; les cadres blancs sur blanc des deux chiffres du hero.
+**Un contraste se mesure aussi sur les icônes** (seuil 3:1) : le premier audit ne testait que
+le texte, et c'est pour cela que l'icône lui avait échappé.
+
 Un audit conforme à ces deux règles est passé le 26 octobre 2026 sur les 60 pages, en 1280 px et
 en 375 px : 8 803 éléments testés, zéro échec. Il avait révélé **35 défauts hérités du site de
 Lyon** — du texte en `--color-white` posé sur fond clair (jusqu'à du blanc sur blanc, 1:1) et un
@@ -618,6 +688,9 @@ Réglé :
 
 En attente — **ne rien inventer pour combler ces trous** :
 
+- [ ] **SIRET et adresse du siège** — le registre SIRENE porte un autre SIRET et un siège à
+      Villeurbanne depuis le 1er mai 2026. Laissé en l'état sur décision de Rayane le
+      11/11/2026 ; voir « Le registre SIRENE ne concorde plus avec le site ».
 - [ ] **Téléphone de l'hébergeur** — `site.legal.host.phone` est vide. La LCEN impose de le
       porter dans les mentions légales. Il n'a pas pu être vérifié à une source officielle pour
       GitHub, Inc. À relever à la main plutôt qu'à recopier d'un annuaire : publier un numéro

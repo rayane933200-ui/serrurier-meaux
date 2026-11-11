@@ -282,6 +282,30 @@ const currentPath = Astro.url.pathname;
     }
   }
 
+  /* Juste au-dessus de 1100px, logo, navigation complète et numéro demandent
+     1042px alors que le conteneur n'en offre que 1038 : le bouton d'appel
+     mordait de 4px sur la marge. Mesuré le 11 novembre 2026 sur les 61 pages.
+     L'écart resserré rend 16px, ce qui suffit jusqu'à 1200px.
+     La borne est 1100.01 et non 1101 : une fenêtre zoomée ou un écran à
+     125 % donne des largeurs à virgule, et à 1100,5px ni cette règle ni celle
+     du dessus ne s'appliquait — mesuré, le débordement revenait. */
+  @media (min-width: 1100.01px) and (max-width: 1199px) {
+    .header-inner {
+      gap: var(--space-sm);
+    }
+  }
+
+  /* Juste avant que le numéro ne se replie en icône, logo, numéro et menu
+     demandent 504px. Une fenêtre d'ordinateur étroite, dont la barre de
+     défilement retire 15px, n'en offre que 498 entre 561 et 567px : le menu
+     mordait de 6px sur la marge. Borne à virgule pour la même raison que
+     plus haut. */
+  @media (min-width: 560.01px) and (max-width: 600px) {
+    .header-inner {
+      gap: var(--space-xs);
+    }
+  }
+
   /* Sous 560px le numéro ne tient plus à côté du logo et du menu : le bouton
      devient un bouton d'appel circulaire. On garde 44px de côté (cible tactile
      minimale recommandée) au lieu de conserver les marges d'un bouton large,
@@ -305,6 +329,16 @@ const currentPath = Astro.url.pathname;
        dont le bouton d'appel et le menu ont besoin. Le footer la conserve. */
     .brand :global(.logo-subtitle) {
       display: none;
+    }
+  }
+
+  /* À 320px, logo, bouton d'appel et menu demandent 291px pour 272 : le menu
+     mordait de 19px sur la marge. On resserre l'écart et la marge latérale de
+     l'en-tête plutôt que de rapetisser le logo ou la cible tactile du menu. */
+  @media (max-width: 340px) {
+    .header-inner {
+      gap: var(--space-xs);
+      padding-inline: 0.75rem;
     }
   }
 </style>
