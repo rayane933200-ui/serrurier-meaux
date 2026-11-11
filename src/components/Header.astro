@@ -44,10 +44,25 @@ const currentPath = Astro.url.pathname;
     {/* Le nom accessible évite de répéter le numéro : Google le remplace pour
         les visiteurs venus d'une annonce, et un aria-label figé ferait annoncer
         à un lecteur d'écran un numéro différent de celui qui est affiché. */}
-    <a class="btn btn-primary phone-cta" href={site.phoneHref} aria-label="Appeler le serrurier">
-      <Icon name="phone" size={18} />
-      <span>{site.phoneDisplay}</span>
-    </a>
+    <div class="header-contact">
+      <a class="btn btn-primary phone-cta" href={site.phoneHref} aria-label="Appeler le serrurier">
+        <Icon name="phone" size={18} />
+        <span>{site.phoneDisplay}</span>
+      </a>
+      {/* Pas de numéro dans ce lien, ni affiché ni lu : Google remplace à
+          l'écran le numéro des visiteurs venus d'une annonce par un numéro de
+          transfert, qui n'existe pas sur WhatsApp. */}
+      <a
+        class="whatsapp-cta"
+        href={site.whatsappHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Écrire ou appeler sur WhatsApp"
+        title="WhatsApp"
+      >
+        <Icon name="whatsapp" size={22} />
+      </a>
+    </div>
 
     <details class="nav-toggle">
       <summary aria-label="Ouvrir le menu de navigation">
@@ -131,12 +146,10 @@ const currentPath = Astro.url.pathname;
     padding: 0;
   }
 
-  /* Au-delà de 1200px la place revient, on rend son air à la navigation. */
-  @media (min-width: 1200px) {
-    .nav-desktop ul {
-      gap: var(--space-md);
-    }
-  }
+  /* Jusqu'au 10 novembre 2026, la navigation reprenait un écart plus large
+     au-delà de 1200px. Le bouton WhatsApp occupe désormais cette place : avec
+     l'écart large, l'en-tête dépassait son conteneur d'une cinquantaine de
+     pixels. Ne pas le rétablir sans mesurer. */
 
   .nav-desktop a {
     font-family: var(--font-heading);
@@ -157,6 +170,50 @@ const currentPath = Astro.url.pathname;
 
   .phone-cta span {
     white-space: nowrap;
+  }
+
+  /* Le bouton WhatsApp prend la hauteur du bouton d'appel par étirement ; sa
+     largeur est fixée à cette même hauteur (56px) pour qu'il reste carré.
+     aspect-ratio ne suffit pas : un élément étiré par flex ne reporte pas sa
+     hauteur sur sa largeur. */
+  .header-contact {
+    display: flex;
+    align-items: stretch;
+    gap: var(--space-xs);
+  }
+
+  /* Contour et non aplat : l'appel reste l'action principale, et l'or reste
+     la seule couleur d'accent de la page. Le glyphe est en --band-text
+     (17,74:1), le contour en --band-border-ui (3,77:1). */
+  .whatsapp-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    min-height: 44px;
+    color: var(--band-text);
+    border: 2px solid var(--band-border-ui);
+    border-radius: var(--radius);
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .whatsapp-cta:hover,
+  .whatsapp-cta:focus-visible {
+    color: var(--color-gold-text);
+    border-color: var(--color-gold-dark);
+  }
+
+  /* Le bouton ne paraît dans l'en-tête qu'à partir de 1200px, seule largeur où
+     il tient à coup sûr. Mesuré le 10 novembre 2026 : entre 1101 et 1199px la
+     navigation complète ne laisse que quelques pixels, et entre 561 et 631px
+     il faisait déborder l'en-tête de 71px, défilement horizontal compris.
+     Sous 1100px la barre d'appel fixe le porte déjà, à côté du numéro ; le pied
+     de page et la page Contact le portent partout. Une seule règle, plutôt
+     qu'une plage par largeur où il se trouve tenir. */
+  @media (max-width: 1199px) {
+    .whatsapp-cta {
+      display: none;
+    }
   }
 
   .nav-toggle {

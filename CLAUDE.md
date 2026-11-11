@@ -436,6 +436,41 @@ choix enregistré → `document.cookie` **vide** ; après « Accepter » → `_g
 `_uetsid` et `_uetvid` ; après « Refuser » → vide à nouveau. Mesuré le
 10 novembre 2026, les trois états conformes.
 
+### Bouton WhatsApp : un lien, pas un module
+
+Posé à côté du numéro le 10 novembre 2026, à la demande de Rayane, pour que les
+visiteurs puissent l'appeler ou lui écrire sur WhatsApp. L'adresse vit dans
+`site.whatsappHref` ; le bouton paraît dans l'en-tête, la barre d'appel mobile,
+le pied de page et la page Contact.
+
+- **C'est un lien `wa.me`, et il doit le rester.** Rien n'est chargé depuis Meta
+  tant que le visiteur ne le touche pas : pas de traceur, donc pas de
+  consentement à recueillir, et le bandeau n'a pas eu à changer. Le remplacer par
+  une bulle de discussion ou un module tiers ferait charger un script externe à
+  chaque visite et rendrait fausse la politique de confidentialité, qui décrit
+  ce lien nommément.
+- **Il ouvre une conversation, pas un appel.** WhatsApp ne propose aucun lien qui
+  lance directement un appel : le visiteur appelle depuis la conversation.
+- **Pas de numéro dans le libellé du lien.** Google remplace à l'écran le numéro
+  des visiteurs venus d'une annonce par un numéro de transfert, qui n'existe pas
+  sur WhatsApp.
+- **Il n'est pas compté comme un appel.** Les deux balises publicitaires
+  n'écoutent que les liens `tel:`. Le ranger sous la conversion `appel`
+  fausserait les statistiques des campagnes ; le mesurer à part est une décision
+  de Rayane, pas un réglage à faire en passant.
+- **Il est aux couleurs de la charte, pas en vert WhatsApp.** L'or reste la seule
+  couleur d'accent. Passer au vert demande son accord.
+- **Le lien suppose que le 06 52 91 50 53 est bien le numéro du compte
+  WhatsApp.** Ce n'est pas vérifiable depuis le dépôt. Si le numéro change,
+  changer `phoneHref` et `whatsappHref` ensemble.
+- **Dans l'en-tête, il ne paraît qu'à partir de 1200px.** En dessous, il ne
+  tient pas partout : il faisait déborder l'en-tête de 71px entre 561 et 631px.
+  Sous 1100px la barre d'appel fixe le porte à côté du numéro ; entre 1101 et
+  1199px il ne reste que le pied de page et la page Contact. L'en-tête était
+  réglé au pixel : l'écart élargi de la navigation au-delà de 1200px a été
+  retiré pour lui faire place, il reste 6px de marge. Mesurer avant d'y
+  ajouter quoi que ce soit.
+
 ### Blanc épuré : la règle des trois ors
 
 Le site est en **blanc franc** (`#ffffff`) depuis le 27 octobre 2026, à la

@@ -11,6 +11,16 @@ import { site } from '../data/site';
     <Icon name="phone" size={18} />
     <span>{site.phoneDisplay}</span>
   </a>
+  <a
+    class="sticky-call-whatsapp"
+    href={site.whatsappHref}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Écrire ou appeler sur WhatsApp"
+    title="WhatsApp"
+  >
+    <Icon name="whatsapp" size={22} />
+  </a>
   <a class="sticky-call-secondary" href="/contact/">Devis gratuit</a>
 </div>
 
@@ -43,7 +53,9 @@ import { site } from '../data/site';
       font-family: var(--font-heading);
       font-weight: 700;
       font-size: 0.95rem;
-      padding: 0.75rem 0.9rem;
+      /* 0.6rem et non 0.9rem de marge latérale depuis l'ajout de WhatsApp :
+         trois boutons doivent tenir sur 360px sans que le libellé se replie. */
+      padding: 0.75rem 0.6rem;
       border-radius: var(--radius);
       border: 2px solid transparent;
       text-decoration: none;
@@ -58,6 +70,31 @@ import { site } from '../data/site';
     .sticky-call-secondary {
       color: var(--color-text);
       border-color: var(--band-border-ui);
+    }
+
+    /* Filet de sécurité pour les écrans de 320px : le numéro ne se coupe
+       jamais, c'est « Devis gratuit » qui passe sur deux lignes. */
+    .sticky-call .sticky-call-secondary {
+      min-width: 0;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.15;
+    }
+
+    /* Carré, à sa largeur propre : il ne doit pas prendre au numéro la place
+       qu'il lui faut pour tenir sur une ligne à 320px. */
+    .sticky-call .sticky-call-whatsapp {
+      flex: 0 0 auto;
+      min-width: 48px;
+      padding-inline: 0;
+      color: var(--band-text);
+      border-color: var(--band-border-ui);
+    }
+  }
+
+  @media (max-width: 380px) {
+    .sticky-call a {
+      font-size: 0.88rem;
     }
   }
 </style>

@@ -11,6 +11,19 @@ export const site = {
   phoneHref: 'tel:+33652915053',
   /** Format international, attendu par les donnees structurees schema.org */
   phoneE164: '+33652915053',
+  /**
+   * Lien « cliquer pour discuter » de WhatsApp, posé à côté du numéro le
+   * 10 novembre 2026 à la demande de Rayane.
+   *
+   * wa.me n'accepte que des chiffres, indicatif compris, sans « + » ni espace.
+   * Le lien suppose que ce numéro est bien celui du compte WhatsApp : si le
+   * téléphone change, changer les deux, sinon le bouton aboutit au message
+   * d'erreur de WhatsApp et non à une conversation.
+   *
+   * Il ouvre une conversation, d'où le visiteur écrit ou appelle. WhatsApp ne
+   * propose aucun lien qui lance directement un appel.
+   */
+  whatsappHref: 'https://wa.me/33652915053',
   email: 'Contact.avoscles@gmail.com',
 
   // Couverture et disponibilité
