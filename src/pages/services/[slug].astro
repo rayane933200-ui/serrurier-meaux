@@ -106,7 +106,11 @@ const jsonLd = [
         {service.details.map((detail) => (
           <div class="service-detail">
             <h2>{detail.title}</h2>
-            <p>{detail.body}</p>
+            {/* set:html et non {detail.body} : plusieurs textes de services.ts
+                portent un lien vers un article. Rendus tels quels, ils
+                affichaient le code du lien au visiteur — relevé le
+                14 novembre 2026 sur deux pages. Même règle que le blog. */}
+            <p set:html={detail.body} />
           </div>
         ))}
       </div>

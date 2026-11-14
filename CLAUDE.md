@@ -246,9 +246,9 @@ ajouter une entrée dans le fichier de données correspondant ; la page, le site
 interne du footer et les données structurées suivent automatiquement. Ne pas recréer de tableaux
 de contenu en dur dans une page.
 
-Le site compte **61 pages** générées : 15 pages fixes (dont tarifs, assurance habitation,
+Le site compte **64 pages** générées : 15 pages fixes (dont tarifs, assurance habitation,
 après un cambriolage, marques de serrures, installation Paris / Île-de-France, politique de
-confidentialité, blog et 404), 5 pages prestation, 20 pages locales, 20 articles de blog.
+confidentialité, blog et 404), 5 pages prestation, 20 pages locales, 23 articles de blog.
 
 ### Accueil : deux blocs de confiance, aucune promesse nouvelle
 
@@ -305,6 +305,16 @@ Le blog suit le même principe : `src/data/articles/<slug>.ts` par article, agr�
 `src/data/articles.ts`. Les paragraphes sont rendus avec `set:html` pour que les liens de
 maillage vers les prestations fonctionnent — ne pas revenir à `{paragraphe}`, cela échapperait
 le HTML et supprimerait tout le maillage interne.
+
+Trois articles sur la porte blindée ont été ajoutés le 14 novembre 2026, à la demande de Rayane :
+le déroulement de la pose, le choix entre bloc-porte et blindage, les autorisations en
+copropriété et en location. Ils ne publient **aucun prix** — le coût d'une porte se chiffre au
+devis, et les 200 € de la page d'installation sont un plancher de pose, pas le prix d'une porte
+(voir plus haut). Les règles de droit du troisième ont été relues à leur source ; le commentaire
+en tête du fichier dit lesquelles ne doivent pas être « arrondies ».
+
+**Les textes de `services.ts` se rendent eux aussi avec `set:html`** depuis cette date : deux
+pages de prestation affichaient au visiteur le code d'un lien (`<a href=…>`) au lieu du lien.
 
 Les polices Montserrat et Roboto sont **auto-hébergées** dans `public/fonts/` : ne jamais
 réintroduire d'appel à Google Fonts, cela transmettrait l'IP des visiteurs hors UE et rendrait

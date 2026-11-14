@@ -128,7 +128,7 @@ export const services: Service[] = [
     details: [
       {
         title: 'Blindage de porte ou porte blindée : la différence',
-        body: "Le blindage renforce une porte que vous conservez : une tôle d'acier est appliquée sur le vantail, l'encadrement est renforcé par des cornières, et la serrure est remplacée par un modèle multipoints. La porte blindée, elle, est un bloc-porte complet — vantail et dormant conçus ensemble — qui remplace l'existant. Le blindage coûte moins cher et conserve l'aspect intérieur de la porte ; le bloc-porte offre un niveau de résistance supérieur et homogène. Le choix dépend de l'état de la porte, de la configuration du bâti et de votre budget.",
+        body: "Le blindage renforce une porte que vous conservez : une tôle d'acier est appliquée sur le vantail, l'encadrement est renforcé par des cornières, et la serrure est remplacée par un modèle multipoints. La porte blindée, elle, est un bloc-porte complet — vantail et dormant conçus ensemble — qui remplace l'existant. Le blindage coûte moins cher et conserve l'aspect intérieur de la porte ; le bloc-porte offre un niveau de résistance supérieur et homogène. Le choix dépend de l'état de la porte, de la configuration du bâti et de votre budget — les critères sont détaillés dans notre article <a href=\"/blog/porte-blindee-ou-blindage-de-porte/\">porte blindée ou blindage de la porte existante</a>.",
       },
       {
         title: 'Les trois points faibles à traiter ensemble',
@@ -136,7 +136,7 @@ export const services: Service[] = [
       },
       {
         title: 'Copropriété et porte palière : ce qu’il faut anticiper',
-        body: "Dans un immeuble, modifier l'aspect extérieur d'une porte palière peut relever du règlement de copropriété, notamment quand la porte donne sur une cage d'escalier classée ou quand l'harmonie des paliers est imposée. Un blindage intérieur, qui ne change pas la face visible depuis le palier, pose généralement moins de difficultés. Renseignez-vous auprès de votre syndic avant les travaux : cela évite d'avoir à revenir en arrière.",
+        body: "Dans un immeuble, modifier l'aspect extérieur d'une porte palière peut relever du règlement de copropriété, notamment quand la porte donne sur une cage d'escalier classée ou quand l'harmonie des paliers est imposée. Un blindage intérieur, qui ne change pas la face visible depuis le palier, pose généralement moins de difficultés. Renseignez-vous auprès de votre syndic avant les travaux : cela évite d'avoir à revenir en arrière. Les démarches sont détaillées dans notre article <a href=\"/blog/porte-blindee-copropriete-location-autorisations/\">porte blindée en copropriété ou en location</a>.",
       },
       {
         title: 'Niveaux de résistance et assurance',

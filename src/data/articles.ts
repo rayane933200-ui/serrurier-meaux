@@ -25,6 +25,9 @@ import sansDegat from './articles/ouverture-sans-degat-ce-que-ca-veut-dire';
 import verrou from './articles/ajouter-un-verrou-supplementaire';
 import diagnostic from './articles/quelle-panne-de-serrure-avez-vous';
 import securiser from './articles/securiser-son-logement-par-ou-commencer';
+import poseBlindee from './articles/installation-porte-blindee-etapes';
+import blindeeOuBlindage from './articles/porte-blindee-ou-blindage-de-porte';
+import blindeeCopropriete from './articles/porte-blindee-copropriete-location-autorisations';
 
 export type { Article, ArticleSection } from './articles/types';
 
@@ -49,6 +52,9 @@ export const articles: Article[] = [
   verrou,
   diagnostic,
   securiser,
+  poseBlindee,
+  blindeeOuBlindage,
+  blindeeCopropriete,
 ].sort((a, b) => b.publishedOn.localeCompare(a.publishedOn));
 
 export const getArticle = (slug: string) => articles.find((article) => article.slug === slug);
